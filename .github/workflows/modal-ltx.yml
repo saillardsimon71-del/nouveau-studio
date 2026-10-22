@@ -65,7 +65,8 @@ env:
   PYTHONUNBUFFERED: "1"
   MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
   MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
-  MODAL_WORKSPACE_EXPECTED: ${{ vars.MODAL_WORKSPACE_EXPECTED }}
+  # Workspace verified by the successful 2026-10-22 preflight. Refuse other accounts.
+  MODAL_WORKSPACE_EXPECTED: kulejean567
   PVS_MODAL_APP: pvs-ltx
   PVS_MODAL_LTX_VOLUME: studio-ltx25-models
   PVS_MODAL_GPU: ${{ vars.MODAL_GPU || 'L40S' }}
