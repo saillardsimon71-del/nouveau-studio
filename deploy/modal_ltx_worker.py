@@ -30,6 +30,7 @@ Deploy-time overrides:
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import math
 import os
@@ -94,7 +95,7 @@ image = (
         "pip install --no-cache-dir -r /opt/ComfyUI/requirements.txt "
         "torch==2.8.0 --extra-index-url https://download.pytorch.org/whl/cu128",
     )
-    .env({"PVS_COMFYUI_DIR": "/opt/ComfyUI"})
+    .env({"PVS_COMFYUI_DIR": "/opt/ComfyUI", "PVS_MODAL_APP": APP_NAME, "PVS_MODAL_GPU": GPU})
 )
 
 
@@ -163,6 +164,17 @@ def validate(payload: dict) -> dict:
     if not 0.0 <= strength <= 1.0:
         raise ValueError("image_strength must be within 0.0-1.0")
 
+    video_b64 = payload.get("video_mp4_base64")
+    if video_b64 is not None:
+        if not isinstance(video_b64, str) or not video_b64:
+            raise ValueError("video_mp4_base64 must be a non-empty string")
+        try:
+            content = base64.b64decode(video_b64, validate=True)
+        except ValueError as exc:
+            raise ValueError("video_mp4_base64 is not valid base64") from exc
+        if content[4:8] != b"ftyp" or len(content) > 24 * 1024 * 1024:
+            raise ValueError("video_mp4_base64 must be an MP4 smaller than 24 MiB")
+
     trace = payload.get("trace_id") or f"pvs-{uuid.uuid4().hex[:12]}"
     if not isinstance(trace, str) or len(trace) > 96 or not trace.replace("-", "").replace("_", "").isalnum():
         raise ValueError("trace_id must be alphanumeric (96 chars max)")
@@ -175,11 +187,12 @@ def validate(payload: dict) -> dict:
         "fps": LTX_FPS,
         "frames": frames,
         "duration_s": round(frames / LTX_FPS, 3),
-        "steps": LTX_STEPS,
+        "steps": 3 if video_b64 else LTX_STEPS,
         "seed": seed,
         "audio_mode": audio_mode,
         "image_png_base64": image_b64,
         "image_strength": strength,
+        "video_mp4_base64": video_b64,
         "trace_id": trace,
     }
 
@@ -187,7 +200,8 @@ def validate(payload: dict) -> dict:
 # ---------------------------------------------------------------------------
 # ComfyUI graph (LTX-2.5 two passes)
 # ---------------------------------------------------------------------------
-def build_graph(request: dict, *, output_prefix: str, uploaded_image: str | None = None) -> dict:
+def build_graph(request: dict, *, output_prefix: str, uploaded_image: str | None = None,
+                uploaded_video: str | None = None) -> dict:
     if not output_prefix or output_prefix.startswith("/") or ".." in output_prefix.split("/"):
         raise ValueError("invalid output prefix")
 
@@ -266,6 +280,15 @@ def build_graph(request: dict, *, output_prefix: str, uploaded_image: str | None
         "91": node("CreateVideo", images=["10", 0], fps=request["fps"]),
         "92": node("SaveVideo", video=["91", 0], filename_prefix=output_prefix, format="auto", codec="auto"),
     }
+    if uploaded_video:
+        graph["3"] = node("LoadVideo", file=uploaded_video)
+        graph["4"] = node("GetVideoComponents", video=["3", 0])
+        graph["5"] = node("ImageScale", image=["4", 0], upscale_method="bicubic",
+                          width=request["width"] // 2, height=request["height"] // 2, crop="center")
+        graph["30"] = node("VAEEncodeTiled", pixels=["5", 0], vae=["11", 0],
+                           tile_size=512, overlap=64, temporal_size=64, temporal_overlap=16)
+        # Partial flow denoising preserves a signal from every source frame.
+        graph["9"]["inputs"]["sigmas"] = "0.85, 0.725, 0.421875, 0.0"
     if uploaded_image:
         graph["1"] = node("LoadImage", image=uploaded_image)
         graph["2"] = node("LTXVPreprocess", image=["1", 0], img_compression=18)
@@ -477,6 +500,22 @@ def _probe_video(path: Path) -> dict:
     }
 
 
+def probe_source_video(path: Path, request: dict) -> dict:
+    result = subprocess.run(
+        ["ffprobe", "-v", "error", "-count_frames", "-select_streams", "v:0", "-show_entries",
+         "stream=width,height,avg_frame_rate,nb_read_frames", "-of", "json", str(path)],
+        capture_output=True, text=True, timeout=120, check=True,
+    )
+    stream = json.loads(result.stdout)["streams"][0]
+    numerator, denominator = stream["avg_frame_rate"].split("/")
+    fps = float(numerator) / float(denominator)
+    if (stream["width"], stream["height"]) != (request["width"], request["height"]):
+        raise ValueError("source video dimensions must match the requested dimensions")
+    if fps != request["fps"] or int(stream["nb_read_frames"]) != request["frames"]:
+        raise ValueError("source video must match the requested frame count and fps")
+    return {**stream, "fps": fps}
+
+
 # ---------------------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------------------
@@ -533,7 +572,7 @@ def doctor() -> dict:
     gpu=GPU,
     cpu=8,
     memory=65536,
-    timeout=5400,
+    timeout=int(os.getenv("PVS_MODAL_RENDER_TIMEOUT", "5400")),
     min_containers=0,
     max_containers=1,
     scaledown_window=2,
@@ -554,22 +593,34 @@ def render_clip(payload: dict) -> dict:
         phases.append({"phase": name, "seconds": round(now - since, 3), "detail": detail})
         return now
 
-    input_path: Path | None = None
+    input_paths: list[Path] = []
     try:
         startup_seconds, reused = _ensure_comfy()
         phases.append({"phase": "COMFY_READY", "seconds": round(startup_seconds, 3), "detail": f"reused={reused}"})
         load_ready = time.perf_counter()
 
         uploaded = None
+        uploaded_video = None
+        source_info = None
+        if request["video_mp4_base64"]:
+            content = base64.b64decode(request["video_mp4_base64"], validate=True)
+            video_input = COMFYUI_DIR / "input" / f"pvs-{uuid.uuid4().hex}.mp4"
+            video_input.parent.mkdir(parents=True, exist_ok=True)
+            video_input.write_bytes(content)
+            input_paths.append(video_input)
+            source_info = probe_source_video(video_input, request)
+            source_info["sha256"] = hashlib.sha256(content).hexdigest()
+            uploaded_video = video_input.name
         if request["image_png_base64"]:
             content = base64.b64decode(request["image_png_base64"], validate=True)
             input_path = COMFYUI_DIR / "input" / f"pvs-{uuid.uuid4().hex}.png"
             input_path.parent.mkdir(parents=True, exist_ok=True)
             input_path.write_bytes(content)
+            input_paths.append(input_path)
             uploaded = input_path.name
 
         prefix = f"pvs/{request['trace_id']}"
-        graph = build_graph(request, output_prefix=prefix, uploaded_image=uploaded)
+        graph = build_graph(request, output_prefix=prefix, uploaded_image=uploaded, uploaded_video=uploaded_video)
         submitted = phase("GRAPH_BUILT", load_ready, f"{len(graph)} nodes")
 
         response = _http_json("/prompt", {"prompt": graph, "client_id": f"pvs-{uuid.uuid4().hex}"}, timeout=120)
@@ -597,7 +648,9 @@ def render_clip(payload: dict) -> dict:
             "duration_requested": request["duration_s"],
             "aspect_ratio": request["aspect_ratio"],
             "audio_mode": request["audio_mode"],
-            "continuity_mode": "image" if uploaded else "none",
+            "continuity_mode": "video" if uploaded_video else "image" if uploaded else "none",
+            "source_video": source_info,
+            "source_noise_sigma": 0.85 if uploaded_video else None,
             "image_strength": request["image_strength"],
             "model_revision": LTX_MODEL_REVISION,
             "comfyui_revision": LTX_COMFYUI_REVISION,
@@ -612,7 +665,7 @@ def render_clip(payload: dict) -> dict:
             "metadata": metadata,
         }
     finally:
-        if input_path is not None:
+        for input_path in input_paths:
             try:
                 input_path.unlink(missing_ok=True)
             except OSError:
@@ -671,6 +724,7 @@ def main(
     audio_mode: str = "native",
     image_png: str = "",
     image_strength: float = 0.7,
+    source_video: str = "",
     json_out: str = "artifacts/doctor.json",
     out: str = "artifacts/clip.mp4",
 ):
@@ -714,15 +768,21 @@ def main(
             raise SystemExit(f"{image_png} n'est pas un PNG")
         payload["image_png_base64"] = base64.b64encode(content).decode("ascii")
         print(f"image de référence : {image_png} ({len(content)} octets)")
+    if source_video:
+        payload["video_mp4_base64"] = base64.b64encode(Path(source_video).read_bytes()).decode("ascii")
 
     request = validate(payload)
+    if source_video:
+        probe_source_video(Path(source_video), request)
+    payload["trace_id"] = request["trace_id"]
     print(
         json.dumps(
             {
                 "app": APP_NAME,
                 "gpu": GPU,
                 "volume": LTX_VOLUME_NAME,
-                "resolved": {key: value for key, value in request.items() if key != "image_png_base64"},
+                "resolved": {key: value for key, value in request.items()
+                             if key not in ("image_png_base64", "video_mp4_base64")},
             },
             indent=2,
         )

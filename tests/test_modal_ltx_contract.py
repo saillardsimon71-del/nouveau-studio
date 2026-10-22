@@ -234,6 +234,27 @@ def test_cost_estimate_uses_published_rates(worker):
     assert worker.estimate_cost_usd("unknown-gpu", 100) < 0.03
 
 
+def test_video_source_is_encoded_before_partial_denoising(worker):
+    request = worker.validate({**GOOD, "video_mp4_base64": base64.b64encode(b"\x00\x00\x00\x20ftypisom" + b"\x00" * 64).decode()})
+    assert request["steps"] == 3
+    graph = worker.build_graph(request, output_prefix="pvs/v2v", uploaded_video="motion.mp4")
+    latent = graph[graph["33"]["inputs"]["video_latent"][0]]
+    assert latent["class_type"] == "VAEEncodeTiled"
+    resize = graph[latent["inputs"]["pixels"][0]]
+    components = graph[resize["inputs"]["image"][0]]
+    video = graph[components["inputs"]["video"][0]]
+    assert video == {"class_type": "LoadVideo", "inputs": {"file": "motion.mp4"}}
+    assert components["class_type"] == "GetVideoComponents"
+    assert resize["inputs"]["width"] == request["width"] // 2
+    assert 0 < float(graph["9"]["inputs"]["sigmas"].split(",")[0]) < 1
+
+
+@pytest.mark.parametrize("value", ["bad!", base64.b64encode(b"not mp4").decode()])
+def test_invalid_video_source_rejected_before_gpu(worker, value):
+    with pytest.raises(ValueError, match="video_mp4_base64"):
+        worker.validate({**GOOD, "video_mp4_base64": value})
+
+
 def test_wait_for_video_polls_comfyui_history(worker, monkeypatch, tmp_path):
     """The polling loop, against a fake ComfyUI: it must return the written MP4."""
     import http.server
