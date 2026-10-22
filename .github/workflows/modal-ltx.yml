@@ -259,7 +259,10 @@ jobs:
   # 4. Premier rendu réel : une prise courte, MP4 téléchargeable en artifact.
   # ---------------------------------------------------------------------------
   render:
-    needs: [preflight, deploy]
+    # Un run `render` peut appeler Modal directement sans job `deploy` dans ce même workflow.
+    # Garder uniquement preflight comme dépendance ; sinon GitHub ignore `render`
+    # lorsque `deploy` est sauté sur stage=render.
+    needs: preflight
     if: ${{ (inputs.stage == 'render' || inputs.stage == 'full') && inputs.confirm_spend == 'oui' }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
