@@ -1,6 +1,10 @@
 name: PVS French Talking Avatar (LongCat)
 # Separate Modal app & volume; never touches legacy Studio IA resources.
 on:
+  # One-shot replacement of a stalled runner. Remove after queued.
+  push:
+    branches: [main]
+    paths: [.github/workflows/modal-avatar.yml]
   workflow_dispatch:
     inputs:
       stage:
@@ -16,14 +20,14 @@ permissions:
   contents: read
 concurrency:
   group: pvs-avatar-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   avatar:
     runs-on: ubuntu-latest
     timeout-minutes: 150
     env:
       PYTHONUNBUFFERED: "1"
-      STAGE: ${{ github.event_name == 'push' && 'prepare' || inputs.stage }}
+      STAGE: ${{ github.event_name == 'push' && 'voice' || inputs.stage }}
       CONFIRM_SPEND: ${{ inputs.confirm_spend || 'non' }}
       MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
       MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
