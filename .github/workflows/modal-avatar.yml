@@ -48,7 +48,7 @@ jobs:
       - name: Install small CPU preparation tools
         run: |
           pip install "modal>=1.0,<2" edge-tts
-          sudo apt-get update -qq && sudo apt-get install -y ffmpeg >/dev/null
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq; sudo apt-get install -y ffmpeg >/dev/null; }
       - name: Generate a short French demo voice (no avatar GPU)
         if: ${{ env.STAGE == 'voice' || env.STAGE == 'render' }}
         shell: bash
