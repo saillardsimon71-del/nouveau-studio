@@ -6,11 +6,6 @@ name: Modal LTX-2.5
 # il déploie `pvs-ltx` (nouveau nom) et monte `studio-ltx25-models` en lecture seule.
 
 on:
-  # Activation temporaire pour lancer UNIQUEMENT le diagnostic CPU via un commit.
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/modal-ltx.yml
   workflow_dispatch:
     inputs:
       stage:
@@ -226,7 +221,7 @@ jobs:
   # ---------------------------------------------------------------------------
   doctor:
     needs: preflight
-    if: ${{ github.event_name == 'push' || inputs.stage == 'doctor' || inputs.stage == 'full' }}
+    if: ${{ inputs.stage == 'doctor' || inputs.stage == 'full' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
