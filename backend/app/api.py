@@ -32,6 +32,7 @@ router = APIRouter(prefix="/api")
 ALLOWED_IMAGE = {".png", ".jpg", ".jpeg", ".webp"}
 ALLOWED_AUDIO = {".wav", ".mp3", ".m4a", ".flac", ".ogg"}
 ALLOWED_VIDEO = {".mp4", ".mov", ".webm", ".mkv"}
+DEFAULT_VIDEO_MIME = {"video": "video/mp4", "image": "image/png", "audio": "audio/wav"}
 
 
 # ---------------------------------------------------------------------------- system
@@ -298,20 +299,12 @@ async def upload_shot_media(shot_id: str, file: UploadFile = File(...), kind: st
     shot = _require("shots", shot_id)
     stored = await _save_upload(file, ALLOWED_VIDEO | ALLOWED_IMAGE | ALLOWED_AUDIO)
     artifact_kind = kind if kind in {"video", "image", "audio"} else "video"
-    artifact = db.insert(
-        "artifacts",
-        {
-            "id": db.new_id("art"),
-            "job_id": None,
-            "project_id": shot["project_id"],
-            "shot_id": shot_id,
-            "kind": artifact_kind,
-            "path": str(stored),
-            "mime": file.content_type or "application/octet-stream",
-            "bytes": stored.stat().st_size,
-            "meta": {"source": "upload", "filename": file.filename},
-            "created_at": db.now_iso(),
-        },
+    if DEFAULT_VIDEO_MIME.get(artifact_kind) is None:
+        raise HTTPException(400, f"type d'artefact non supporté: {artifact_kind}")
+    artifact = _store_artifact(
+        stored, artifact_kind, file.content_type or DEFAULT_VIDEO_MIME[artifact_kind],
+        project_id=shot["project_id"], shot_id=shot_id,
+        meta={"source": "upload", "filename": file.filename},
     )
     if artifact_kind == "video":
         inspection = qc.inspect_clip(stored, expected_duration_s=shot.get("duration_s"))
@@ -364,11 +357,25 @@ def delete_character(character_id: str) -> dict[str, bool]:
 
 @router.post("/characters/{character_id}/image")
 async def upload_character_image(character_id: str, file: UploadFile = File(...)) -> dict[str, Any]:
-    _require("characters", character_id)
+    character = _require("characters", character_id)
     stored = await _save_upload(file, ALLOWED_IMAGE)
-    info = media.probe(stored)
-    return db.update("characters", character_id, {"base_image": str(stored), "updated_at": db.now_iso(),
-                                                  "appearance": {"reference_size": f"{info.width}x{info.height}"}}) or {}
+    artifact = _store_artifact(
+        stored, "image", file.content_type or "image/jpeg",
+        project_id=character.get("project_id"),
+        meta={"source": "upload", "role": "character_reference", "filename": file.filename},
+    )
+    appearance = dict(character.get("appearance") or {})
+    try:
+        info = media.probe(stored)
+        if info.width:
+            appearance["reference_size"] = f"{info.width}x{info.height}"
+    except media.MediaError:
+        appearance["reference_size"] = "unknown"
+    return db.update(
+        "characters",
+        character_id,
+        {"base_image": artifact["id"], "appearance": appearance, "updated_at": db.now_iso()},
+    ) or {}
 
 
 @router.get("/voices")
@@ -395,10 +402,18 @@ def create_voice(body: VoiceCreate) -> dict[str, Any]:
 
 @router.post("/voices/{voice_id}/sample")
 async def upload_voice_sample(voice_id: str, file: UploadFile = File(...)) -> dict[str, Any]:
-    _require("voices", voice_id)
+    voice = _require("voices", voice_id)
     stored = await _save_upload(file, ALLOWED_AUDIO)
-    info = media.probe(stored)
-    return db.update("voices", voice_id, {"ref_audio": str(stored), "params": {"sample_seconds": info.duration_s}}) or {}
+    artifact = _store_artifact(
+        stored, "audio", file.content_type or "audio/wav",
+        meta={"source": "upload", "role": "voice_reference", "filename": file.filename},
+    )
+    params = dict(voice.get("params") or {})
+    try:
+        params["sample_seconds"] = media.probe(stored).duration_s
+    except media.MediaError:
+        params["sample_seconds"] = None
+    return db.update("voices", voice_id, {"ref_audio": artifact["id"], "params": params}) or {}
 
 
 # ---------------------------------------------------------------------------- jobs & exports
@@ -489,6 +504,39 @@ def project_cost(project_id: str) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------- helpers
+def _store_artifact(
+    path: Path,
+    kind: str,
+    mime: str,
+    *,
+    project_id: str | None = None,
+    shot_id: str | None = None,
+    job_id: str | None = None,
+    meta: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Register an uploaded file as an artifact.
+
+    The UI addresses media by artifact id (not by path), so every upload must
+    produce a row; the id is what gets stored on characters/voices/shots.
+    """
+    return db.insert(
+        "artifacts",
+        {
+            "id": db.new_id("art"),
+            "job_id": job_id,
+            "project_id": project_id,
+            "shot_id": shot_id,
+            "kind": kind,
+            "path": str(path),
+            "mime": mime,
+            "bytes": path.stat().st_size,
+            "meta": meta or {},
+            "selected": 0,
+            "created_at": db.now_iso(),
+        },
+    )
+
+
 def _require(table: str, row_id: str) -> dict[str, Any]:
     row = db.get(table, row_id)
     if row is None:

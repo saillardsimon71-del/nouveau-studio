@@ -194,3 +194,41 @@ def test_job_cancel_marks_cancelled(client, project):
     job = client.post(f"/api/shots/{board['id']}/generate", json={}).json()
     cancelled = client.post(f"/api/jobs/{job['id']}/cancel").json()
     assert cancelled["status"] in {"cancelled", "succeeded"}
+
+
+def test_character_and_voice_references_roundtrip(client):
+    """Uploads must be addressable by artifact id (that is what the UI stores)."""
+    character = client.post(
+        "/api/characters", json={"name": "Camille", "description": "présentatrice", "appearance": {}}
+    ).json()
+
+    png = (
+        b"\x89PNG\r\n\x1a\n" + b"\x00\x00\x00\rIHDR" + b"\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00"
+        + b"\x90wS\xde" + b"\x00\x00\x00\x0cIDATx\x9cc\xf8\xcf\xc0\x00\x00\x03\x01\x01\x00\x18\xdd\x8d\xb0"
+        + b"\x00\x00\x00\x00IEND\xaeB`\x82"
+    )
+    updated = client.post(
+        f"/api/characters/{character['id']}/image",
+        files={"file": ("ref.png", io.BytesIO(png), "image/png")},
+    ).json()
+    assert updated["base_image"].startswith("art_")
+    served = client.get(f"/api/artifacts/{updated['base_image']}/file")
+    assert served.status_code == 200
+    assert served.content == png
+
+    voice = client.post("/api/voices", json={"name": "Voix FR", "engine": "chatterbox", "language": "fr"}).json()
+    import wave
+
+    buffer = io.BytesIO()
+    with wave.open(buffer, "wb") as handle:
+        handle.setnchannels(1)
+        handle.setsampwidth(2)
+        handle.setframerate(16000)
+        handle.writeframes(b"\x00\x00" * 8000)
+    sample = client.post(
+        f"/api/voices/{voice['id']}/sample",
+        files={"file": ("sample.wav", io.BytesIO(buffer.getvalue()), "audio/wav")},
+    ).json()
+    assert sample["ref_audio"].startswith("art_")
+    assert client.get(f"/api/artifacts/{sample['ref_audio']}/file").status_code == 200
+    assert sample["params"]["sample_seconds"] > 0.3

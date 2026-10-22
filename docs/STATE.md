@@ -14,7 +14,7 @@ séparés ci-dessous.
 
 | Fonction | Preuve | Mesure |
 |---|---|---|
-| API complète (projets, plans, personnages, voix, artefacts, exports, coûts) | 21 tests pytest, tous verts | ~43 s |
+| API complète (projets, plans, personnages, voix, artefacts, exports, coûts) | 22 tests pytest, tous verts | ~43 s |
 | Directeur créatif local (template FR) | test unitaire + démo | storyboard de 5 plans, 35,0 s |
 | Directeur IA (LLM JSON validé + retry) | code + fallback testé | **appel réseau réel non exécuté** (pas de clé) |
 | File de jobs, progression, reprise après redémarrage, annulation | tests API | job complet en 3–12 s (simulation) |

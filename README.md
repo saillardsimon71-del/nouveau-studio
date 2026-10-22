@@ -36,7 +36,7 @@ Aucune clé n'est nécessaire pour démarrer.
 ### Vérifier que tout fonctionne, sans GPU
 
 ```bash
-make test        # 21 tests : pipeline, QC, montage, sous-titres, API
+make test        # 22 tests : pipeline, QC, montage, sous-titres, API
 make demo        # crée une pub de 35 s, génère les plans, monte, exporte, affiche le QC
 make bench-dry   # plan des 3 benchmarks + estimations de coût GPU
 ```

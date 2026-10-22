@@ -264,7 +264,7 @@ def _dispatch(job: dict[str, Any], ctx: Ctx) -> tuple[EngineOutput, str, str, bo
                 raise ValueError("plan avatar sans dialogue: écrire le texte avant de générer")
             voice = db.get("voices", shot.get("voice_id")) if shot.get("voice_id") else None
             if voice:
-                tts_params.setdefault("ref_audio", voice.get("ref_audio"))
+                tts_params.setdefault("ref_audio", _resolve_media(voice.get("ref_audio")))
                 tts_params.setdefault("language", voice.get("language", "fr"))
                 tts_params.setdefault("engine", voice.get("engine"))
             tts_engine, tts_fallback = registry.resolve("tts", tts_params.get("engine"))
@@ -483,6 +483,20 @@ def _latest_artifact(shot_id: str | None, kinds: tuple[str, ...] = ()) -> dict[s
     return None
 
 
+def _resolve_media(value: str | None) -> str | None:
+    """Accept either a filesystem path or an artifact id and return a path.
+
+    The UI stores artifact ids (so media can be served by id); engines need real
+    paths. Resolving here keeps that detail out of every adapter.
+    """
+    if not value:
+        return None
+    if value.startswith("art_"):
+        artifact = db.get("artifacts", value)
+        return artifact["path"] if artifact else None
+    return value
+
+
 def _character_reference(shot: dict[str, Any]) -> str | None:
     character_id = shot.get("character_id")
     if not character_id:
@@ -490,7 +504,15 @@ def _character_reference(shot: dict[str, Any]) -> str | None:
     character = db.get("characters", character_id)
     if not character:
         return None
-    return character.get("base_image")
+    path = _resolve_media(character.get("base_image"))
+    if path and Path(path).exists():
+        return path
+    # fall back to the newest image artifact registered for this character's
+    # reference uploads (project-independent)
+    for artifact in db.find("artifacts", "kind = ?", ("image",), order="created_at DESC", limit=50):
+        if (artifact.get("meta") or {}).get("role") == "character_reference":
+            return artifact["path"]
+    return None
 
 
 def job_log_tail(job_id: str, lines: int = 80) -> str:
