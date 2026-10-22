@@ -22,6 +22,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   system: () => request<import("./types").SystemInfo>("/api/system"),
   projects: () => request<import("./types").Project[]>("/api/projects"),
+  avatarDemo: () => request<import("./types").Project>("/api/projects/avatar-demo", { method: "POST" }),
   project: (id: string) => request<import("./types").Project>(`/api/projects/${id}`),
   createProject: (body: { name: string; brief: string; format?: string }) =>
     request<import("./types").Project>("/api/projects", { method: "POST", body: JSON.stringify(body) }),

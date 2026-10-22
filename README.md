@@ -11,12 +11,12 @@ jobs asynchrones, contrôle qualité, régénération ciblée, suivi de coût.
 
 ## État en une ligne
 
-Le pipeline complet fonctionne de bout en bout et est testé ; **les moteurs
-génératifs réels (LTX-2.5, LongCat-Video-Avatar, Chatterbox) sont écrits,
-branchés et documentés mais n'ont pas encore tourné sur GPU** — l'environnement
-de développement n'en a pas. Tout ce qui dépend de l'IA est donc, ici, exécuté par
-un moteur de simulation **explicitement étiqueté**. Le détail honnête, jalon par
-jalon, est dans [`docs/STATE.md`](docs/STATE.md).
+LTX-2.5 et LongCat-Video-Avatar 1.5 ont produit de vrais MP4 sur Modal
+`kulejean567`. Le premier avatar français mesure 720 x 1280, dure 3,72 s et
+contient une piste AAC. Le branchement direct aux jobs du studio est décrit dans
+[`docs/MODAL_STUDIO.md`](docs/MODAL_STUDIO.md). Chatterbox et VoxCPM2 restent
+des adaptateurs locaux non validés ici ; le parcours Modal utilise la voix
+synthétique française Henri.
 
 ## Démarrage
 
@@ -73,7 +73,8 @@ avec de l'IA. Un exemple est versionné :
 | Montage ffmpeg (xfade, ASS, mixage, loudnorm, poster, SRT) | ✅ mesuré et vérifié image par image |
 | QC automatique | ✅ |
 | Coût par job / par export | ✅ |
-| Adapters LTX-2.5, LongCat 1.5, Chatterbox, VoxCPM2, ComfyUI | ✅ écrits, ⏳ **non exécutés** (pas de GPU) |
+| Moteurs Modal LTX-2.5 et LongCat 1.5 | MP4 réels générés ; interface directe via les jobs du studio |
+| Adaptateurs locaux Chatterbox, VoxCPM2, LTX natif et ComfyUI | Écrits, non validés ici |
 | Scripts d'installation GPU + protocole de benchmark | ✅ prêts |
 
 ## Documentation

@@ -64,6 +64,20 @@ export default function Projects({
     }
   };
 
+  const avatarDemo = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const project = await api.avatarDemo();
+      onChanged();
+      onOpen(project.id);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div className="page">
       <header className="page-head">
@@ -72,6 +86,17 @@ export default function Projects({
           <p className="muted">Décrire la vidéo, obtenir un storyboard, générer plan par plan.</p>
         </div>
       </header>
+
+      <section className="card">
+        <div className="row between gap">
+          <div>
+            <strong>Avatar français</strong>
+            <p className="muted small">Portrait synthétique, voix Henri et synchronisation labiale. Plan vertical de 3,72 s maximum.</p>
+          </div>
+          <button className="btn primary" onClick={avatarDemo} disabled={busy}>Préparer un avatar français</button>
+        </div>
+        <p className="muted small">La préparation ne lance aucun rendu. Le bouton Générer du plan utilise les crédits Modal.</p>
+      </section>
 
       <section className="card composer">
         <div className="row gap">

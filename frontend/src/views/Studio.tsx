@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, artifactUrl, exportUrl } from "../api";
-import type { Job, Project, Shot, SystemInfo } from "../types";
+import type { Character, Job, Project, Shot, SystemInfo } from "../types";
 
 const ACTIVE = new Set(["queued", "running"]);
 
@@ -16,6 +16,7 @@ export default function Studio({
   onBack: () => void;
 }) {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [characters, setCharacters] = useState<Character[]>([]);
   const [busyShot, setBusyShot] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +36,7 @@ export default function Studio({
 
   useEffect(() => {
     void loadJobs();
+    void api.characters().then(setCharacters).catch((err: Error) => setError(err.message));
   }, [loadJobs]);
 
   const hasActive = jobs.some((job) => ACTIVE.has(job.status));
@@ -55,7 +57,7 @@ export default function Studio({
     setBusyShot(shot.id);
     setError(null);
     try {
-      if (kind === "video") await api.generateShot(shot.id);
+      if (kind === "video") await api.generateShot(shot.id, {params: {force_tts: shot.kind === "avatar"}});
       if (kind === "voice") await api.generateVoice(shot.id);
       await loadJobs();
     } catch (err) {
@@ -99,6 +101,15 @@ export default function Studio({
     if (dialogue === shot.dialogue) return;
     await api.patchShot(shot.id, { dialogue });
     reload();
+  };
+
+  const editShot = async (shot: Shot, patch: Record<string, unknown>) => {
+    try {
+      await api.patchShot(shot.id, patch);
+      reload();
+    } catch (err) {
+      setError((err as Error).message);
+    }
   };
 
   const doExport = async () => {
@@ -187,6 +198,35 @@ export default function Studio({
                 </div>
 
                 <label className="field">
+                  <span className="muted small">Moteur</span>
+                  <select className="input" value={String(shot.params?.engine_hint || "")}
+                    disabled={running} onChange={(event) => void editShot(shot, {params: {...shot.params, engine_hint: event.target.value}})}>
+                    <option value="">Automatique</option>
+                    {system?.engines.filter((engine) => engine.kind === (shot.kind === "avatar" ? "avatar" : "video")).map((engine) => (
+                      <option key={engine.name} value={engine.name} disabled={!engine.available}>
+                        {engine.label}{engine.simulated ? " (simulation)" : ""}{!engine.available ? " (indisponible)" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {shot.kind === "avatar" && (
+                  <label className="field">
+                    <span className="muted small">Personnage</span>
+                    <select className="input" value={shot.character_id || ""} disabled={running}
+                      onChange={(event) => void editShot(shot, {character_id: event.target.value})}>
+                      <option value="">Sélectionner un personnage</option>
+                      {characters.map((character) => <option key={character.id} value={character.id}>{character.name}</option>)}
+                    </select>
+                  </label>
+                )}
+                <label className="field">
+                  <span className="muted small">Durée du plan (secondes)</span>
+                  <input className="input" type="number" min={1} max={60} step={0.01} defaultValue={shot.duration_s}
+                    disabled={running} onBlur={(event) => void editShot(shot, {duration_s: Number(event.target.value)})} />
+                </label>
+                {shot.params?.engine_hint === "modal_avatar" && <p className="muted small">LongCat : phrase courte, voix de 3,72 s maximum. Aucun rendu GPU si la voix dépasse cette durée.</p>}
+
+                <label className="field">
                   <span className="muted small">Dialogue (français)</span>
                   <textarea
                     className="input"
@@ -211,6 +251,7 @@ export default function Studio({
                 )}
 
                 <div className="row gap wrap">
+                  {media && <a className="btn ghost small" href={artifactUrl(media.id)} download>Télécharger MP4</a>}
                   <button
                     className="btn primary small"
                     onClick={() => void act(shot, "video")}

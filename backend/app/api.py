@@ -127,6 +127,25 @@ def get_project(project_id: str) -> dict[str, Any]:
     return project
 
 
+@router.post("/projects/avatar-demo", status_code=201)
+def create_avatar_demo() -> dict[str, Any]:
+    reference = get_settings().repo_root / "benchmark_assets" / "character_reference.png"
+    if not reference.is_file():
+        raise HTTPException(503, "Portrait synthétique de référence absent")
+    project = create_project(ProjectCreate(name="Avatar français", brief="Premier avatar français LongCat", format="9:16"))
+    artifact = _store_artifact(reference, "image", "image/png", project_id=project["id"],
+                               meta={"role": "character_reference", "synthetic": True})
+    character = create_character(CharacterCreate(name="Présentateur synthétique", project_id=project["id"], base_image=artifact["id"]))
+    shot = add_shot(project["id"], ShotCreate(
+        kind="avatar", title="Avatar français", duration_s=3.72,
+        dialogue="L'IA peut automatiser vos tâches, dès aujourd'hui.",
+        prompt="Photorealistic French man speaking naturally to camera, subtle head motion, cinematic studio lighting.",
+        character_id=character["id"],
+    ))
+    db.update("shots", shot["id"], {"params": {"engine_hint": "modal_avatar"}})
+    return get_project(project["id"])
+
+
 @router.patch("/projects/{project_id}")
 def update_project(project_id: str, body: ProjectUpdate) -> dict[str, Any]:
     _require("projects", project_id)

@@ -13,17 +13,18 @@ from typing import Any
 
 from ..config import get_settings
 from .assembly import AssemblyEngine
-from .base import Engine
+from .base import Engine, EngineUnavailable
 from .comfyui import ComfyUIEngine
 from .longcat import LongCatAvatarEngine
 from .ltx_native import LTXNativeEngine
 from .mock import build_engines as build_mock_engines
+from .modal_remote import ModalEngine, FrenchEdgeVoice
 from .tts import ChatterboxEngine, VoxCPMEngine
 
 _PREFERENCE: dict[str, list[str]] = {
-    "video": ["ltx_native", "comfyui", "mock"],
-    "avatar": ["longcat_avatar", "mock_avatar"],
-    "tts": ["chatterbox", "voxcpm2", "mock_tts"],
+    "video": ["modal_ltx", "ltx_native", "comfyui", "mock"],
+    "avatar": ["modal_avatar", "longcat_avatar", "mock_avatar"],
+    "tts": ["edge_tts_fr", "chatterbox", "voxcpm2", "mock_tts"],
     "image": ["comfyui", "mock_image"],
     "assembly": ["ffmpeg_assembly"],
 }
@@ -35,6 +36,9 @@ def _build() -> dict[str, Engine]:
     global _instances
     if not _instances:
         engines: list[Engine] = [
+            ModalEngine("video"),
+            ModalEngine("avatar"),
+            FrenchEdgeVoice(),
             LTXNativeEngine(),
             ComfyUIEngine(),
             LongCatAvatarEngine(),
@@ -74,6 +78,8 @@ def resolve(kind: str, requested: str | None = None) -> tuple[Engine, str]:
             engine = get(requested)
         except KeyError as exc:
             raise ValueError(str(exc)) from exc
+        if engine.info.simulated and not settings.allow_mock:
+            raise EngineUnavailable("La simulation est désactivée sur ce serveur")
         ok, reason = engine.available()
         if ok:
             return engine, ""
@@ -108,6 +114,8 @@ def catalog() -> list[dict[str, Any]]:
     items = []
     for engine in _build().values():
         ok, reason = engine.available()
+        if engine.info.simulated and not get_settings().allow_mock:
+            ok, reason = False, "Simulation désactivée"
         item = engine.info.to_dict()
         item["available"] = ok
         item["unavailable_reason"] = reason
