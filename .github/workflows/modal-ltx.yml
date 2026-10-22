@@ -101,7 +101,18 @@ jobs:
             echo "::error title=Secrets Modal manquants::Ajouter MODAL_TOKEN_ID et MODAL_TOKEN_SECRET dans Settings > Secrets and variables > Actions."
             exit 1
           fi
-          echo "secrets présents (non affichés)"
+          # Les secrets doivent être des valeurs brutes, pas une commande complète.
+          # Valider avant tout appel Modal évite qu’une erreur externe journalise
+          # accidentellement une valeur mal collée.
+          if ! [[ "$MODAL_TOKEN_ID" =~ ^ak-[A-Za-z0-9_-]+$ ]]; then
+            echo "::error title=Token ID invalide::MODAL_TOKEN_ID doit contenir seulement la valeur ak-... ; créer un nouveau jeton Modal et remplacer le secret GitHub."
+            exit 1
+          fi
+          if ! [[ "$MODAL_TOKEN_SECRET" =~ ^as-[A-Za-z0-9_-]+$ ]]; then
+            echo "::error title=Token Secret invalide::MODAL_TOKEN_SECRET doit contenir seulement la valeur as-... ; créer un nouveau jeton Modal et remplacer le secret GitHub."
+            exit 1
+          fi
+          echo "secrets présents et de format valide (valeurs non affichées)"
 
       # `modal token info` prints the token ID itself: never let that reach a
       # public log. We keep only the workspace name, then delete the file.
@@ -111,7 +122,9 @@ jobs:
           set -eu
           if ! modal token info > token-info.raw 2>&1; then
             echo "::error title=Jeton Modal refusé::le jeton ne s'authentifie pas; vérifier MODAL_TOKEN_ID / MODAL_TOKEN_SECRET."
-            sed -E 's/ak-[A-Za-z0-9_-]+/ak-***/g' token-info.raw
+            # Ne jamais afficher l’erreur brute du client : certaines erreurs
+            # peuvent reproduire une partie de l’argument d’authentification.
+            echo "Échec d’authentification Modal ; vérifier que les deux secrets correspondent à un jeton actif."
             rm -f token-info.raw
             exit 1
           fi
