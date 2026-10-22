@@ -47,6 +47,8 @@ jobs:
             exit 1
           fi
           case "$STAGE" in voice|prepare|doctor|render) ;; *) exit 2;; esac
+      - name: Check Python source syntax (no GPU)
+        run: python -m py_compile deploy/modal_avatar_worker.py backend/app/engines/longcat.py
       - name: Install small CPU preparation tools
         run: |
           pip install "modal>=1.0,<2" edge-tts
