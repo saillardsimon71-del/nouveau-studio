@@ -113,7 +113,7 @@ Garde-fous intégrés :
 
 | Élément | État | Preuve / ce qu'il faut |
 | --- | --- | --- |
-| Contrat de requête (`validate`) | **testé** | 30 tests locaux, sans GPU |
+| Contrat de requête (`validate`) | **testé** | 32 tests locaux (54 avec la suite complète), sans GPU |
 | Graphe ComfyUI deux passes | **testé** (structure) | nœuds, poids, upsampler, mode image, mode silencieux |
 | Entrée CI → MP4 + métadonnées | **testé** (avec un faux `render_clip`) | `test_render_entrypoint_writes_the_mp4_and_metadata` |
 | Validateur d'inputs | **testé** | refuse PNG non vertical, WAV absent/silencieux |

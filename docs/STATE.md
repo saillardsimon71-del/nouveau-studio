@@ -55,7 +55,7 @@ monté en lecture seule), `scripts/modal_render.py`, `.github/workflows/modal-lt
 
 | Élément | État | Preuve |
 |---|---|---|
-| Contrat de requête + graphe ComfyUI deux passes | **testé** (30 tests, sans GPU) | `tests/test_modal_ltx_contract.py` |
+| Contrat de requête + graphe ComfyUI deux passes | **testé** (32 tests, sans GPU) | `tests/test_modal_ltx_contract.py` |
 | Entrée CI → MP4 + métadonnées | **testé** avec un faux `render_clip` | même fichier |
 | Validateur d'inputs (PNG/WAV) | **testé** | image 768×1344 acceptée, voix absente refusée |
 | Identité du workspace Modal, poids du volume, rendu | **non exécuté** | 2 secrets GitHub à créer + 1 run `preflight` |
