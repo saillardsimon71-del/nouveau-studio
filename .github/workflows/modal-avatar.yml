@@ -1,10 +1,6 @@
 name: PVS French Talking Avatar (LongCat)
 # Separate Modal app & volume; never touches legacy Studio IA resources.
 on:
-  # One-shot replacement of a stalled runner. Remove after queued.
-  push:
-    branches: [main]
-    paths: [.github/workflows/modal-avatar.yml]
   workflow_dispatch:
     inputs:
       stage:
