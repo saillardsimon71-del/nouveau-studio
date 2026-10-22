@@ -1,0 +1,70 @@
+# TEST B — Séquence cinématographique premium (deuxième jalon)
+id: test_b_cinematic
+title: "Plan publicitaire technologique 5–8 s"
+goal: >
+  Un plan unique qui tient comme un plan de publicité haut de gamme : lumière, matière,
+  composition, mouvement de caméra fluide, cohérence temporelle.
+duration_s: 6
+format: "9:16"
+prompt: >
+  A dark modern office at night, a single blue light beam cutting through atmospheric haze,
+  a laptop on a walnut desk displaying a clean dark work interface with soft data rows.
+  Slow dolly-in from a low three-quarter angle, 35mm lens, f/2.0, volumetric light, dust
+  motes, deep shadows, cool blue and faint amber accents, glossy reflections on the desk,
+  realistic screen glow on the desk edge, cinematic contrast, fine grain.
+negative_prompt: "text, watermark, logo, distorted geometry, warped text on screen, flicker"
+variants:
+  - engine: ltx_native
+    label: "LTX-2.5 DFR (production quality)"
+    params:
+      pipeline: dfr
+      width: 1088
+      height: 1920
+      fps: 24
+      num_frames: 145
+      temporal_upscalings: 0
+      quantization: fp8-cast
+    gpu: H100_80GB
+  - engine: ltx_native
+    label: "LTX-2.5 distilled (draft rapide)"
+    params: { pipeline: distilled, width: 1088, height: 1920, fps: 24, num_frames: 145 }
+    gpu: H100_80GB
+  - engine: comfyui
+    label: "ComfyUI + LTX-2.5 (workflow exporté)"
+    params: { workflow: ltx_t2v, fps: 24 }
+    gpu: RTX_5090
+  - engine: wan22_ti2v
+    label: "Wan2.2 TI2V-5B (comparaison coût/vitesse)"
+    params: { resolution: "720p", fps: 24 }
+    gpu: RTX_4090
+criteria:
+  - id: photorealism
+    label: "Photoréalisme (matière, réflexions, grain)"
+    scale: 0-5
+    fail_if_below: 3
+  - id: lighting
+    label: "Éclairage et textures"
+    scale: 0-5
+  - id: composition
+    label: "Composition et profondeur"
+    scale: 0-5
+  - id: motion
+    label: "Fluidité du mouvement de caméra"
+    scale: 0-5
+    fail_if_below: 3
+  - id: temporal
+    label: "Cohérence temporelle (pas de morphing)"
+    scale: 0-5
+  - id: artifacts
+    label: "Absence d'artefacts majeurs"
+    scale: 0-5
+    fail_if_below: 3
+automatic_checks:
+  - container_probe
+  - no_black_frames
+  - no_frozen_frames
+  - frame_flicker_proxy
+  - duration_matches_request
+decision_rule: >
+  Un moteur est retenu pour la production si photoréalisme ≥ 4, mouvement ≥ 4 et
+  artefacts ≥ 4 sur au moins 2 essais sur 3, avec un coût par seconde acceptée < 0,60 $.

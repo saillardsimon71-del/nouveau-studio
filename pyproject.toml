@@ -1,0 +1,17 @@
+[project]
+name = "premium-video-studio"
+version = "0.1.0"
+description = "Studio de production vidéo IA verticale : orchestrateur de moteurs, QC, montage."
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = [
+    "ignore::DeprecationWarning:starlette.*",
+    "ignore:Using `httpx` with `starlette.testclient`:UserWarning",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"

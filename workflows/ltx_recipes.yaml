@@ -1,0 +1,104 @@
+# LTX-2.5 — recipes used by backend/app/engines/ltx_native.py
+# Flags are taken from the upstream CLI (packages/ltx-pipelines/src/ltx_pipelines/utils/args.py).
+# `{placeholders}` are filled by the adapter; nothing here is guessed.
+version: 2.5
+engine: ltx_native
+model_dir: /models/ltx-2.5
+
+models:
+  transformer_distilled: diffusion_models/ltx-2.5-22b-distilled-transformer-bf16.safetensors
+  transformer_dev: diffusion_models/ltx-2.5-22b-dev-transformer-bf16.safetensors
+  text_encoder: text_encoders/gemma4-12b-with-proj-ltx-2.5-bf16.safetensors
+  video_vae: vae/ltx-2.5-video-vae-bf16.safetensors
+  video_vae_conv: vae/ltx-2.5-video-vae-conv-bf16.safetensors
+  audio_vae: vae/ltx-2.5-audio-vae-bf16.safetensors
+  spatial_upsampler: latent_upscale_models/ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors
+  temporal_upsampler: latent_upscale_models/ltx-2.5-latent-temporal-upscaler-x2-bf16-1.0.safetensors
+  detailing_lora: loras/ltx-2.5-22b-ic-lora-pixel-spatial-upscaler-x2-1.0.safetensors
+
+recipes:
+  # Used for every B-roll shot of the reference ad. Production quality.
+  b_roll_dfr:
+    module: ltx_pipelines.dfr_pipeline
+    purpose: "Plan cinématographique, texte/image -> vidéo, détail maximal"
+    gpu: H100_80GB
+    args:
+      - "--transformer-path {transformer_distilled}"
+      - "--text-encoder-path {text_encoder}"
+      - "--video-vae-path {video_vae}"
+      - "--audio-vae-path {audio_vae}"
+      - "--spatial-upsampler-path {spatial_upsampler}"
+      - "--detailing-lora {detailing_lora}"
+      - "--num-frames {num_frames}"      # grid 8k+1, e.g. 145 for 6 s @ 24 fps
+      - "--width {width}"
+      - "--height {height}"
+      - "--frame-rate {fps}"
+      - "--seed {seed}"
+      - "--prompt {prompt}"
+      - "--output-path {output}"
+
+  # Cheap iteration: check framing and motion before paying for DFR.
+  b_roll_draft:
+    module: ltx_pipelines.distilled
+    purpose: "Brouillon rapide (8 + 4 pas) avant validation du cadrage"
+    gpu: H100_80GB
+    args:
+      - "--num-frames {num_frames}"
+      - "--width {width}"
+      - "--height {height}"
+      - "--frame-rate {fps}"
+      - "--seed {seed}"
+      - "--quantization fp8-cast"
+      - "--prompt {prompt}"
+      - "--output-path {output}"
+
+  # Keyframe-driven shot: same character, controlled start (and optional end) frame.
+  image_to_video:
+    module: ltx_pipelines.dfr_pipeline
+    purpose: "Cohérence d'identité entre plans via image de référence"
+    args:
+      - "--image {start_image} 0 1.0"
+      - "--image {end_image} {last_frame} 1.0"   # only when an end frame is needed
+      - "--num-frames {num_frames}"
+      - "--seed {seed}"
+      - "--prompt {prompt}"
+      - "--output-path {output}"
+
+  # Targeted regeneration of a time region — the answer to "ce passage est raté".
+  retake:
+    module: ltx_pipelines.retake
+    purpose: "Régénérer uniquement [start, end) d'un clip existant"
+    args:
+      - "--video-path {video}"
+      - "--start-time {start_s}"
+      - "--end-time {end_s}"
+      - "--prompt {prompt}"
+      - "--seed {seed}"
+      - "--output-path {output}"
+
+  # Audio-conditioned visuals (e.g. match the presenter clip to the recorded voice).
+  audio_to_video:
+    module: ltx_pipelines.a2vid_two_stage
+    purpose: "Conditionnement audio -> vidéo"
+    status: "flags à confirmer sur GPU (dépend du build amont)"
+    args:
+      - "--audio-max-duration {duration_s}"
+      - "--num-frames {num_frames}"
+      - "--seed {seed}"
+      - "--prompt {prompt}"
+      - "--output-path {output}"
+
+memory_profiles:
+  h100_80gb:
+    quantization: null
+    offload: none
+    note: "dfr 1080x1920 sans offload"
+  a100_80gb:
+    quantization: fp8-cast
+    offload: cpu
+    note: "plus lent, même qualité"
+  rtx_5090_32gb:
+    quantization: fp8-cast
+    offload: cpu
+    compile: "capture=true"
+    note: "itérations seulement, DFR instable au-delà de 720p"
