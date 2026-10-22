@@ -1,0 +1,66 @@
+name: PVS One-Time French Avatar GPU Render
+# Trigger only after the exact authorized model staging run succeeds.
+on:
+  workflow_run:
+    workflows: ["PVS One-Time Avatar Model Prep (CPU)"]
+    types: [completed]
+permissions:
+  contents: read
+jobs:
+  render:
+    if: ${{ github.event.workflow_run.id == 39833050319 && github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      PYTHONUNBUFFERED: "1"
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install Modal and French voice (no GPU)
+        run: |
+          pip install "modal>=1.0,<2" edge-tts
+          command -v ffmpeg
+      - name: Create 3.65s French speech WAV
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          edge-tts --voice fr-FR-HenriNeural --text "L'IA peut automatiser vos tâches, dès aujourd'hui." --write-media artifacts/voice_fr.mp3
+          ffmpeg -hide_banner -loglevel error -y -i artifacts/voice_fr.mp3 -ac 1 -ar 16000 -c:a pcm_s16le artifacts/voice_fr.wav
+      - name: Verify correct Modal workspace and new model volume
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${MODAL_TOKEN_ID:-}" =~ ^ak-[A-Za-z0-9_-]+$ ]] || exit 1
+          [[ "${MODAL_TOKEN_SECRET:-}" =~ ^as-[A-Za-z0-9_-]+$ ]] || exit 1
+          modal token info >/dev/null 2>&1 || exit 1
+          modal volume list | grep -q studio-ltx25-models || { echo "Expected prior V2 workspace volume missing"; exit 1; }
+          modal volume list | grep -q pvs-longcat-models || { echo "New avatar model volume missing"; exit 1; }
+          modal run deploy/modal_avatar_worker.py --mode doctor
+      - name: Real LongCat 1.5 French talking avatar GPU render
+        run: |
+          modal run deploy/modal_avatar_worker.py --mode render \
+            --image-png benchmark_assets/character_reference.png \
+            --audio-wav artifacts/voice_fr.wav \
+            --out artifacts/longcat_avatar_fr.mp4
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pvs-longcat-avatar-real-mp4
+          path: artifacts/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: State real result without inventing quality
+        if: always()
+        shell: bash
+        run: |
+          echo "### French avatar (LongCat 1.5)" >> "$GITHUB_STEP_SUMMARY"
+          if test -s artifacts/longcat_avatar_fr.mp4; then
+            echo "Real MP4 available in Artifacts. Visual and lip-sync quality require human review." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No MP4 produced. Inspect GPU logs; this is not a validated avatar." >> "$GITHUB_STEP_SUMMARY"
+          fi
