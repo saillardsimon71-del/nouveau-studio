@@ -24,7 +24,7 @@ séparés ci-dessous.
 | Sous-titres incrustés (ASS) + `.srt` | vérifié **image par image** (pixels clairs dans la frame) | cues ≤ 60 caractères, dans la fenêtre du plan |
 | Musique + loudness | démo | **−14,0 LUFS** intégré, vrai pic ≤ −1,5 dBTP |
 | QC automatique | démo | 9 contrôles, verdict `pass` |
-| Suivi de coût (y compris échecs) | tests | coût 0,00 $ en local (CPU) |
+| Régénération ciblée (Retake) | UI (sélection de zone) + `splice_region` testé, réinsertion mesurée | refus explicite sans moteur réel : « le retake nécessite un moteur vidéo réel (LTX) » |
 | UI React (projets, studio, personnages, moteurs/coûts) | build TypeScript sans erreur, servie par l'API | 167 kB JS, 8,9 kB CSS |
 
 ### Mesures de l'export de démonstration

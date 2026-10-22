@@ -44,9 +44,11 @@ ordre de fréquence observée dans ce type de pipeline :
 7. **Générer d'abord en `distilled`, valider le cadrage sur une image clé, puis
    DFR** : la moitié des essais ratés en cadrage ne devraient jamais coûter une
    passe DFR. Mécanique : un mode « brouillon » explicite dans l'UI.
-8. **Retake plutôt que régénération** : l'API existe (`/shots/{id}/retake`), mais
-   l'UI n'expose pas encore la sélection de zone. C'est le prochain ajout UI
-   rentable : un passage raté sur 8 s ne doit coûter que 2 s.
+8. **Retake plutôt que régénération** — fait côté mécanique : API
+   (`/shots/{id}/retake`), sélection de zone dans l'UI, réinsertion ffmpeg
+   testée. Reste à **valider sur GPU** que LTX Retake préserve le raccord
+   (continuité de lumière et de mouvement aux bornes de la zone). C'est le
+   prochain gain de coût : un passage raté sur 8 s ne doit coûter que 2 s.
 9. **Mise en cache des prompts identiques** (même prompt + même graine = même
    coût évité) : simple, mais ne pas le construire avant d'avoir mesuré combien
    de générations sont réellement dupliquées.

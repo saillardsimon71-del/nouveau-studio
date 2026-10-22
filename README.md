@@ -56,8 +56,9 @@ avec de l'IA. Un exemple est versionné :
    **import** d'une vraie capture d'écran.
 4. **Contrôler** : QC automatique (format, durée, audio, noirs, images figées,
    loudness) + checklist humaine (identité, lip-sync, jeu).
-5. **Régénérer** un plan ou seulement une zone (`Retake`), choisir la meilleure
-   prise parmi les artefacts du plan.
+5. **Régénérer** un plan ou seulement une **zone** (Retake : sélection début/fin,
+   réinsertion dans le clip d'origine), puis choisir la meilleure prise parmi les
+   artefacts du plan.
 6. **Exporter** : enchaînements, sous-titres ASS + `.srt`, musique, loudness
    cible, poster.
 

@@ -541,6 +541,13 @@ details summary {
   margin: 6px 0;
 }
 
+.retake {
+  display: grid;
+  gap: 8px;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+}
+
 .jobline {
   display: flex;
   align-items: center;

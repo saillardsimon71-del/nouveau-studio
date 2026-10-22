@@ -22,6 +22,7 @@ export default function Studio({
   const [musicGain, setMusicGain] = useState(-20);
   const [subtitles, setSubtitles] = useState(true);
   const [transitionsOn, setTransitionsOn] = useState(true);
+  const [retake, setRetake] = useState<{ shotId: string; start: number; end: number } | null>(null);
   const galleryRef = useRef<HTMLDivElement | null>(null);
 
   const loadJobs = useCallback(async () => {
@@ -71,6 +72,26 @@ export default function Studio({
       reload();
     } catch (err) {
       setError((err as Error).message);
+    }
+  };
+
+  const runRetake = async (shot: Shot) => {
+    if (!shot.selected_artifact || !retake) return;
+    setError(null);
+    setBusyShot(shot.id);
+    try {
+      await api.retakeShot(shot.id, {
+        artifact_id: shot.selected_artifact,
+        start_s: retake.start,
+        end_s: retake.end,
+        prompt: shot.prompt,
+      });
+      setRetake(null);
+      await loadJobs();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusyShot(null);
     }
   };
 
@@ -214,6 +235,20 @@ export default function Studio({
                       }}
                     />
                   </label>
+                  {shot.selected_artifact && (
+                    <button
+                      className="btn ghost small"
+                      onClick={() =>
+                        setRetake(
+                          retake?.shotId === shot.id
+                            ? null
+                            : { shotId: shot.id, start: 0, end: Math.min(2, shot.duration_s) },
+                        )
+                      }
+                    >
+                      Régénérer une zone
+                    </button>
+                  )}
                   {shot.artifacts && shot.artifacts.filter((a) => a.kind === "video").length > 1 && (
                     <select
                       className="input small-select"
@@ -233,6 +268,48 @@ export default function Studio({
                     </select>
                   )}
                 </div>
+
+                {retake?.shotId === shot.id && (
+                  <div className="retake">
+                    <p className="muted tiny">
+                      Seule la zone choisie est régénérée puis réinsérée dans le clip. Le clip d'origine reste intact
+                      comme prise de référence.
+                    </p>
+                    <div className="row gap small">
+                      <label className="field grow">
+                        <span className="muted tiny">début (s)</span>
+                        <input
+                          className="input"
+                          type="number"
+                          min={0}
+                          max={Math.max(0, shot.duration_s - 0.2)}
+                          step={0.1}
+                          value={retake.start}
+                          onChange={(event) => setRetake({ ...retake, start: Number(event.target.value) })}
+                        />
+                      </label>
+                      <label className="field grow">
+                        <span className="muted tiny">fin (s)</span>
+                        <input
+                          className="input"
+                          type="number"
+                          min={0.2}
+                          max={shot.duration_s}
+                          step={0.1}
+                          value={retake.end}
+                          onChange={(event) => setRetake({ ...retake, end: Number(event.target.value) })}
+                        />
+                      </label>
+                    </div>
+                    <button
+                      className="btn primary small"
+                      disabled={busyShot === shot.id || retake.end <= retake.start}
+                      onClick={() => void runRetake(shot)}
+                    >
+                      {busyShot === shot.id ? "…" : `Régénérer ${(retake.end - retake.start).toFixed(1)}s`}
+                    </button>
+                  </div>
+                )}
               </article>
             );
           })}
