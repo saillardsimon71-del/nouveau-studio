@@ -15,8 +15,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: pvs-avatar-${{ github.ref }}-${{ github.run_id }}
-  cancel-in-progress: true
+  group: pvs-avatar-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   avatar:
     runs-on: ubuntu-latest
@@ -44,7 +44,7 @@ jobs:
           fi
           case "$STAGE" in voice|prepare|doctor|render) ;; *) exit 2;; esac
       - name: Check Python source syntax (no GPU)
-        run: python -m py_compile deploy/modal_avatar_worker.py backend/app/engines/longcat.py
+        run: python -m py_compile deploy/modal_avatar_models.py deploy/modal_avatar_worker.py backend/app/engines/longcat.py
       - name: Install small CPU preparation tools
         run: |
           pip install "modal>=1.0,<2" edge-tts
@@ -74,14 +74,15 @@ jobs:
           echo "Modal authenticated; expected workspace resources found."
       - name: Download model weights into NEW volume (CPU only)
         if: ${{ env.STAGE == 'prepare' }}
-        run: modal run deploy/modal_avatar_worker.py --mode prepare
+        run: modal run -m deploy.modal_avatar_models --mode prepare
       - name: Doctor LongCat weights (CPU only)
         if: ${{ env.STAGE == 'doctor' }}
-        run: modal run deploy/modal_avatar_worker.py --mode doctor
+        run: modal run -m deploy.modal_avatar_models --mode doctor
       - name: Generate real speaking French avatar on NEW Modal app
         if: ${{ env.STAGE == 'render' }}
         run: |
-          modal run deploy/modal_avatar_worker.py --mode render \
+          modal run -m deploy.modal_avatar_models --mode doctor
+          modal run -m deploy.modal_avatar_worker --mode render \
             --image-png benchmark_assets/character_reference.png \
             --audio-wav artifacts/voice_fr.wav \
             --out artifacts/longcat_avatar_fr.mp4

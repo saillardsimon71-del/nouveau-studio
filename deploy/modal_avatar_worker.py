@@ -16,21 +16,11 @@ from pathlib import Path
 
 import modal
 
+from deploy.modal_avatar_models import ROOT, AVATAR, models, inspection
+
 APP_NAME = "pvs-longcat-avatar"
-VOLUME_NAME = "pvs-longcat-models"
-ROOT = Path("/models")
-BASE = ROOT / "LongCat-Video"
-AVATAR = ROOT / "LongCat-Video-Avatar-1.5"
 GPU_NAME = "A100-80GB"
-
 app = modal.App(APP_NAME)
-models = modal.Volume.from_name(VOLUME_NAME, create_if_missing=True)
-
-# CPU only: model downloads are persisted once, never baked into a GPU image.
-download_image = (
-    modal.Image.debian_slim(python_version="3.10")
-    .pip_install("huggingface_hub>=0.26,<2", "hf_xet")
-)
 
 # Upstream instructions: PyTorch 2.6 cu124 and flash-attn 2.7.4.post1.
 # The devel image is required to build flash-attn; one build can take minutes.
@@ -45,93 +35,19 @@ render_image = (
     .run_commands(
         "pip install torch==2.6.0 torchvision==0.21.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu124",
         "pip install ninja psutil packaging setuptools wheel",
-        "git clone --depth 1 https://github.com/meituan-longcat/LongCat-Video.git /opt/LongCat-Video",
+        "git clone https://github.com/meituan-longcat/LongCat-Video.git /opt/LongCat-Video && cd /opt/LongCat-Video && git checkout 6b3f4b8582a8bc3f20f795735f5383716c4ba794",
         "MAX_JOBS=2 pip install flash_attn==2.7.4.post1 --no-build-isolation",
-        "pip install -r /opt/LongCat-Video/requirements.txt -r /opt/LongCat-Video/requirements_avatar.txt",
+        "sed '/^libsndfile1==/d' /opt/LongCat-Video/requirements_avatar.txt > /opt/LongCat-Video/requirements_avatar_python.txt",
+        "pip install -r /opt/LongCat-Video/requirements.txt -r /opt/LongCat-Video/requirements_avatar_python.txt",
     )
 )
-
-NEEDED = {
-    "base_tokenizer": BASE / "tokenizer",
-    "base_encoder": BASE / "text_encoder",
-    "base_vae": BASE / "vae",
-    "avatar_int8": AVATAR / "base_model_int8",
-    "avatar_lora": AVATAR / "lora",
-    "avatar_scheduler": AVATAR / "scheduler",
-    "avatar_whisper": AVATAR / "whisper-large-v3",
-    "avatar_vocal_separator": AVATAR / "vocal_separator",
-}
-
-
-def inspection() -> dict:
-    """Read-only diagnostic; a folder must contain at least one real file."""
-    sections = {}
-    for name, folder in NEEDED.items():
-        files = [p for p in folder.rglob("*") if p.is_file()] if folder.is_dir() else []
-        sections[name] = {
-            "present": bool(files),
-            "file_count": len(files),
-            "bytes": sum(p.stat().st_size for p in files),
-        }
-    return {
-        "app": APP_NAME,
-        "volume": VOLUME_NAME,
-        "sections": sections,
-        "ready": all(section["present"] for section in sections.values()),
-    }
-
-
-@app.function(
-    image=download_image,
-    cpu=4,
-    memory=16384,
-    timeout=7200,
-    volumes={str(ROOT): models},
-)
-def prepare_models() -> dict:
-    """Download only the model components used by v1.5 INT8 into a NEW volume."""
-    from huggingface_hub import snapshot_download
-
-    os.environ.setdefault("HF_HOME", str(ROOT / ".hf_cache"))
-    for repo, target, patterns in (
-        (
-            "meituan-longcat/LongCat-Video", BASE,
-            ["tokenizer/**", "text_encoder/**", "vae/**"],
-        ),
-        (
-            "meituan-longcat/LongCat-Video-Avatar-1.5", AVATAR,
-            ["base_model_int8/**", "lora/**", "scheduler/**",
-             "whisper-large-v3/**", "vocal_separator/**"],
-        ),
-    ):
-        print(f"Checking/downloading allowed components from {repo} ...", flush=True)
-        target.mkdir(parents=True, exist_ok=True)
-        snapshot_download(
-            repo_id=repo, local_dir=str(target),
-            allow_patterns=patterns, max_workers=5,
-        )
-        models.commit()
-    report = inspection()
-    models.commit()
-    if not report["ready"]:
-        raise RuntimeError(f"Incomplete model volume: {json.dumps(report)}")
-    return report
-
-
-@app.function(
-    image=download_image, cpu=1, memory=2048, timeout=600,
-    volumes={str(ROOT): models},
-)
-def doctor() -> dict:
-    return inspection()
-
 
 @app.function(
     image=render_image,
     gpu=GPU_NAME,
     cpu=8,
     memory=65536,
-    timeout=3600,
+    timeout=1800,
     min_containers=0,
     max_containers=1,
     scaledown_window=2,
@@ -177,22 +93,33 @@ def render_avatar(image_b64: str, audio_b64: str, prompt: str) -> dict:
             "--use_distill", "--use_int8",
         ]
         print("Running official LongCat Avatar v1.5, INT8, 480p, 1 segment ...", flush=True)
-        completed = subprocess.run(
-            cmd, cwd="/opt/LongCat-Video", text=True,
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=3300,
-            env={**os.environ, "OMP_NUM_THREADS": "4"},
-        )
+        samples_path = folder / "gpu.csv"
+        with samples_path.open("w") as samples:
+            monitor = subprocess.Popen(
+                ["nvidia-smi", "--query-gpu=memory.used,utilization.gpu", "--format=csv,noheader,nounits", "-l", "1"],
+                stdout=samples, stderr=subprocess.DEVNULL,
+            )
+            try:
+                completed = subprocess.run(
+                    cmd, cwd="/opt/LongCat-Video", text=True,
+                    stderr=subprocess.STDOUT, timeout=1500,
+                    env={**os.environ, "OMP_NUM_THREADS": "4", "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"},
+                )
+            finally:
+                monitor.terminate()
+                monitor.wait(timeout=10)
         if completed.returncode:
-            raise RuntimeError("LongCat failed:\n" + completed.stdout[-8500:])
+            raise RuntimeError(f"LongCat failed with exit {completed.returncode}; see inference logs above")
         candidates = sorted(output.rglob("*.mp4"), key=lambda p: p.stat().st_mtime)
         if not candidates:
-            raise RuntimeError("LongCat finished but output MP4 missing:\n" + completed.stdout[-3000:])
+            raise RuntimeError("LongCat finished but output MP4 missing")
         raw = candidates[-1]
         final = folder / "avatar_vertical.mp4"
         # Official upstream inference is landscape; crop centrally to true 9:16
         # without stretching faces. Preserve speech and verify video/audio streams.
         subprocess.run(
             ["ffmpeg", "-y", "-v", "error", "-i", str(raw),
+             "-map", "0:v:0", "-map", "0:a:0",
              "-vf", "crop=ih*9/16:ih,scale=720:1280",
              "-c:v", "libx264", "-crf", "19", "-preset", "fast",
              "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
@@ -209,12 +136,19 @@ def render_avatar(image_b64: str, audio_b64: str, prompt: str) -> dict:
         if not {"video", "audio"}.issubset(tracks):
             raise RuntimeError("LongCat MP4 missing video or French audio track")
         wall = round(time.perf_counter() - started, 2)
+        samples = [tuple(float(v.strip()) for v in line.split(",")) for line in samples_path.read_text().splitlines()]
+        import resource
+
         return {
             "video_b64": base64.b64encode(final.read_bytes()).decode("ascii"),
             "metadata": {
                 "engine": "longcat-video-avatar-1.5",
                 "gpu": GPU_NAME,
                 "gpu_wall_seconds": wall,
+                "gpu_peak_memory_mib": max((s[0] for s in samples), default=0),
+                "gpu_mean_utilization_percent": round(sum(s[1] for s in samples) / max(1, len(samples)), 2),
+                "child_peak_ram_kib": resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
+                "compute_cost_upper_estimate_usd": round(wall * (0.000694 + 8 * 0.0000131 + 64 * 0.00000222), 4),
                 "duration_seconds": float(detail["format"]["duration"]),
                 "bytes": final.stat().st_size,
                 "streams": detail["streams"],
@@ -225,7 +159,7 @@ def render_avatar(image_b64: str, audio_b64: str, prompt: str) -> dict:
 
 @app.local_entrypoint()
 def main(
-    mode: str = "doctor",
+    mode: str = "render",
     image_png: str = "benchmark_assets/character_reference.png",
     audio_wav: str = "artifacts/voice_fr.wav",
     out: str = "artifacts/longcat_avatar_fr.mp4",
@@ -235,18 +169,8 @@ def main(
         "French naturally in a modern dark premium tech studio, soft cinematic lighting"
     ),
 ):
-    if mode == "prepare":
-        result = prepare_models.remote()
-        print(json.dumps(result, indent=2))
-        return
-    if mode == "doctor":
-        result = doctor.remote()
-        print(json.dumps(result, indent=2))
-        if not result["ready"]:
-            raise SystemExit("Models not ready: use --mode prepare")
-        return
     if mode != "render":
-        raise SystemExit("Allowed modes: prepare, doctor, render")
+        raise SystemExit("Use deploy/modal_avatar_models.py for prepare/doctor; this app renders only")
     photo = Path(image_png).read_bytes()
     voice = Path(audio_wav).read_bytes()
     result = render_avatar.remote(

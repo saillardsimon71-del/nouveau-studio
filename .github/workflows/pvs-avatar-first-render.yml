@@ -40,10 +40,10 @@ jobs:
           modal token info >/dev/null 2>&1 || exit 1
           modal volume list | grep -q studio-ltx25-models || { echo "Expected prior V2 workspace volume missing"; exit 1; }
           modal volume list | grep -q pvs-longcat-models || { echo "New avatar model volume missing"; exit 1; }
-          modal run deploy/modal_avatar_worker.py --mode doctor
+          modal run -m deploy.modal_avatar_models --mode doctor
       - name: Real LongCat 1.5 French talking avatar GPU render
         run: |
-          modal run deploy/modal_avatar_worker.py --mode render \
+          modal run -m deploy.modal_avatar_worker --mode render \
             --image-png benchmark_assets/character_reference.png \
             --audio-wav artifacts/voice_fr.wav \
             --out artifacts/longcat_avatar_fr.mp4
