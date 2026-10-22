@@ -46,6 +46,29 @@ des modèles.
 
 ---
 
+## Branchement Modal (2026-10-22) — préparé, pas encore exécuté
+
+Ajouté pour produire de vrais MP4 avec le compte GPU de Studio IA V2 :
+`deploy/modal_ltx_worker.py` (app **`pvs-ltx`**, volume `studio-ltx25-models`
+monté en lecture seule), `scripts/modal_render.py`, `.github/workflows/modal-ltx.yml`,
+`benchmark_assets/` et `docs/MODAL.md`.
+
+| Élément | État | Preuve |
+|---|---|---|
+| Contrat de requête + graphe ComfyUI deux passes | **testé** (30 tests, sans GPU) | `tests/test_modal_ltx_contract.py` |
+| Entrée CI → MP4 + métadonnées | **testé** avec un faux `render_clip` | même fichier |
+| Validateur d'inputs (PNG/WAV) | **testé** | image 768×1344 acceptée, voix absente refusée |
+| Identité du workspace Modal, poids du volume, rendu | **non exécuté** | 2 secrets GitHub à créer + 1 run `preflight` |
+| Avatar français (LongCat) | **non commencé** | volume neuf + voix référence |
+
+Aucun crédit consommé : aucun appel n'a pu atteindre `api.modal.com` depuis
+l'environnement de construction.
+
+Le détail (deux comptes documentés, nom d'app ambigu, réutilisation, procédure
+iPhone) est dans [`MODAL.md`](MODAL.md).
+
+---
+
 ## Ce qui est écrit mais non exécuté (bloqué : pas de GPU)
 
 | Composant | Ce qui est prêt | Ce qui manque pour valider |

@@ -28,6 +28,12 @@ benchmarks/out/
 *.wav
 *.mp3
 !data/exports/*.mp4
+# benchmark inputs are real, versioned media (see benchmark_assets/README.md)
+!benchmark_assets/*.wav
+!benchmark_assets/*.png
+
+# outputs of the Modal workflow (MP4 + metadata are artifacts, not commits)
+artifacts/
 
 # editors / os
 .DS_Store

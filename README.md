@@ -83,6 +83,8 @@ avec de l'IA. Un exemple est versionné :
   et la décision motivée sur LTX Desktop).
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — contrat de moteur, modèle de
   données, jobs, montage, QC, coûts.
+- [`docs/MODAL.md`](docs/MODAL.md) — branchement du compte Modal de Studio IA V2
+  (identité, réutilisation des volumes, iPhone → Actions → GPU → MP4)
 - [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md) — les trois tests de référence, ce
   qui est mesuré automatiquement, ce qui reste humain, protocole reproductible.
 - [`docs/GPU.md`](docs/GPU.md) — choix du fournisseur, recettes de pod, volumes

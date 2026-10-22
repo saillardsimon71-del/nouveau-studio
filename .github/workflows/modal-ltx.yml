@@ -1,0 +1,338 @@
+name: Modal LTX-2.5
+
+# Path: téléphone -> GitHub Actions -> Modal (GPU) -> artifact MP4.
+# Aucun secret n'est écrit ici : MODAL_TOKEN_ID / MODAL_TOKEN_SECRET viennent des
+# "Repository secrets". Le workflow ne touche jamais l'app historique Studio IA :
+# il déploie `pvs-ltx` (nouveau nom) et monte `studio-ltx25-models` en lecture seule.
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "Étape à exécuter"
+        type: choice
+        default: preflight
+        options:
+          - preflight
+          - doctor
+          - deploy
+          - render
+          - full
+          - stop
+      confirm_spend:
+        description: "Autoriser la dépense GPU ('oui' pour deploy/render/full)"
+        type: string
+        default: "non"
+      prompt:
+        description: "Prompt de la prise (render/full)"
+        type: string
+        default: "Shot vertical, cinématique : une jeune femme en blouson de cuir marche dans une rue mouillée de Rouen à l'aube, enseignes néon floues, caméra en travelling latéral lent qui la suit, pluie fine rétroéclairée, grain 35 mm, palette bleu-cyan et ambre, faible profondeur de champ, texture de peau et de tissu très détaillée, aucun texte à l'écran."
+      duration:
+        description: "Durée visée (secondes, 1-15)"
+        type: string
+        default: "5"
+      aspect:
+        description: "Format"
+        type: choice
+        default: "9:16"
+        options: ["9:16", "16:9", "1:1"]
+      seed:
+        description: "Seed (entier)"
+        type: string
+        default: "42"
+      audio_mode:
+        description: "Audio natif LTX ou silencieux"
+        type: choice
+        default: "native"
+        options: ["native", "silent"]
+      reference_image:
+        description: "Chemin d'un PNG de référence dans le dépôt (vide = text-to-video)"
+        type: string
+        default: ""
+      require_assets:
+        description: "Exiger les inputs de benchmark validés ('oui' pour les tests B/C)"
+        type: string
+        default: "non"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: modal-ltx-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHONUNBUFFERED: "1"
+  MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+  MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+  MODAL_WORKSPACE_EXPECTED: ${{ vars.MODAL_WORKSPACE_EXPECTED }}
+  PVS_MODAL_APP: pvs-ltx
+  PVS_MODAL_LTX_VOLUME: studio-ltx25-models
+  PVS_MODAL_GPU: ${{ vars.MODAL_GPU || 'L40S' }}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Identité du compte : 0 GPU, 0 €. C'est ici qu'on apprend dans quel
+  #    workspace Modal on est réellement connecté, et si les volumes attendus
+  #    existent. Échoue si MODAL_WORKSPACE_EXPECTED est défini et différent.
+  # ---------------------------------------------------------------------------
+  # Toujours exécuté, quel que soit `stage` : 0 GPU, 0 $, et il prouve le compte.
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installer le client Modal
+        run: pip install --upgrade "modal>=1.0,<2"
+
+      - name: État des inputs de benchmark (informatif, sans GPU)
+        continue-on-error: true
+        run: python scripts/check_benchmark_assets.py --warn-only
+
+      - name: Vérifier que les secrets existent (sans les afficher)
+        run: |
+          set -eu
+          if [ -z "${MODAL_TOKEN_ID:-}" ] || [ -z "${MODAL_TOKEN_SECRET:-}" ]; then
+            echo "::error title=Secrets Modal manquants::Ajouter MODAL_TOKEN_ID et MODAL_TOKEN_SECRET dans Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          echo "secrets présents (non affichés)"
+
+      # `modal token info` prints the token ID itself: never let that reach a
+      # public log. We keep only the workspace name, then delete the file.
+      - name: Identité du workspace (sans exposer le jeton)
+        id: identity
+        run: |
+          set -eu
+          if ! modal token info > token-info.raw 2>&1; then
+            echo "::error title=Jeton Modal refusé::le jeton ne s'authentifie pas; vérifier MODAL_TOKEN_ID / MODAL_TOKEN_SECRET."
+            sed -E 's/ak-[A-Za-z0-9_-]+/ak-***/g' token-info.raw
+            rm -f token-info.raw
+            exit 1
+          fi
+          clean=$(sed -E 's/\[[^]]*\]//g' token-info.raw)
+          workspace=$(printf '%s\n' "$clean" | sed -n 's/^Workspace:[[:space:]]*\([^[:space:](]*\).*/\1/p' | head -n1)
+          rm -f token-info.raw
+          echo "workspace=$workspace" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Compte Modal connecté"
+            echo "- workspace : \`${workspace:-inconnu}\`"
+            echo "- environnement Modal : \`${MODAL_ENVIRONMENT:-default}\`"
+            echo "- GPU configuré : \`$PVS_MODAL_GPU\`"
+            echo "- volume attendu : \`$PVS_MODAL_LTX_VOLUME\` (lecture seule)"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -z "$workspace" ]; then
+            echo "::error title=Workspace illisible::modal token info n'a pas renvoyé de nom de workspace."
+            exit 1
+          fi
+          if [ -n "${MODAL_WORKSPACE_EXPECTED:-}" ] && [ "$workspace" != "$MODAL_WORKSPACE_EXPECTED" ]; then
+            echo "::error title=Mauvais workspace::attendu '$MODAL_WORKSPACE_EXPECTED', obtenu '$workspace'"
+            exit 1
+          fi
+
+      - name: Apps existantes dans ce compte (0 GPU)
+        run: |
+          set -eu
+          modal app list 2>&1 | tee app-list.txt
+          {
+            echo "### Applications du compte"
+            echo '```'
+            cat app-list.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Volumes existants (0 GPU)
+        run: |
+          set -eu
+          modal volume list 2>&1 | tee volume-list.txt
+          {
+            echo "### Volumes"
+            echo '```'
+            cat volume-list.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Contenu du volume de modèles LTX-2.5 (lecture seule)
+        run: |
+          set -eu
+          if ! grep -q "$PVS_MODAL_LTX_VOLUME" volume-list.txt; then
+            echo "::error title=Volume absent::$PVS_MODAL_LTX_VOLUME n'existe pas dans ce workspace: ce n'est pas le compte qui a servi à Studio IA V2."
+            exit 1
+          fi
+          modal volume ls "$PVS_MODAL_LTX_VOLUME" diffusion_models | tee models-unet.txt
+          modal volume ls "$PVS_MODAL_LTX_VOLUME" text_encoders | tee models-clip.txt
+          modal volume ls "$PVS_MODAL_LTX_VOLUME" vae | tee models-vae.txt
+          modal volume ls "$PVS_MODAL_LTX_VOLUME" latent_upscale_models | tee models-upscaler.txt
+
+      - name: Exiger les 5 poids LTX-2.5
+        run: |
+          set -eu
+          missing=""
+          for pair in \
+            "models-unet.txt:ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors" \
+            "models-clip.txt:gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors" \
+            "models-vae.txt:ltx-2.5-video-vae-conv-bf16.safetensors" \
+            "models-vae.txt:ltx-2.5-audio-vae-bf16.safetensors" \
+            "models-upscaler.txt:ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors" \
+          ; do
+            file=${pair%%:*}; weight=${pair#*:}
+            grep -q "$weight" "$file" || missing="$missing $weight"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error title=Poids manquants::le volume existe mais il manque:$missing"
+            exit 1
+          fi
+          echo "Les 5 poids LTX-2.5 sont présents dans le volume."
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: modal-identity
+          path: |
+            app-list.txt
+            volume-list.txt
+            models-unet.txt
+            models-clip.txt
+            models-vae.txt
+            models-upscaler.txt
+          if-no-files-found: warn
+
+  # ---------------------------------------------------------------------------
+  # 2. Doctor : exécute une fonction 1 CPU / 0 GPU dans Modal pour prouver que
+  #    l'app démarre, que le volume se monte et que les 5 poids sont là.
+  # ---------------------------------------------------------------------------
+  doctor:
+    needs: preflight
+    if: ${{ inputs.stage == 'doctor' || inputs.stage == 'full' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --upgrade "modal>=1.0,<2"
+      - name: Doctor (0 GPU)
+        run: modal run deploy/modal_ltx_worker.py --mode doctor --json-out artifacts/doctor.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: doctor-report
+          path: artifacts/doctor.json
+          if-no-files-found: warn
+
+  # ---------------------------------------------------------------------------
+  # 3. Deploy du NOUVEAU app `pvs-ltx` (jamais studio-ia-ltx).
+  # ---------------------------------------------------------------------------
+  deploy:
+    needs: preflight
+    if: ${{ (inputs.stage == 'deploy' || inputs.stage == 'full') && inputs.confirm_spend == 'oui' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --upgrade "modal>=1.0,<2"
+      - name: Refuser de toucher une app historique
+        run: |
+          set -eu
+          if [ "$PVS_MODAL_APP" = "studio-ia-ltx" ]; then
+            echo "::error::Le nom d'app historique est interdit dans ce dépôt."
+            exit 1
+          fi
+          echo "déploiement de $PVS_MODAL_APP (GPU $PVS_MODAL_GPU, volume $PVS_MODAL_LTX_VOLUME, lecture seule)"
+      - name: Modal deploy
+        run: modal deploy deploy/modal_ltx_worker.py
+      - name: Rappel d'arrêt des ressources
+        if: always()
+        run: |
+          echo "scaledown_window=2 s : le conteneur GPU s'arrête seul après la dernière requête." >> "$GITHUB_STEP_SUMMARY"
+          echo "Pour tout couper immédiatement : \`modal app stop $PVS_MODAL_APP\`." >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # 4. Premier rendu réel : une prise courte, MP4 téléchargeable en artifact.
+  # ---------------------------------------------------------------------------
+  render:
+    needs: [preflight, deploy]
+    if: ${{ (inputs.stage == 'render' || inputs.stage == 'full') && inputs.confirm_spend == 'oui' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --upgrade "modal>=1.0,<2"
+
+      - name: Exiger des inputs valides si demandé
+        if: ${{ inputs.require_assets == 'oui' }}
+        run: python scripts/check_benchmark_assets.py
+
+      - name: Rendu LTX-2.5
+        env:
+          PROMPT: ${{ inputs.prompt }}
+          DURATION: ${{ inputs.duration }}
+          ASPECT: ${{ inputs.aspect }}
+          SEED: ${{ inputs.seed }}
+          AUDIO_MODE: ${{ inputs.audio_mode }}
+          REFERENCE_IMAGE: ${{ inputs.reference_image }}
+        run: |
+          set -eu
+          args=(--prompt "$PROMPT" --duration "$DURATION" --aspect "$ASPECT" --seed "$SEED" --audio-mode "$AUDIO_MODE" --out "artifacts/ltx_${GITHUB_RUN_NUMBER}.mp4")
+          if [ -n "$REFERENCE_IMAGE" ]; then
+            args+=(--image-png "$REFERENCE_IMAGE")
+          fi
+          modal run deploy/modal_ltx_worker.py --mode render "${args[@]}"
+
+      - name: Publier le MP4 et ses métadonnées
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ltx-render-${{ github.run_number }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Résumé
+        if: always()
+        run: |
+          f=$(ls artifacts/*.json 2>/dev/null | head -n1 || true)
+          if [ -n "$f" ]; then
+            python - "$f" >> "$GITHUB_STEP_SUMMARY" <<'PY'
+          import json, sys
+          m = json.load(open(sys.argv[1]))
+          print("### Rendu LTX-2.5")
+          for k in ("engine","gpu","width","height","fps","frames","duration_sec","video_codec","audio_codec","has_audio","generation_seconds","comfy_startup_seconds","cost_estimate_usd"):
+              if k in m: print(f"- **{k}** : {m[k]}")
+          print("\nTélécharger le MP4 dans l'onglet *Artifacts* de ce run.")
+          PY
+          else
+            echo "Pas de métadonnées : voir les logs." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  # ---------------------------------------------------------------------------
+  # 5. Arrêt d'urgence depuis le téléphone : coupe l'app déployée. Les runs
+  #    éphémères (`modal run`) meurent seuls, et scaledown_window=2 s éteint le
+  #    GPU après la dernière requête.
+  # ---------------------------------------------------------------------------
+  stop:
+    if: ${{ inputs.stage == 'stop' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --upgrade "modal>=1.0,<2"
+      - name: Arrêter ${{ env.PVS_MODAL_APP }}
+        run: |
+          set -eu
+          modal app stop "$PVS_MODAL_APP" || echo "app déjà arrêtée ou absente"
+          modal app list | tee apps.txt
+          { echo "### Ressources arrêtées"; echo '```'; cat apps.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
