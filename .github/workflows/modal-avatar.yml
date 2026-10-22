@@ -12,10 +12,6 @@ on:
         description: "GPU spend authorized? Enter oui for render"
         type: string
         default: "non"
-  # Temporary CPU-only bootstrap on merge; remove after successful setup.
-  push:
-    branches: [main]
-    paths: [.github/workflows/modal-avatar.yml]
 permissions:
   contents: read
 concurrency:
