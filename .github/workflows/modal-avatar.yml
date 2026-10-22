@@ -19,7 +19,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: pvs-avatar-${{ github.ref }}
+  group: pvs-avatar-${{ github.ref }}-${{ github.run_id }}
   cancel-in-progress: true
 jobs:
   avatar:
