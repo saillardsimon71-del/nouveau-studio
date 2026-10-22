@@ -139,7 +139,7 @@ def create_avatar_demo() -> dict[str, Any]:
     shot = add_shot(project["id"], ShotCreate(
         kind="avatar", title="Avatar français", duration_s=3.72,
         dialogue="L'IA peut automatiser vos tâches, dès aujourd'hui.",
-        prompt="Photorealistic French man speaking naturally to camera, subtle head motion, cinematic studio lighting.",
+        prompt="Photorealistic presenter speaking naturally to camera, subtle head motion, cinematic studio lighting.",
         character_id=character["id"],
     ))
     db.update("shots", shot["id"], {"params": {"engine_hint": "modal_avatar"}})

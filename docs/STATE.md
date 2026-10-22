@@ -1,5 +1,22 @@
 # État réel du studio
 
+## Mise en service Modal du 2026-10-22
+
+LTX-2.5 et LongCat 1.5 ont maintenant produit de vrais MP4 sur `kulejean567`.
+La préparation CPU a réussi dans le run [39839343682](https://github.com/saillardsimon71-del/nouveau-studio/actions/runs/39839343682).
+Le [run 39839348041](https://github.com/saillardsimon71-del/nouveau-studio/actions/runs/39839348041)
+contient le MP4 français réel : 720 x 1280, 3,72 s, H.264 et AAC.
+Les 47 fichiers LongCat sont vérifiés dans `pvs-longcat-models` (66,42 Go).
+
+Le parcours direct depuis l'interface a aussi réussi : LongCat 308,08 s sur
+A100 80 Go, puis LTX 108,74 s sur L40S, sans GitHub Actions.
+Le pilote avatar conserve l'audio source à 16 kHz et -21,7 LUFS ; le QC signale
+ces deux points comme finitions audio. Il ne détecte ni noir ni image figée.
+La synchronisation labiale fine reste un contrôle visuel et auditif humain.
+Voir [MODAL_STUDIO.md](MODAL_STUDIO.md) pour reproduire les rendus.
+
+Les mesures de l'ancien environnement de développement ci-dessous sont historiques.
+
 Dernière mise à jour : 2026-10-22. Environnement de développement : Debian,
 **2 vCPU, 3 Go de RAM, aucun GPU**. Toutes les mesures ci-dessous viennent de cet
 environnement, sauf mention explicite.

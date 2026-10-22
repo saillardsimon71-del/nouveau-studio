@@ -117,7 +117,7 @@ def render_avatar(image_b64: str, audio_b64: str, prompt: str) -> dict:
             raise RuntimeError("LongCat finished but output MP4 missing")
         raw = candidates[-1]
         final = folder / "avatar_vertical.mp4"
-        # Official upstream inference is landscape; crop centrally to true 9:16
+        # Upstream uses aspect-ratio buckets; crop centrally to true 9:16
         # without stretching faces. Preserve speech and verify video/audio streams.
         subprocess.run(
             ["ffmpeg", "-y", "-v", "error", "-i", str(raw),
@@ -150,7 +150,8 @@ def render_avatar(image_b64: str, audio_b64: str, prompt: str) -> dict:
                 "gpu_peak_memory_mib": max((s[0] for s in samples), default=0),
                 "gpu_mean_utilization_percent": round(sum(s[1] for s in samples) / max(1, len(samples)), 2),
                 "child_peak_ram_kib": resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
-                "compute_cost_upper_estimate_usd": round(wall * (0.000694 + 8 * 0.0000131 + 64 * 0.00000222), 4),
+                "compute_cost_estimate_usd": round(wall * (0.000694 + 8 * 0.0000131 + 64 * 0.00000222), 4),
+                "cost_basis": "GPU plus reserved CPU/RAM; excludes cold start and RAM bursts",
                 "duration_seconds": float(detail["format"]["duration"]),
                 "bytes": final.stat().st_size,
                 "streams": detail["streams"],
@@ -166,8 +167,7 @@ def main(
     audio_wav: str = "artifacts/voice_fr.wav",
     out: str = "artifacts/longcat_avatar_fr.mp4",
     prompt: str = (
-        "Photorealistic French man in his thirties, short dark hair, neat beard, "
-        "anthracite sweater, subtle expressions, looking at camera, speaking "
+        "Photorealistic presenter, subtle expressions, looking at camera, speaking "
         "French naturally in a modern dark premium tech studio, soft cinematic lighting"
     ),
 ):

@@ -19,6 +19,7 @@ class ModalEngine(Engine):
             label="LongCat 1.5 sur Modal" if kind == "avatar" else "LTX-2.5 sur Modal",
             capabilities=["image_to_video", "lip_sync"] if kind == "avatar" else ["text_to_video", "image_to_video"],
             requires_gpu=True, provider="modal", gpu="A100_80GB" if kind == "avatar" else "L40S",
+            verified=True,
             notes="Un segment de 3.72 s maximum" if kind == "avatar" else "Rendu distant sans GitHub Actions",
         )
 
