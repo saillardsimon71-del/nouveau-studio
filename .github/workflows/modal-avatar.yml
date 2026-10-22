@@ -1,0 +1,110 @@
+name: PVS French Talking Avatar (LongCat)
+# Separate Modal app & volume; never touches legacy Studio IA resources.
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "voice / prepare / doctor / render"
+        type: choice
+        options: [voice, prepare, doctor, render]
+        default: voice
+      confirm_spend:
+        description: "GPU spend authorized? Enter oui for render"
+        type: string
+        default: "non"
+  # Temporary CPU-only bootstrap on merge; remove after successful setup.
+  push:
+    branches: [main]
+    paths: [.github/workflows/modal-avatar.yml]
+permissions:
+  contents: read
+concurrency:
+  group: pvs-avatar-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  avatar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      PYTHONUNBUFFERED: "1"
+      STAGE: ${{ github.event_name == 'push' && 'voice' || inputs.stage }}
+      CONFIRM_SPEND: ${{ inputs.confirm_spend || 'non' }}
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Validate inputs without disclosing secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${MODAL_TOKEN_ID:-}" =~ ^ak-[A-Za-z0-9_-]+$ ]] || { echo "::error::Invalid token id"; exit 1; }
+          [[ "${MODAL_TOKEN_SECRET:-}" =~ ^as-[A-Za-z0-9_-]+$ ]] || { echo "::error::Invalid token secret"; exit 1; }
+          if [[ "$STAGE" == "render" && "$CONFIRM_SPEND" != "oui" ]]; then
+            echo "::error::render needs confirm_spend=oui"
+            exit 1
+          fi
+          case "$STAGE" in voice|prepare|doctor|render) ;; *) exit 2;; esac
+      - name: Check Python source syntax (no GPU)
+        run: python -m py_compile deploy/modal_avatar_worker.py backend/app/engines/longcat.py
+      - name: Install small CPU preparation tools
+        run: |
+          pip install "modal>=1.0,<2" edge-tts
+          sudo apt-get update -qq && sudo apt-get install -y ffmpeg >/dev/null
+      - name: Generate a short French demo voice (no avatar GPU)
+        if: ${{ env.STAGE == 'voice' || env.STAGE == 'render' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          edge-tts --voice fr-FR-HenriNeural --text "L'IA peut automatiser vos tâches, dès aujourd'hui." --write-media artifacts/voice_fr.mp3
+          ffmpeg -hide_banner -loglevel error -y -i artifacts/voice_fr.mp3 -ac 1 -ar 16000 -c:a pcm_s16le artifacts/voice_fr.wav
+          python - <<'PY'
+          import wave
+          with wave.open("artifacts/voice_fr.wav","rb") as f:
+              duration=f.getnframes()/f.getframerate()
+              print(f"French TTS WAV: {duration:.2f}s, {f.getframerate()} Hz")
+              if not 1 < duration < 8: raise RuntimeError("unexpected speech duration")
+          PY
+      - name: Check account (no secret values in output)
+        if: ${{ env.STAGE == 'prepare' || env.STAGE == 'doctor' || env.STAGE == 'render' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          modal token info >/dev/null 2>&1 || { echo "::error::Modal authentication failed"; exit 1; }
+          modal volume list | grep -q 'studio-ltx25-models' || { echo "::error::Expected V2 legacy volume missing"; exit 1; }
+          echo "Modal authenticated; expected workspace resources found."
+      - name: Download model weights into NEW volume (CPU only)
+        if: ${{ env.STAGE == 'prepare' }}
+        run: modal run deploy/modal_avatar_worker.py --mode prepare
+      - name: Doctor LongCat weights (CPU only)
+        if: ${{ env.STAGE == 'doctor' }}
+        run: modal run deploy/modal_avatar_worker.py --mode doctor
+      - name: Generate real speaking French avatar on NEW Modal app
+        if: ${{ env.STAGE == 'render' }}
+        run: |
+          modal run deploy/modal_avatar_worker.py --mode render \
+            --image-png benchmark_assets/character_reference.png \
+            --audio-wav artifacts/voice_fr.wav \
+            --out artifacts/longcat_avatar_fr.mp4
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pvs-avatar-${{ github.run_number }}
+          path: artifacts/
+          retention-days: 30
+          if-no-files-found: ignore
+      - name: Report actual result only
+        if: always()
+        shell: bash
+        run: |
+          echo "### LongCat French Avatar" >> "$GITHUB_STEP_SUMMARY"
+          echo "- stage: $STAGE" >> "$GITHUB_STEP_SUMMARY"
+          echo "- workspace expected: kulejean567" >> "$GITHUB_STEP_SUMMARY"
+          if test -s artifacts/longcat_avatar_fr.mp4; then
+            echo "- real MP4: generated (see Artifacts)" >> "$GITHUB_STEP_SUMMARY"
+          elif [[ "$STAGE" == "render" ]]; then
+            echo "- MP4: NOT generated; see job log" >> "$GITHUB_STEP_SUMMARY"
+          fi

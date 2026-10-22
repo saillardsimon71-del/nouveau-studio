@@ -74,7 +74,11 @@ class LongCatAvatarEngine(Engine):
         input_json.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
         nproc = int(request.params.get("nproc", 1))
-        resolution = int(request.params.get("resolution", 720))
+        resolution = str(request.params.get("resolution", "720p"))
+        if resolution in ("480", "720"):
+            resolution += "p"
+        if resolution not in ("480p", "720p"):
+            raise ValueError("LongCat resolution must be 480p or 720p")
         segments = int(request.params.get("num_segments", 1))
         cmd = [
             "torchrun", f"--nproc_per_node={nproc}",
