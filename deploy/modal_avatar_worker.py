@@ -37,8 +37,10 @@ render_image = (
         "pip install ninja psutil packaging setuptools wheel",
         "git clone https://github.com/meituan-longcat/LongCat-Video.git /opt/LongCat-Video && cd /opt/LongCat-Video && git checkout 6b3f4b8582a8bc3f20f795735f5383716c4ba794",
         "MAX_JOBS=2 pip install flash_attn==2.7.4.post1 --no-build-isolation",
-        "sed '/^libsndfile1==/d' /opt/LongCat-Video/requirements_avatar.txt > /opt/LongCat-Video/requirements_avatar_python.txt",
+        # libsndfile1 is installed by apt; tritonserverclient is unpublished and unused by inference.
+        "sed -e '/^libsndfile1==/d' -e '/^tritonserverclient==/d' /opt/LongCat-Video/requirements_avatar.txt > /opt/LongCat-Video/requirements_avatar_python.txt",
         "pip install -r /opt/LongCat-Video/requirements.txt -r /opt/LongCat-Video/requirements_avatar_python.txt",
+        "cd /opt/LongCat-Video && python -c 'import ctypes; ctypes.CDLL(\"libsndfile.so.1\"); from longcat_video.pipeline_longcat_video_avatar import LongCatVideoAvatarPipeline; from audio_separator.separator import Separator'",
     )
 )
 
