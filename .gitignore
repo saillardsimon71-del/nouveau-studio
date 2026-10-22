@@ -1,0 +1,35 @@
+# runtime data (generated media, DB, logs)
+data/*
+!data/exports/
+!data/exports/**
+!data/README.md
+
+# python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# tooling
+.tools/
+.env
+.env.local
+
+# benchmarks: scenarios and published results are versioned, raw clips are not
+benchmarks/raw/
+benchmarks/out/
+*.mp4
+*.wav
+*.mp3
+!data/exports/*.mp4
+
+# editors / os
+.DS_Store
+.idea/
+.vscode/

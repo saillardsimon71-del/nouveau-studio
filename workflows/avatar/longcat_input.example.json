@@ -1,0 +1,7 @@
+{
+  "prompt": "A photorealistic French presenter in his thirties, short dark hair, neatly trimmed short beard, fine anthracite knit sweater, seated in a dark contemporary studio. Cool blue key light from camera left, warm rim light on the shoulder, shallow depth of field. Medium close-up, looking directly into the lens, speaking naturally with subtle head movement and micro-expressions, realistic skin texture, steady tripod framing.",
+  "cond_image": "/data/characters/presenter_reference.png",
+  "cond_audio": {
+    "person1": "/data/projects/proj_x/jobs/job_y/voice/voice.wav"
+  }
+}

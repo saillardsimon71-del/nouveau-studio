@@ -1,0 +1,92 @@
+# TEST A — Avatar premium (premier jalon)
+# Vidéo verticale ~8 s, présentateur photoréaliste, français naturel.
+id: test_a_avatar
+title: "Avatar premium — présentateur français face caméra"
+goal: >
+  Prouver qu'un présentateur photoréaliste, récurrent et cohérent, peut prononcer une
+  phrase française de 8 secondes avec une synchronisation labiale et un regard crédibles.
+duration_s: 8
+format: "9:16"
+spoken_text: "Et si tu pouvais automatiser toutes ces tâches qui te font perdre du temps ?"
+character:
+  description: >
+    Homme français, 32-38 ans, barbe courte soignée, cheveux bruns courts, pull en maille
+    fine anthracite, studio contemporain sombre, lumière clé froide + rim light chaude.
+  reference_image: benchmark_assets/character_reference.png
+  voice_reference: benchmark_assets/voice_reference_fr.wav   # 8-12 s de voix réelle
+engine_prompt: >
+  Cinematic medium close-up of a photorealistic French man in his thirties, short dark hair,
+  neatly trimmed short beard, fine anthracite knit sweater, seated in a dark contemporary
+  studio. Cool blue key light from camera left, warm rim light on the shoulder, shallow depth
+  of field, 85mm lens, eye level, looking directly into the lens, speaking naturally with
+  subtle head movement and micro-expressions, realistic skin texture with visible pores,
+  steady tripod framing, no camera move.
+variants:
+  - engine: longcat_avatar
+    label: "LongCat-Video-Avatar 1.5 (Whisper sync, 8 steps, int8)"
+    params:
+      resolution: 720
+      use_distill: true
+      use_int8: true
+      num_segments: 1
+      ref_img_index: 10
+      mask_frame_range: 3
+      nproc: 1
+    gpu: A100_80GB
+  - engine: ltx_native
+    label: "LTX-2.5 audio-to-video (audio conditionné, pas de lip-sync dédié)"
+    params:
+      pipeline: two_stages
+      width: 1088
+      height: 1920
+      fps: 24
+    gpu: H100_80GB
+    note: "Comparaison : LTX-2.5 génère l'audio et l'image ensemble ; ici on lui donne la voix pour tester le rendu du visage."
+  - engine: infinite_talk
+    label: "InfiniteTalk (référence de comparaison, fallback)"
+    params: { resolution: 480, nproc: 1 }
+    gpu: A100_80GB
+criteria:
+  - id: face_credibility
+    label: "Visage crédible (peau, yeux, dents)"
+    scale: 0-5
+    fail_if_below: 3
+  - id: gaze
+    label: "Regard naturel, ancré caméra"
+    scale: 0-5
+    fail_if_below: 3
+  - id: expression
+    label: "Expressions humaines (pas de masque figé)"
+    scale: 0-5
+  - id: head_motion
+    label: "Mouvement de tête réaliste, sans tremblement"
+    scale: 0-5
+  - id: lip_sync
+    label: "Synchronisation labiale perçue (contrôle humain, visionnage 0.25x)"
+    scale: 0-5
+    fail_if_below: 3
+  - id: deformation
+    label: "Absence de déformations (bouche, mâchoire, mains)"
+    scale: 0-5
+  - id: voice
+    label: "Voix française convaincante (accent, prosodie, respiration)"
+    scale: 0-5
+    fail_if_below: 3
+  - id: duration_accuracy
+    label: "Durée utile ≤ 8 s avec la phrase complète"
+    type: boolean
+automatic_checks:
+  - container_probe
+  - audio_track_present
+  - loudness_range
+  - no_black_frames
+  - no_frozen_frames
+  - duration_matches_speech
+record:
+  - engine_and_version
+  - parameters
+  - gpu_and_vram_peak
+  - generation_seconds
+  - est_cost_usd
+  - attempts
+  - observations

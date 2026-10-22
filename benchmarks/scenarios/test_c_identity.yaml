@@ -1,0 +1,68 @@
+# TEST C — Cohérence d'identité (troisième jalon)
+id: test_c_identity
+title: "Trois plans, un seul personnage"
+goal: >
+  Le même présentateur reste reconnaissable en plan face caméra, de profil et assis devant
+  son ordinateur. C'est la condition d'une série de vidéos, pas d'une vidéo.
+duration_s: 4
+format: "9:16"
+identity_anchor:
+  reference_image: benchmark_assets/character_reference.png
+  method: >
+    Tous les plans partent de la MÊME image de référence. Les plans avatar passent par le
+    moteur de talking-head (image de référence = cond_image). Les plans B-roll passent par
+    LTX image-to-video avec la même référence en première frame et un prompt d'apparence
+    identique (mêmes vêtements, même coiffure, même barbe).
+shared_appearance_prompt: >
+  Same man as the reference image: French man in his thirties, short dark hair, neatly
+  trimmed short beard, fine anthracite knit sweater, dark contemporary studio.
+shots:
+  - id: face_camera
+    kind: avatar
+    prompt: "Medium close-up, facing camera, 85mm, f/2.0, eye level, speaking"
+    dialogue: "Voici le même présentateur, plan par plan."
+  - id: profile
+    kind: avatar
+    prompt: "Profile three-quarter view, 50mm, f/2.0, looking slightly off-camera, profile light"
+    dialogue: "Ici il est de profil dans son studio."
+  - id: at_desk
+    kind: b_roll
+    prompt: >
+      Same man seated at a dark walnut desk in front of an open laptop, side light from a
+      window, three-quarter back view then turning toward camera, 35mm, f/2.8
+    dialogue: "Et ici, assis devant son ordinateur."
+variants:
+  - engine: longcat_avatar
+    label: "Plans 1-2 (avatar) + plan 3 en B-roll LTX depuis la même référence"
+    params: { resolution: 720, use_distill: true, use_int8: true, nproc: 1 }
+    gpu: A100_80GB
+  - engine: ltx_native
+    label: "Trois plans image->vidéo LTX avec la même image de référence"
+    params: { pipeline: dfr, width: 1088, height: 1920, fps: 24 }
+    gpu: H100_80GB
+criteria:
+  - id: face_similarity
+    label: "Similarité du visage (jugement humain + embedding si dispo)"
+    scale: 0-5
+    fail_if_below: 3
+  - id: silhouette
+    label: "Silhouette et carrure"
+    scale: 0-5
+  - id: wardrobe
+    label: "Tenue identique"
+    scale: 0-5
+  - id: identity_drift
+    label: "Dérive d'identité entre plans (0 = identique)"
+    scale: 0-5
+    fail_if_below: 3
+automatic_checks:
+  - container_probe
+  - same_resolution_and_fps
+  - no_black_frames
+  - no_frozen_frames
+manual_checks:
+  - side_by_side_review
+  - embed_and_compare (facultatif: facenet/arcface sur 3 frames par plan)
+decision_rule: >
+  Retenu si l'identité est reconnue sans hésitation par 2 relecteurs indépendants sur les
+  trois plans, et si la tenue ne change pas.

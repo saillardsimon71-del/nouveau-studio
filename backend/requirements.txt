@@ -1,0 +1,14 @@
+# Versions vérifiées dans l'environnement de développement (Python 3.11, Debian, 2 vCPU).
+# Les bornes hautes protègent des ruptures d'API ; les bornes basses sont les
+# versions réellement testées (fichier généré à partir de l'environnement qui a
+# fait passer la suite de tests).
+fastapi>=0.159,<0.170
+uvicorn[standard]>=0.54,<0.60
+pydantic>=2.14,<3
+httpx>=0.28,<0.29
+python-multipart>=0.0.32
+pyyaml>=6.0.3,<7
+av>=18.1,<19
+imageio-ffmpeg>=0.6,<0.7
+numpy>=2.0,<3
+pytest>=9.1,<10

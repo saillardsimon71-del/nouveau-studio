@@ -1,0 +1,274 @@
+{
+  "generated_at": "2026-10-22T16:09:08+00:00",
+  "mode": "dry_run",
+  "results": [
+    {
+      "scenario": "test_a_avatar",
+      "title": "Avatar premium — présentateur français face caméra",
+      "duration_s": 8,
+      "status": "planned_not_executed",
+      "variants": [
+        {
+          "engine": "longcat_avatar",
+          "label": "LongCat-Video-Avatar 1.5 (Whisper sync, 8 steps, int8)",
+          "params": {
+            "resolution": 720,
+            "use_distill": true,
+            "use_int8": true,
+            "num_segments": 1,
+            "ref_img_index": 10,
+            "mask_frame_range": 3,
+            "nproc": 1
+          },
+          "gpu": "A100_80GB",
+          "gpu_seconds_estimate": 64.0,
+          "rate_usd_hr": 1.39,
+          "cost_usd_estimate": 0.025,
+          "assumption": "GPU-seconds per video-second from published speed claims; verify on first real run"
+        },
+        {
+          "engine": "ltx_native",
+          "label": "LTX-2.5 audio-to-video (audio conditionné, pas de lip-sync dédié)",
+          "params": {
+            "pipeline": "two_stages",
+            "width": 1088,
+            "height": 1920,
+            "fps": 24
+          },
+          "gpu": "H100_80GB",
+          "gpu_seconds_estimate": 144.0,
+          "rate_usd_hr": 2.89,
+          "cost_usd_estimate": 0.116,
+          "assumption": "GPU-seconds per video-second from published speed claims; verify on first real run"
+        },
+        {
+          "engine": "infinite_talk",
+          "label": "InfiniteTalk (référence de comparaison, fallback)",
+          "params": {
+            "resolution": 480,
+            "nproc": 1
+          },
+          "gpu": "A100_80GB",
+          "gpu_seconds_estimate": 96.0,
+          "rate_usd_hr": 1.39,
+          "cost_usd_estimate": 0.037,
+          "assumption": "GPU-seconds per video-second from published speed claims; verify on first real run"
+        }
+      ],
+      "criteria": [
+        {
+          "id": "face_credibility",
+          "label": "Visage crédible (peau, yeux, dents)",
+          "scale": "0-5",
+          "fail_if_below": 3
+        },
+        {
+          "id": "gaze",
+          "label": "Regard naturel, ancré caméra",
+          "scale": "0-5",
+          "fail_if_below": 3
+        },
+        {
+          "id": "expression",
+          "label": "Expressions humaines (pas de masque figé)",
+          "scale": "0-5"
+        },
+        {
+          "id": "head_motion",
+          "label": "Mouvement de tête réaliste, sans tremblement",
+          "scale": "0-5"
+        },
+        {
+          "id": "lip_sync",
+          "label": "Synchronisation labiale perçue (contrôle humain, visionnage 0.25x)",
+          "scale": "0-5",
+          "fail_if_below": 3
+        },
+        {
+          "id": "deformation",
+          "label": "Absence de déformations (bouche, mâchoire, mains)",
+          "scale": "0-5"
+        },
+        {
+          "id": "voice",
+          "label": "Voix française convaincante (accent, prosodie, respiration)",
+          "scale": "0-5",
+          "fail_if_below": 3
+        },
+        {
+          "id": "duration_accuracy",
+          "label": "Durée utile ≤ 8 s avec la phrase complète",
+          "type": "boolean"
+        }
+      ],
+      "note": "Aucune génération n'a été lancée: ce fichier est un plan, pas un résultat."
+    },
+    {
+      "scenario": "test_b_cinematic",
+      "title": "Plan publicitaire technologique 5–8 s",
+      "duration_s": 6,
+      "status": "planned_not_executed",
+      "variants": [
+        {
+          "engine": "ltx_native",
+          "label": "LTX-2.5 DFR (production quality)",
+          "params": {
+            "pipeline": "dfr",
+            "width": 1088,
+            "height": 1920,
+            "fps": 24,
+            "num_frames": 145,
+            "temporal_upscalings": 0,
+            "quantization": "fp8-cast"
+          },
+          "gpu": "H100_80GB",
+          "gpu_seconds_estimate": 150.0,
+          "rate_usd_hr": 2.89,
+          "cost_usd_estimate": 0.12,
+          "assumption": "GPU-seconds per video-second from published speed claims; verify on first real run"
+        },
+        {
+          "engine": "ltx_native",
+          "label": "LTX-2.5 distilled (draft rapide)",
+          "params": {
+            "pipeline": "distilled",
+            "width": 1088,
+            "height": 1920,
+            "fps": 24,
+            "num_frames": 145
+          },
+          "gpu": "H100_80GB",
+          "gpu_seconds_estimate": 42.0,
+          "rate_usd_hr": 2.89,
+          "cost_usd_estimate": 0.034,
+          "assumption": "GPU-seconds per video-second from published speed claims; verify on first real run"
+        },
+        {
+          "engine": "comfyui",
+          "label": "ComfyUI + LTX-2.5 (workflow exporté)",
+          "params": {
+            "workflow": "ltx_t2v",
+            "fps": 24
+          },
+          "gpu": "RTX_5090",
+          "gpu_seconds_estimate": 60.0,
+          "rate_usd_hr": 0.99,
+          "cost_usd_estimate": 0.017,
+          "assumption": "GPU-seconds per video-second from published speed claims; verify on first real run"
+        },
+        {
+          "engine": "wan22_ti2v",
+          "label": "Wan2.2 TI2V-5B (comparaison coût/vitesse)",
+          "params": {
+            "resolution": "720p",
+            "fps": 24
+          },
+          "gpu": "RTX_4090",
+          "gpu_seconds_estimate": 18.0,
+          "rate_usd_hr": 0.69,
+          "cost_usd_estimate": 0.003,
+          "assumption": "GPU-seconds per video-second from published speed claims; verify on first real run"
+        }
+      ],
+      "criteria": [
+        {
+          "id": "photorealism",
+          "label": "Photoréalisme (matière, réflexions, grain)",
+          "scale": "0-5",
+          "fail_if_below": 3
+        },
+        {
+          "id": "lighting",
+          "label": "Éclairage et textures",
+          "scale": "0-5"
+        },
+        {
+          "id": "composition",
+          "label": "Composition et profondeur",
+          "scale": "0-5"
+        },
+        {
+          "id": "motion",
+          "label": "Fluidité du mouvement de caméra",
+          "scale": "0-5",
+          "fail_if_below": 3
+        },
+        {
+          "id": "temporal",
+          "label": "Cohérence temporelle (pas de morphing)",
+          "scale": "0-5"
+        },
+        {
+          "id": "artifacts",
+          "label": "Absence d'artefacts majeurs",
+          "scale": "0-5",
+          "fail_if_below": 3
+        }
+      ],
+      "note": "Aucune génération n'a été lancée: ce fichier est un plan, pas un résultat."
+    },
+    {
+      "scenario": "test_c_identity",
+      "title": "Trois plans, un seul personnage",
+      "duration_s": 4,
+      "status": "planned_not_executed",
+      "variants": [
+        {
+          "engine": "longcat_avatar",
+          "label": "Plans 1-2 (avatar) + plan 3 en B-roll LTX depuis la même référence",
+          "params": {
+            "resolution": 720,
+            "use_distill": true,
+            "use_int8": true,
+            "nproc": 1
+          },
+          "gpu": "A100_80GB",
+          "gpu_seconds_estimate": 32.0,
+          "rate_usd_hr": 1.39,
+          "cost_usd_estimate": 0.012,
+          "assumption": "GPU-seconds per video-second from published speed claims; verify on first real run"
+        },
+        {
+          "engine": "ltx_native",
+          "label": "Trois plans image->vidéo LTX avec la même image de référence",
+          "params": {
+            "pipeline": "dfr",
+            "width": 1088,
+            "height": 1920,
+            "fps": 24
+          },
+          "gpu": "H100_80GB",
+          "gpu_seconds_estimate": 100.0,
+          "rate_usd_hr": 2.89,
+          "cost_usd_estimate": 0.08,
+          "assumption": "GPU-seconds per video-second from published speed claims; verify on first real run"
+        }
+      ],
+      "criteria": [
+        {
+          "id": "face_similarity",
+          "label": "Similarité du visage (jugement humain + embedding si dispo)",
+          "scale": "0-5",
+          "fail_if_below": 3
+        },
+        {
+          "id": "silhouette",
+          "label": "Silhouette et carrure",
+          "scale": "0-5"
+        },
+        {
+          "id": "wardrobe",
+          "label": "Tenue identique",
+          "scale": "0-5"
+        },
+        {
+          "id": "identity_drift",
+          "label": "Dérive d'identité entre plans (0 = identique)",
+          "scale": "0-5",
+          "fail_if_below": 3
+        }
+      ],
+      "note": "Aucune génération n'a été lancée: ce fichier est un plan, pas un résultat."
+    }
+  ]
+}
