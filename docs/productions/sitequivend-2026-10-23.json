@@ -1,0 +1,170 @@
+{
+  "brand": "SiteQuiVend",
+  "date": "2026-10-23",
+  "delivery": "26 seconds / 1080x1920 / H.264 + AAC stereo 48kHz",
+  "modal_usage_usd": "0.39089376",
+  "cost_scope": "Modal resource usage only; imagegen unit price not supplied by the tool; local CPU editing not monetised.",
+  "source": {
+    "url": "https://www.pexels.com/video/elegant-modern-living-room-with-natural-light-37479012/",
+    "author": "Alef Morais",
+    "license_url": "https://www.pexels.com/license/"
+  },
+  "music": {
+    "title": "Ascension",
+    "artist": "Scott Buckley",
+    "source": "https://www.scottbuckley.com.au/library/ascension/",
+    "license": "CC BY 4.0",
+    "excerpt_start_s": 46,
+    "excerpt_duration_s": 26
+  },
+  "local_runtime": {
+    "modal": "1.6.1",
+    "Pillow": "12.2.0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "openai-whisper": "20250625",
+    "fonttools": "4.63.0"
+  },
+  "visual_review": {
+    "produit": "stable bottle, controlled camera move, no generated lettering",
+    "restaurant": "stable chocolate plating and macro camera move",
+    "villa": "stable architectural lines and moving reflections",
+    "interieur": "source-conditioned creative transformation, furnishing details reinterpreted"
+  },
+  "limitations": [
+    "LTX shots generated at 768x1344 and resized to 1080x1920",
+    "Video-to-video reinterprets furniture details; this is an illustrative transformation, not a faithful property record"
+  ],
+  "outputs": {
+    "SiteQuiVend-publicite-26s.mp4": {
+      "bytes": 24051214,
+      "sha256": "5abfd94f9b86371f420b0e035d0a289c66143f6963a477b19302b62ff46d3854"
+    },
+    "SiteQuiVend-sans-sous-titres.mp4": {
+      "bytes": 23806342,
+      "sha256": "dc58cd89f3c76da7b17aef6aba6ce98ebb98ab01dc8e0e802a2e0a0f6a8e82d0"
+    },
+    "SiteQuiVend-miniature.jpg": {
+      "bytes": 841216,
+      "sha256": "16551e04cf9b158cb96c0dbb05535fff6dcb20f24314d547b3a7b0b70f944190"
+    }
+  },
+  "shots": [
+    {
+      "engine": "LTX-2.5 Distilled (ComfyUI, 2 passes)",
+      "app": "pvs-sitequivend-ad",
+      "trace_id": "sqv-produit-v1",
+      "seed": 812310,
+      "steps": 8,
+      "width": 768,
+      "height": 1344,
+      "frames": 121,
+      "fps": 24,
+      "duration_sec": 5.042,
+      "continuity_mode": "image",
+      "image_strength": 0.85,
+      "source_noise_sigma": null,
+      "source_video": null,
+      "model_revision": "49b093a39c19169a8a81721dcc541e07e945232f",
+      "comfyui_revision": "d49e888586dd8ae012c0667b33466b815fee07f7",
+      "generation_seconds": 120.406
+    },
+    {
+      "engine": "LTX-2.5 Distilled (ComfyUI, 2 passes)",
+      "app": "pvs-sitequivend-ad",
+      "trace_id": "sqv-restaurant-v1",
+      "seed": 812311,
+      "steps": 8,
+      "width": 768,
+      "height": 1344,
+      "frames": 121,
+      "fps": 24,
+      "duration_sec": 5.042,
+      "continuity_mode": "image",
+      "image_strength": 0.85,
+      "source_noise_sigma": null,
+      "source_video": null,
+      "model_revision": "49b093a39c19169a8a81721dcc541e07e945232f",
+      "comfyui_revision": "d49e888586dd8ae012c0667b33466b815fee07f7",
+      "generation_seconds": 107.353
+    },
+    {
+      "engine": "LTX-2.5 Distilled (ComfyUI, 2 passes)",
+      "app": "pvs-sitequivend-ad",
+      "trace_id": "sqv-villa-v1",
+      "seed": 812312,
+      "steps": 8,
+      "width": 768,
+      "height": 1344,
+      "frames": 121,
+      "fps": 24,
+      "duration_sec": 5.042,
+      "continuity_mode": "image",
+      "image_strength": 0.85,
+      "source_noise_sigma": null,
+      "source_video": null,
+      "model_revision": "49b093a39c19169a8a81721dcc541e07e945232f",
+      "comfyui_revision": "d49e888586dd8ae012c0667b33466b815fee07f7",
+      "generation_seconds": 115.038
+    },
+    {
+      "engine": "LTX-2.5 Distilled (ComfyUI, 2 passes)",
+      "app": "pvs-sitequivend-ad",
+      "trace_id": "sqv-interieur-v1",
+      "seed": 812313,
+      "steps": 3,
+      "width": 768,
+      "height": 1344,
+      "frames": 121,
+      "fps": 24,
+      "duration_sec": 5.042,
+      "continuity_mode": "video",
+      "image_strength": 0.85,
+      "source_noise_sigma": 0.85,
+      "source_video": {
+        "width": 768,
+        "height": 1344,
+        "avg_frame_rate": "24/1",
+        "nb_read_frames": "121",
+        "fps": 24.0,
+        "sha256": "1d5cd4c0ebc1c2cfd14204f8f061379d9e35235b37f2df9e88d2696e5138fac3"
+      },
+      "model_revision": "49b093a39c19169a8a81721dcc541e07e945232f",
+      "comfyui_revision": "d49e888586dd8ae012c0667b33466b815fee07f7",
+      "generation_seconds": 97.726
+    }
+  ],
+  "image_prompts": {
+    "produit": "Create ONE extraordinary photorealistic luxury product-advertising photograph, vertical 9:16, designed as the opening frame of a premium cinematic video for a creative agency. A single unbranded sculptural AMBER GLASS PERFUME BOTTLE, solid rectangular body with gently rounded shoulders, small polished dark bronze cylindrical cap, NO LABEL and absolutely NO WRITING anywhere. Bottle stands upright on a low wet charcoal basalt monolith in the lower center of frame, a thin reflective film of water and a few physically plausible droplets on glass. A dramatic warm golden shaft of backlight passes through the amber glass, forming a luminous copper caustic across black stone; velvety black negative space above the bottle, controlled rim light, subtle atmospheric mist behind, elegant editorial composition. Extremely realistic thick glass edges, correct refraction, precise cap, physically correct reflections. High-end global luxury cosmetics campaign, macro 85mm product photography, deep charcoal, warm copper and soft ivory palette, rich blacks with recoverable detail, no CGI plastic appearance, no floating rocks, no explosion, no impossible objects, no people, no text, no logo, no watermark. Product must feel tangible and commercially photographed. The image is a full-frame scene, not a mockup or poster.",
+    "restaurant": "Create ONE breathtaking PHOTOREALISTIC Michelin-level restaurant food advertising photograph, vertical 9:16, designed as an opening frame for a cinematic camera move. A refined dark-chocolate dessert plated on a wide matte ivory ceramic plate: one perfectly shaped glossy chocolate dome with a small cut revealing dense molten center, a thin elegant curved chocolate shard, three tiny raspberries, one realistic green mint tip, a restrained brush of raspberry coulis and fine cocoa crumb. Absolutely delicious realistic textures with a subtle wisp of warmth above the freshly opened chocolate. Plate on dark walnut restaurant table, dim tasteful fine-dining background with a few copper bokeh lights and a soft warm candle glow, no readable signage. Camera is at a low three-quarter macro angle, shallow optical depth of field, very fine highlights in chocolate, appetizing warm amber key light from left and a delicate cool soft fill to preserve chocolate texture. Luxury food cinematography, 85mm lens, deep charcoal, copper, dark cocoa and soft ivory palette, coherent natural geometry, no huge splashes, no hands, no people, no duplicate utensils, no writing, no logo, no watermark. Food must be real restaurant food rather than a 3D illustration. Leave calm darker background in the upper third suitable for typography added later.",
+    "villa": "Create ONE premium architectural advertising PHOTOGRAPH, absolutely photorealistic, vertical 9:16. A beautifully proportioned contemporary Mediterranean villa seen from its landscaped pool terrace at early blue hour just after sunset. Two calm simple architectural volumes in pale travertine and warm timber, a broad double-height glass living space with warm amber interior light, a clean overhanging flat roof, believable structural columns, neat thin window frames, an olive tree at one side. A calm rectangular infinity pool occupies the lower third, with physically accurate soft rippled reflections of the lit villa and the copper sunset sky. The house is the clear hero in the middle of the image, dark upper sky leaves modest negative space, restrained landscaping, no random extra buildings. Camera is at human eye height, carefully corrected vertical perspective, 28mm architectural photography, warm ivory stone against rich charcoal-blue sky and copper reflections. High-end real-estate commercial, inviting, sophisticated and materially convincing; no science-fiction design, no bent walls or curving windows, no excessive futuristic curves, no impossible cantilevers, no people, no cars, no text, no logo, no watermark. The shot must be simple enough for a slow 4-second dolly-in with strong temporal stability."
+  },
+  "video_prompts": {
+    "produit": "A continuous luxury perfume commercial. Preserve exactly the unbranded amber glass bottle and bronze cap from the reference, perfectly stable glass geometry, closed cap, blank front with no label or lettering. A smooth controlled camera arc of six degrees with a gentle slow push-in reveals moving specular highlights and amber caustics through thick glass. Water glistens on charcoal basalt, a few droplets slide naturally, very subtle mist moves behind the bottle. The bottle remains upright and completely unchanged. Rich warm copper backlight, precise optical reflections, detailed real glass and dark stone, expensive studio product cinematography, no camera shake, no cuts, no transformation of the object, no text, no logo, no people. Sound of a few delicate water drops, no speech and no music.",
+    "restaurant": "A continuous photorealistic fine dining commercial. Preserve exactly the plated chocolate dessert, ivory ceramic plate, raspberries and curved chocolate shard from the reference. A refined slow macro dolly move travels a few centimeters sideways while gently pushing toward the chocolate, believable optical parallax and shallow depth of field. A faint wisp of steam rises and chocolate highlights move naturally; the dessert does not change shape and the molten center barely settles. Warm candle bokeh softly flickers in the dark restaurant background. Appetizing cocoa texture and realistic glossy chocolate, luxury cinematic food photography, no hands, no people, no added food, no utensils appearing, no text, no logos, no cuts, no camera shake. Very quiet restaurant room tone, no dialogue, no music.",
+    "villa": "A continuous photorealistic luxury real estate commercial. Preserve exactly the contemporary travertine villa and all straight columns, window frames, flat roof, terrace, olive tree and rectangular pool from the reference. A calm smooth camera dolly moves forward half a meter and slightly to the right, creating subtle real parallax. Gentle water ripples carry the warm interior reflections across the pool; olive leaves move a little in a light breeze. The building is structurally stable, every wall, door and window stays rigid and in place. Elegant early blue hour, soft copper sunset and inviting warm ivory interior lights, real architectural photography, restrained cinematic contrast, no people, no vehicles, no text, no logo, no cut, no surreal geometry. Gentle pool water and evening breeze, no music and no speech.",
+    "interieur": "Transform this exact source-video living room into a photorealistic premium architectural advertisement at golden hour. Preserve the source camera trajectory, exact room layout, number and placement of chairs, low rectangular slatted timber coffee table, television wall, large left glass windows, ceiling lines and floor geometry. Keep all structural lines straight and do not add doors, windows, objects or people. Replace flat daylight with rich warm copper sunset light streaming through the same windows, elegant golden shafts of light and natural soft shadows. Sophisticated material finish with warm ivory upholstery, detailed natural wood and pale warm stone, vivid lush green foliage outside the windows. High-end real estate cinematography, restrained warm film grade, realistic exposure and coherent physically accurate reflections, stable furniture throughout the moving shot. No cartoon rendering, no text, no signs, no logos. Very quiet interior room tone, no music and no dialogue."
+  },
+  "voice": {
+    "model": "hexgrad/Kokoro-82M",
+    "revision": "f3ff3571791e39611d31c381e3a41a3af07b4987",
+    "voice": "ff_siwis",
+    "license": "Apache-2.0",
+    "device": "CPU",
+    "generation_seconds": 14.172,
+    "clips": [
+      {
+        "text": "Votre activité mérite mieux qu'une vidéo ordinaire. Un produit, une table, un lieu.",
+        "duration_s": 5.225
+      },
+      {
+        "text": "Et soudain, une autre dimension. Votre idée, vos photos, vos vidéos : nous les transformons en publicités qui captent l'attention.",
+        "duration_s": 7.5
+      },
+      {
+        "text": "Création, voix, montage. Une seule signature. Site qui vend. Parlons de votre projet.",
+        "duration_s": 5.15
+      }
+    ]
+  }
+}
