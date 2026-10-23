@@ -240,3 +240,5 @@ if __name__ == "__main__":
     except Exception as exc:
         print(f"FAILED — {exc}", file=sys.stderr)
         raise
+
+# Production request: one one-time GitHub Actions render, 3 Modal calls, no automatic retry.
