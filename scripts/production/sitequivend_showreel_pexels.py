@@ -17,39 +17,67 @@ from PIL import Image, ImageOps
 ASSETS = [
     {
         "name": "beauty",
-        "sector": "beauty / skincare",
+        "sector": "beauty",
         "pexels_id": 8054400,
         "photographer": "Ksenia Chernaya",
         "page": "https://www.pexels.com/photo/clear-brown-glass-bottle-with-liquid-8054400/",
-        "download": "https://images.pexels.com/photos/8054400/pexels-photo-8054400.jpeg?cs=srgb&dl=pexels-kseniachernaya-8054400.jpg&fm=jpg",
-        "description": "Unbranded amber dropper bottle on sunlit pale surface",
+        "download": "https://images.pexels.com/photos/8054400/pexels-photo-8054400.jpeg",
+        "description": "Amber glass serum"
     },
     {
         "name": "food",
-        "sector": "e-commerce food",
+        "sector": "food",
         "pexels_id": 15850680,
         "photographer": "Roberto Muñoz",
         "page": "https://www.pexels.com/photo/close-up-of-delicious-chocolate-cake-with-fudge-15850680/",
-        "download": "https://images.pexels.com/photos/15850680/pexels-photo-15850680.jpeg?cs=srgb&dl=pexels-roberto-munoz-328307461-15850680.jpg&fm=jpg",
-        "description": "Macro brownies covered with melted chocolate",
+        "download": "https://images.pexels.com/photos/15850680/pexels-photo-15850680.jpeg",
+        "description": "Chocolate brownie"
     },
     {
         "name": "coffee",
-        "sector": "beverage / coffee shop",
+        "sector": "beverage",
         "pexels_id": 30678777,
         "photographer": "dino Trex",
         "page": "https://www.pexels.com/photo/close-up-of-espresso-pouring-into-cup-30678777/",
-        "download": "https://images.pexels.com/photos/30678777/pexels-photo-30678777.jpeg?cs=srgb&dl=pexels-dino-trex-2149558136-30678777.jpg&fm=jpg",
-        "description": "Real espresso extraction and golden coffee stream",
+        "download": "https://images.pexels.com/photos/30678777/pexels-photo-30678777.jpeg",
+        "description": "Espresso"
     },
+    {
+        "name": "fashion",
+        "sector": "fashion",
+        "pexels_id": 298863,
+        "photographer": "Pexels",
+        "page": "https://www.pexels.com/photo/assorted-color-clothes-hanged-on-rack-298863/",
+        "download": "https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg",
+        "description": "Fashion rack"
+    },
+    {
+        "name": "automotive",
+        "sector": "automotive",
+        "pexels_id": 170811,
+        "photographer": "Pexels",
+        "page": "https://www.pexels.com/photo/black-coupe-parked-on-road-170811/",
+        "download": "https://images.pexels.com/photos/170811/pexels-photo-170811.jpeg",
+        "description": "Sports car"
+    },
+    {
+        "name": "technology",
+        "sector": "technology",
+        "pexels_id": 1092644,
+        "photographer": "Pexels",
+        "page": "https://www.pexels.com/photo/silver-iphone-x-with-airpods-1092644/",
+        "download": "https://images.pexels.com/photos/1092644/pexels-photo-1092644.jpeg",
+        "description": "Smartphone"
+    }
 ]
+
 MUSIC_URL = "https://www.scottbuckley.com.au/library/wp-content/uploads/2019/02/sb_ascension.mp3"
 MUSIC_PAGE = "https://www.scottbuckley.com.au/library/ascension/"
 MUSIC_CREDIT = "'Ascension' by Scott Buckley - released under CC-BY 4.0. www.scottbuckley.com.au"
 FPS = 48
-SHOT_LENGTH = 3.6
-END_LENGTH = 2.2
-OUT_NAME = "SiteQuiVend-Showreel-Pexels-LTX-13s.mp4"
+SHOT_LENGTH = 4.0
+END_LENGTH = 3.0
+OUT_NAME = "SiteQuiVend-Hero-Showreel-LTX-27s.mp4"
 
 
 def call(args: list[str]) -> str:
@@ -97,7 +125,7 @@ def prepare(out: Path) -> None:
         try:
             with Image.open(raw) as im:
                 im = ImageOps.exif_transpose(im).convert("RGB")
-                if min(im.size) < 850:
+                if min(im.size) < 600:
                     raise ValueError(f"{shot['name']} too low resolution: {im.size}")
                 # Input LTX grid: 768x1344. No color manipulation or AI illustration.
                 im = ImageOps.fit(im, (768, 1344), method=Image.Resampling.LANCZOS,
@@ -123,7 +151,7 @@ def prepare(out: Path) -> None:
         "license_notes": "Pexels images used in a transformed creative work; no affiliation or endorsement from photographers/brands implied.",
         "music": {"url": MUSIC_PAGE, "credit": MUSIC_CREDIT, "license": "CC BY 4.0"}
     }, indent=2, ensure_ascii=False), encoding="utf-8")
-    print("PREFLIGHT OK — 3 Pexels images and original licensed music validated, 0 GPU calls")
+    print("PREFLIGHT OK — 6 Pexels images and original licensed music validated, 0 GPU calls")
 
 
 def prepare_clip(src: Path, dest: Path) -> None:
@@ -184,7 +212,7 @@ def assemble(out: Path) -> None:
     if not soundtrack.exists():
         raise FileNotFoundError("Licensed soundtrack missing: preflight must run successfully")
     target = export / OUT_NAME
-    duration = 3 * SHOT_LENGTH + END_LENGTH
+    duration = len(ASSETS) * SHOT_LENGTH + END_LENGTH
     call([
         "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
         "-i", str(picture), "-ss", "46", "-i", str(soundtrack),
@@ -204,9 +232,9 @@ def assemble(out: Path) -> None:
     if (video.get("width"), video.get("height")) != (1080, 1920):
         raise ValueError(f"Invalid final dimensions: {video}")
     measured = float(probe["format"]["duration"])
-    if not 12.5 <= measured <= 13.5:
+    if not 26.5 <= measured <= 27.5:
         raise ValueError(f"Final video has unexpected duration: {measured}s")
-    cover = export / "SiteQuiVend-Showreel-cover.jpg"
+    cover = export / "SiteQuiVend-Hero-Showreel-cover.jpg"
     call(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", "1.2",
           "-i", str(target), "-frames:v", "1", str(cover)])
     manifest = {
