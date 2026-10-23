@@ -1,5 +1,5 @@
 name: SiteQuiVend | Pexels x LTX 13s showreel
-# Branch pushes check assets with zero GPU; video production requires deliberate manual dispatch.
+# Push only runs 0-GPU preflight, except a SINGLE exact opt-in commit message for this requested production.
 on:
   push:
     branches: [feat/sitequivend-showreel-pexels-20261023]
@@ -69,10 +69,10 @@ jobs:
           test "$SPEND_APPROVAL" = 'oui' || { echo "::error::No GPU authorization"; exit 1; }
           test -n "$MODAL_TOKEN_ID" && test -n "$MODAL_TOKEN_SECRET" || { echo "::error::No Modal secrets"; exit 1; }
       - name: Install Modal only for paid manual render
-        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_SITEQUIVEND_SHOWREEL_ONCE_20261023')
         run: python -m pip install 'modal>=1.0,<2'
       - name: LTX shot 1 - premium amber skincare product
-        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_SITEQUIVEND_SHOWREEL_ONCE_20261023')
         env:
           PROMPT: >-
             A single continuous premium skincare commercial using the EXACT real
@@ -92,7 +92,7 @@ jobs:
             --image-png artifacts/references/beauty-reference.png \
             --image-strength 0.85 --audio-mode silent --out artifacts/clips/beauty-ltx.mp4
       - name: LTX shot 2 - chocolate food macro
-        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_SITEQUIVEND_SHOWREEL_ONCE_20261023')
         env:
           PROMPT: >-
             Five-second continuous luxury food commercial preserving exactly
@@ -110,7 +110,7 @@ jobs:
             --image-png artifacts/references/food-reference.png \
             --image-strength 0.85 --audio-mode silent --out artifacts/clips/food-ltx.mp4
       - name: LTX shot 3 - authentic espresso extraction
-        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_SITEQUIVEND_SHOWREEL_ONCE_20261023')
         env:
           PROMPT: >-
             Five-second single continuous realistic cinematic coffee ad.
@@ -136,7 +136,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
       - name: Assemble hard cuts, licensed music and 48fps delivery
-        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_SITEQUIVEND_SHOWREEL_ONCE_20261023')
         run: |
           set -euo pipefail
           python scripts/production/sitequivend_showreel_pexels.py assemble --out artifacts
@@ -145,7 +145,7 @@ jobs:
           echo 'Visual approval is still required before publication. Source LTX is native 24fps.' >> "$GITHUB_STEP_SUMMARY"
           echo "Music: 'Ascension' by Scott Buckley, CC BY 4.0 — attribution required." >> "$GITHUB_STEP_SUMMARY"
       - name: Download MP4, cover and attribution
-        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_SITEQUIVEND_SHOWREEL_ONCE_20261023')
         uses: actions/upload-artifact@v4
         with:
           name: SiteQuiVend-Showreel-13s-LTX
