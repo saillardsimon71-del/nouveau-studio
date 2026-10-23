@@ -20,23 +20,24 @@ Montage : **coupes franches uniquement**, sans morph, flash, crossfade ni zoom n
 
 **48 fps minimum en livraison finale** seulement après validation du mouvement, par génération native si le pipeline réel le prend en charge ou interpolation contrôlée ; ne pas changer artificiellement l'étiquette FPS. Le **premier test source reste à 24 fps LTX**, conformément au worker réellement disponible ; on n'essaie pas de résoudre ce point avant d'avoir un plan valable.
 
-## Porte de validation : une seule prise maintenant
+## Exécution réelle du premier plan : TEST REFUSÉ
 
-Le workflow `.github/workflows/sitequivend-product-pilot.yml` prépare une photographie Pexels libre d'usage commercial, la recadre verticalement et lance **une seule prise LTX guidée par image de 5 secondes**. Il réutilise `deploy/modal_ltx_worker.py`, l'app `pvs-ltx` et les secrets GitHub Modal déjà configurés. Une fois terminé, il publie le MP4, le PNG utilisé et les métadonnées dans les **Artifacts** du run.
+- Action GitHub [run #39964158427](https://github.com/saillardsimon71-del/nouveau-studio/actions/runs/39964158427) : **succès technique, échec visuel**.
+- Vidéo : 5,042 secondes, 768×1344, 24 fps natifs, LTX-2.5 Distilled, L40S, image-guided strength 0.85.
+- Génération : 109,194 secondes GPU, **estimation Modal : 0,0861 USD** ; vérifier la facture dans Modal.
+- L'image Pexels choisie pour cette première expérience avait **une véritable étiquette imprimée** ; elle n'était donc pas le bon input pour une création de parfum fictive sans marque.
+- Revue visuelle de frames toutes les 0,5 s : le flacon se transforme d'un petit flacon étiqueté en bouteille carrée sans étiquette entre 1 et 3 secondes. Des objets et le décor d'arrière-plan s'effacent. La géométrie du produit et la continuité ne sont PAS maintenues ; le plan ne ressemble pas à une publicité premium.
+- **DÉCISION : ne pas utiliser le clip, ne pas lancer les plans 2 et 3.**
 
-- **Pas de renouvellement automatique**, pas de plusieurs variations, pas de longues productions.
-- **Budget :** une prise, timeout du worker existant ; coût réel à lire dans le JSON. Ne pas dépasser le plafond utilisateur de 5 USD.
-- **Si le téléchargement de l'image échoue, le GPU n'est pas sollicité.**
-- **Critères d'acceptation visuelle** : bouteille stable sur cinq secondes, bouchon identique, vrai mouvement de caméra, reflets crédibles, zéro forme parasite, aucune coupure interne. Rejeter si un seul défaut majeur est visible.
-- **Si la prise ne passe pas**, il faut repenser référence/cadrage/prompt AVANT tout second calcul.
-- **Si elle passe**, préparer deux autres prises seulement, avec références de cadrage spécifiques au même produit, puis monter 12–14 s.
+## Marche à suivre corrigée : aucune autre dépense automatique
 
-### Source de l'image d'essai
+Le workflow a été rendu **manuel uniquement**. Avant un éventuel second essai, il faut ajouter au dépôt un fichier PNG `assets/sitequivend/produit-reference.png` représentant **un produit fictif ou explicitement autorisé, propre, sans inscription de marque et en qualité publicitaire**, de préférence l'image originale déjà utilisée par la première publicité. L'image étant un facteur de qualité majeur, on doit l'examiner avant de relancer l'action.
 
-[Albina White — Display of Cosmetic, Pexels #12053223](https://www.pexels.com/photo/display-of-cosmetic-12053223/). Photographie de flacon ambré sur fond sombre. Source stock utilisée comme **visuel de démonstration**, sans affiliation avec la photographe ou un fabricant. Voir [licence Pexels](https://www.pexels.com/license/). La photographie est téléchargée au runtime, pas committée dans Git.
+Le workflow exige une validation manuelle `confirm_spend: oui`, refuse l'absence du PNG **avant GPU**, et réutilise le worker Modal existant. Aucun rerun, aucune variation ni aucun autre rendu ne doit être lancé sans décision explicite.
 
-### Technique — précautions
+### Rappels pour la suite
 
-La durée d'une prise est de 5 s, ratio 9:16, `audio_mode=silent`, prompt inspiré du plan produit **validé** de la première publicité, `seed=812310`. La source est recadrée à 768×1344 en PNG avant tout calcul. Le workflow n'altère aucun Studio historique, aucun DNS, aucune branche `main`, et ne déploie pas une nouvelle application.
-
-**Limite :** la publication GitHub du code n'est pas une vidéo livrée. Le MP4 n'existera qu'une fois le run GitHub Actions passé et son artifact téléchargé.
+- Le scénario complet reste prévu à 12–14 s en 3 plans, MAIS il n'est **pas réalisé**.
+- Le fichier du premier essai rejeté est disponible dans les GitHub Actions Artifacts du run #39964158427.
+- Le rendu final à 48 fps minimum n'est pas encore produit ; l'indicateur 24 fps du MP4 est celui de la génération native LTX, pas un export final.
+- On ne peut pas remplacer la validation du visuel de référence par des promesses de « qualité cinéma » dans le prompt.
