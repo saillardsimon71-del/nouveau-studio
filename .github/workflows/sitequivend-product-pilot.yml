@@ -1,13 +1,7 @@
 name: SiteQuiVend | Premier plan produit (LTX)
 
-# One and only one controlled GPU render on introduction of this branch.
-# Subsequent docs changes do not trigger the workflow.
+# Manual ONLY after validating the reference image. No automatic GPU runs.
 on:
-  push:
-    branches:
-      - feat/sitequivend-product-pilot-20261023
-    paths:
-      - .github/workflows/sitequivend-product-pilot.yml
   workflow_dispatch:
     inputs:
       confirm_spend:
@@ -25,7 +19,7 @@ concurrency:
 
 jobs:
   one-shot:
-    if: ${{ github.event_name == 'push' || inputs.confirm_spend == 'oui' }}
+    if: ${{ inputs.confirm_spend == 'oui' }}
     runs-on: ubuntu-latest
     timeout-minutes: 24
     env:
@@ -61,27 +55,25 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg
 
-      - name: Préparer une photo produit sous licence Pexels (aucun GPU)
+      - name: Préparer une référence produit ORIGINALE et validée (aucun GPU)
         shell: bash
         run: |
           set -euo pipefail
+          SOURCE="assets/sitequivend/produit-reference.png"
+          if [ ! -s "$SOURCE" ]; then
+            echo "::error::Référence absente : ajouter assets/sitequivend/produit-reference.png avant de relancer. AUCUN calcul GPU."
+            exit 1
+          fi
           mkdir -p artifacts
-          curl --fail --location --retry 2 --connect-timeout 10 --max-time 60 \
-            -A "Mozilla/5.0" \
-            "https://images.pexels.com/photos/12053223/pexels-photo-12053223.jpeg" \
-            -o artifacts/pexels-source.jpeg
-          # Security/quality: check it's really a decodable photo, not an HTML error.
-          test "$(file --mime-type --brief artifacts/pexels-source.jpeg)" = "image/jpeg"
           ffmpeg -hide_banner -loglevel error -y \
-            -i artifacts/pexels-source.jpeg \
+            -i "$SOURCE" \
             -vf "scale=768:1344:force_original_aspect_ratio=increase,crop=768:1344" \
             -frames:v 1 artifacts/reference-perfume.png
           test -s artifacts/reference-perfume.png
           ffprobe -v error -select_streams v:0 \
             -show_entries stream=width,height -of csv=p=0 artifacts/reference-perfume.png \
             | grep -qx '768,1344'
-          echo "Photo Pexels #12053223, © Albina White — licence Pexels (demo stock)." >> "$GITHUB_STEP_SUMMARY"
-          echo "Ref prepared. No GPUs used yet." >> "$GITHUB_STEP_SUMMARY"
+          echo "Référence originale fournie depuis le dépôt (vérifier sa propriété/licence)." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Une seule prise LTX image-guided — pas de musique, aucun retry
         shell: bash
