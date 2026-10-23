@@ -1,0 +1,108 @@
+{
+  "title": "SiteQuiVend - Made to be desired",
+  "created_at_utc": "2026-10-23T16:08:48.135793+00:00",
+  "duration_seconds": 30,
+  "format": "1080x1920, 9:16, 48 fps",
+  "sectors": 6,
+  "takes_generated": 7,
+  "generation_seconds": 877.7139999999999,
+  "modal_cost_usd": "0.72953510",
+  "modal_resource_costs_usd": {
+    "CPU": "0.09713450",
+    "Memory": "0.13137743",
+    "Network Egress": "0.00068527",
+    "L40S": "0.50033790"
+  },
+  "modal_active_production_containers": 0,
+  "source_images": "Six real Pexels photographs, no generated reference images",
+  "native_ltx_format": "768x1344, 24 fps",
+  "interpolation": "RIFE 4.6, within source take only",
+  "rife_seconds_local": 261.49,
+  "audio": "Native LTX product Foley, selected and mixed locally, no music or voice-over",
+  "verification": [
+    {
+      "file": "SiteQuiVend-Showreel-30s-Master.mp4",
+      "bytes": 23660325,
+      "sha256": "3df4f6edaafe046d8b668ec617a29f3f95c068dd32c7bde705e26d5b98b85c2e",
+      "media": {
+        "duration_s": 30.0,
+        "width": 1080,
+        "height": 1920,
+        "fps": 48.0,
+        "video_codec": "h264",
+        "audio_codec": "aac",
+        "has_audio": true,
+        "audio_rate": 48000,
+        "audio_channels": 2,
+        "bitrate_kbps": 6309,
+        "nb_frames": 1440
+      },
+      "full_decode": "pass",
+      "decoded_frames": 1440,
+      "loudness": {
+        "integrated_lufs": -18.1,
+        "threshold_lufs": -29.2,
+        "true_peak_db": -5.0
+      },
+      "detected_black_intervals": [
+        {
+          "start": 27.0,
+          "end": 29.979167,
+          "duration": 2.979167
+        }
+      ],
+      "detected_freeze_starts": [
+        27.0
+      ],
+      "expected_static_end_card": {
+        "start": 27,
+        "end": 30
+      },
+      "isolated_luma_spikes": [],
+      "faststart": true,
+      "visual_review": "Frame sheets at 4 fps plus seven consecutive frames at every cut. No human real-time screening or human listening claimed."
+    },
+    {
+      "file": "SiteQuiVend-Showreel-30s-Web.mp4",
+      "bytes": 10295587,
+      "sha256": "f88f5c3235289f9bbc279605de39af8d0e0e010c9773c3036290596174b25b6c",
+      "media": {
+        "duration_s": 30.0,
+        "width": 1080,
+        "height": 1920,
+        "fps": 48.0,
+        "video_codec": "h264",
+        "audio_codec": "aac",
+        "has_audio": true,
+        "audio_rate": 48000,
+        "audio_channels": 2,
+        "bitrate_kbps": 2745,
+        "nb_frames": 1440
+      },
+      "full_decode": "pass",
+      "decoded_frames": 1440,
+      "loudness": {
+        "integrated_lufs": -18.1,
+        "threshold_lufs": -29.2,
+        "true_peak_db": -5.0
+      },
+      "detected_black_intervals": [
+        {
+          "start": 27.0,
+          "end": 29.979167,
+          "duration": 2.979167
+        }
+      ],
+      "detected_freeze_starts": [
+        27.0
+      ],
+      "expected_static_end_card": {
+        "start": 27,
+        "end": 30
+      },
+      "isolated_luma_spikes": [],
+      "faststart": true,
+      "visual_review": "Frame sheets at 4 fps plus seven consecutive frames at every cut. No human real-time screening or human listening claimed."
+    }
+  ]
+}

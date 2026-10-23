@@ -1,0 +1,87 @@
+{
+  "title": "SiteQuiVend - Made to be desired",
+  "duration_seconds": 30,
+  "output": {"width": 1080, "height": 1920, "fps": 48},
+  "modal_app": "pvs-sqv-portfolio-20261023",
+  "generation_estimate_limit_usd": 2.0,
+  "direction": "Tactile desire: ivory, espresso, tobacco leather, graphite and antique gold. Warm grazing light, rich material texture, clean product silhouettes. Real physical actions connect the worlds: drop, stream, pour, close, rotate, sway. Hard editorial cuts only. Six commercial categories, no fictitious client claims. Minimal titles; three-second branded end card matching the website's ink/ivory/lime identity.",
+  "shots": [
+    {
+      "id": "beauty",
+      "pexels_id": 8148742,
+      "author": "Vie Studio",
+      "source": "https://www.pexels.com/photo/a-person-holding-a-glass-bottle-and-a-dropper-8148742/",
+      "duration_s": 6,
+      "seed": 10232301,
+      "crop": [0, 0, 1, 1],
+      "action": "The held pipette releases a distinct serum drop into the bottle, then rises.",
+      "prompt": "Premium skincare campaign, one uninterrupted live-action macro shot. Continue from these exact two hands, beige knit sleeves, blank white label, amber glass bottle and raised white-capped glass pipette. The upper hand smoothly lowers the pipette a few centimeters toward the open bottle. A rounded clear serum droplet visibly gathers at the glass tip, elongates and detaches, falling straight into the bottle neck at second two. The hand then lifts the pipette upward by three centimeters; another tiny bead remains at its tip. The lower hand holds the bottle steady with natural tiny grip adjustments. Clearly readable liquid physics and gentle real hand action throughout, exact original fingers and product geometry. Slow restrained lateral macro dolly, shallow optical focus on the droplet and amber glass. Warm ivory daylight, warm grazing edge light, sculpted soft shadows, exquisite skin and knitted fabric texture, cinematic premium e-commerce product advertising. Sound: one delicate liquid drop and soft fabric movement, no music or speech. Preserve the white blank label. No new objects, text, logos, edits, flashes, dissolves or transformations."
+    },
+    {
+      "id": "beauty-macro",
+      "pexels_id": 8148742,
+      "author": "Vie Studio",
+      "source": "https://www.pexels.com/photo/a-person-holding-a-glass-bottle-and-a-dropper-8148742/",
+      "duration_s": 5,
+      "seed": 10232311,
+      "crop": [0.27, 0.17, 0.94, 0.83],
+      "action": "The pipette dispenses several distinct serum drops into the open bottle.",
+      "prompt": "A real skincare serum demonstration filmed in tight macro. LOCKED camera throughout, the action is the liquid, not a camera move. Continue these exact natural hands, amber bottle with blank white label and glass pipette held by its white rubber bulb. The upper hand brings the pipette tip to two centimeters directly above the open bottle neck. The fingers visibly compress the white rubber bulb ONCE, expelling THREE distinct large clear serum droplets one after another from the pipette into the bottle. Each bead grows at the tip, detaches completely, travels downward through the air and disappears inside the open neck. Show real separated falling droplets clearly. The hand then lowers the glass pipette partway into the bottle. Keep the original bottle, hand anatomy, cream knit sleeves and blank label exact. Warm side-lit ivory studio, rich real amber glass and tactile skin, extraordinary optical detail, premium international beauty campaign. No zoom, dolly or camera motion. Gentle tiny liquid drops and subtle rubber squeeze, no music or speech. One uninterrupted shot, no new objects, text, logo, transitions, flash or morph."
+    },
+    {
+      "id": "coffee",
+      "pexels_id": 5461667,
+      "author": "Amelia Hallsworth",
+      "source": "https://www.pexels.com/photo/coffee-dripping-from-coffee-machine-into-a-glass-5461667/",
+      "duration_s": 6,
+      "seed": 10232302,
+      "crop": [0.04, 0.12, 0.9, 0.98],
+      "action": "Two espresso streams flow and swirl the crema as the glass fills.",
+      "prompt": "Luxury specialty coffee advertisement, continuous real-time macro cinema. This exact polished espresso group and wooden portafilter dispense two thin continuous amber espresso streams into this same clear glass. The liquid visibly flows downward and hits the coffee surface, producing tiny circular ripples. The espresso level rises gradually by one centimeter, marbled golden crema slowly forms and swirls on top. At second four the streams taper into several separate heavy drops, each making a tiny physical ripple. A fine trace of steam drifts upward. Keep the machine and glass perfectly rigid, exact original handle and reflections. A very small low lateral dolly makes the chrome highlights travel while the pouring action stays dominant. Rich dark café background, tungsten amber light and soft neutral highlights, elegant contrast, tactile glass and rich crema, expensive international beverage campaign. Sound: genuine quiet espresso extraction, gentle pump hum, then distinct drips. No music, voice, text, extra cups appearing, cuts, flashes, morph or transitions."
+    },
+    {
+      "id": "chocolate",
+      "pexels_id": 8774282,
+      "author": "Kübra Doğu",
+      "source": "https://www.pexels.com/photo/person-pouring-chocolate-on-profiteroles-8774282/",
+      "duration_s": 6,
+      "seed": 10232303,
+      "crop": [0.04, 0.03, 0.96, 0.95],
+      "action": "The jug tilts; a viscous ribbon coats the profiterole and folds onto the plate.",
+      "prompt": "An exquisite cinematic patisserie commercial, one continuous physical shot. Preserve the exact composition of these cream-filled profiteroles, dark ivory ceramic plate, jug and hand, orchids, glass chocolate pitcher and grey linen. The already-present hand gently tilts the small jug farther, sending a thick continuous ribbon of glossy dark chocolate onto the center profiterole. Show the viscous stream physically travel from the jug lip to the pastry. It coats the round crisp shell, slowly cascades down its front and folds into a small glossy pool on the plate. The hand moves the pouring jug just three centimeters sideways to glaze the next edge, then gently eases the flow. The pastries and cream retain their exact size and shape. Restrained camera dolly toward the flowing chocolate, optical shallow depth of field, dramatic warm grazing light on chocolate against deep soft charcoal shadows. Luxurious appetizing texture, real food photography, premium dessert campaign. Sound of a soft thick pour and quiet ceramic handling, no music, voice or speech. No added food, extra hands, changing plate, edits, flash, transition, text, logo or morph."
+    },
+    {
+      "id": "fashion",
+      "pexels_id": 19354498,
+      "author": "Berna",
+      "source": "https://www.pexels.com/photo/woman-holding-brown-leather-bag-19354498/",
+      "duration_s": 6,
+      "seed": 10232304,
+      "crop": [0, 0, 1, 1],
+      "action": "The hand closes the leather flap, then lifts the bag slightly while the strap swings.",
+      "prompt": "Luxury leather goods campaign, intimate tactile product shot. Preserve these exact hands with dark red nails, black wool coat, ivory knit and structured chocolate-brown leather shoulder bag. The hand resting on the bag flap lifts its edge slightly, then gently folds the flexible leather flap fully DOWN until it rests closed against the bag front at second two. The other hand supports the rigid bag base. The upper hand slowly strokes once along the flap seam, showing supple leather and fine stitching. Then both hands lift the closed bag by a few centimeters; its hanging leather strap swings naturally with inertia and settles. Keep bag proportions, original panels, seams, number of fingers and red manicure completely consistent. No face enters frame. Elegant slow lateral camera move, warm soft window light grazing the rich brown leather, controlled deep blacks and ivory knit texture, expensive editorial fashion advertisement, believable real physical movement. Sound: soft leather fold, discreet clasp click and wool rustle, no music or speech. No new objects, logos, text, cuts, flashes, morphing or transition."
+    },
+    {
+      "id": "tech",
+      "pexels_id": 13570135,
+      "author": "Luis Quintero",
+      "source": "https://www.pexels.com/photo/person-holding-a-smartphone-13570135/",
+      "duration_s": 6,
+      "seed": 10232305,
+      "crop": [0, 0, 1, 1],
+      "action": "The hand rotates the phone toward its edge and back as a soft reflection crosses the glass.",
+      "prompt": "Sophisticated smartphone product commercial, single continuous physical shot. Preserve exactly this hand and the dark graphite smartphone with its blank reflective glass screen. The wrist physically rotates the phone smoothly twenty degrees toward a three-quarter side profile, revealing the thin rigid metal edge. Fingers make subtle natural grip adjustments but maintain their exact number. The wrist then rotates the phone gently back toward the camera, while a broad soft ivory light reflection sweeps across the glass from left to right. The phone remains the same rigid rectangular shape, original notch, straight metal edges and constant thickness throughout. Blank unlit reflective screen with no icons or interface. A subtle lateral macro camera move complements the real wrist rotation. Warm skin, deep charcoal background, soft warm edge light, beautiful realistic metal and glass reflections, controlled cinematic contrast, international consumer electronics campaign. Sound: quiet grip movement and tiny tactile button click only, no music, speech or electronic melody. No logos, lettering, new objects, camera shake, cuts, flashes, transition or shape changes."
+    },
+    {
+      "id": "jewelry",
+      "pexels_id": 13292930,
+      "author": "Maryam",
+      "source": "https://www.pexels.com/photo/gold-necklace-with-pendant-in-close-up-photography-13292930/",
+      "duration_s": 6,
+      "seed": 10232306,
+      "crop": [0, 0, 1, 1],
+      "action": "The suspended pendant swings gently and rotates, catching warm highlights.",
+      "prompt": "Fine jewelry campaign filmed in exquisite macro, one continuous shot. This exact delicate gold necklace is suspended from its chain against the same deep smoky teal and black background. The pendant physically rotates slowly on its chain by about twenty-five degrees, turning from frontal to a three-quarter angle, then swings gently back. The small movement pulls the real chain links with it; show coherent physical torsion and a gradually damping two-centimeter pendulum swing. Keep the exact pendant shape, attachment loop, gold surface and chain link geometry, no redesign or melting. A narrow warm studio highlight naturally travels across the polished pendant as it rotates, revealing real gold thickness. Soft defocused background shapes remain stationary. Nearly locked macro camera with a tiny lateral dolly, shallow optical focus held on the pendant, deep blacks, sculpted gold highlights, luxurious international jewelry advertising. Sound: extremely delicate tiny chain movement over quiet room tone, no music or speech. No added jewels, hands, text, logos, star-shaped sparkles, flashes, edits, transitions or morph."
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "fps": 48,
+  "duration": 30,
+  "live_footage_end": 27,
+  "shots": [
+    {
+      "source": "beauty",
+      "in_frame": 0,
+      "out_frame": 36,
+      "crop": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "audio_lufs": -27,
+      "start_frame": 0,
+      "end_frame": 36
+    },
+    {
+      "source": "beauty-macro",
+      "in_frame": 84,
+      "out_frame": 240,
+      "crop": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "audio_lufs": -25,
+      "start_frame": 36,
+      "end_frame": 192
+    },
+    {
+      "source": "coffee",
+      "in_frame": 24,
+      "out_frame": 96,
+      "crop": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "audio_lufs": -23,
+      "start_frame": 192,
+      "end_frame": 264
+    },
+    {
+      "source": "coffee",
+      "in_frame": 96,
+      "out_frame": 216,
+      "crop": [
+        0.15,
+        0.28,
+        0.72,
+        0.72
+      ],
+      "audio_lufs": -23,
+      "start_frame": 264,
+      "end_frame": 384
+    },
+    {
+      "source": "chocolate",
+      "in_frame": 48,
+      "out_frame": 108,
+      "crop": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "audio_lufs": -24,
+      "start_frame": 384,
+      "end_frame": 444
+    },
+    {
+      "source": "chocolate",
+      "in_frame": 108,
+      "out_frame": 240,
+      "crop": [
+        0.12,
+        0.22,
+        0.78,
+        0.78
+      ],
+      "audio_lufs": -24,
+      "start_frame": 444,
+      "end_frame": 576
+    },
+    {
+      "source": "fashion",
+      "in_frame": 20,
+      "out_frame": 92,
+      "crop": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "audio_lufs": -25,
+      "start_frame": 576,
+      "end_frame": 648
+    },
+    {
+      "source": "fashion",
+      "in_frame": 92,
+      "out_frame": 212,
+      "crop": [
+        0.07,
+        0.14,
+        0.86,
+        0.86
+      ],
+      "audio_lufs": -25,
+      "start_frame": 648,
+      "end_frame": 768
+    },
+    {
+      "source": "tech",
+      "in_frame": 36,
+      "out_frame": 228,
+      "crop": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "audio_lufs": -26,
+      "start_frame": 768,
+      "end_frame": 960
+    },
+    {
+      "source": "jewelry",
+      "in_frame": 24,
+      "out_frame": 96,
+      "crop": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "audio_lufs": -28,
+      "start_frame": 960,
+      "end_frame": 1032
+    },
+    {
+      "source": "jewelry",
+      "in_frame": 96,
+      "out_frame": 216,
+      "crop": [
+        0.17,
+        0.34,
+        0.66,
+        0.66
+      ],
+      "audio_lufs": -28,
+      "start_frame": 1032,
+      "end_frame": 1152
+    },
+    {
+      "source": "coffee",
+      "in_frame": 230,
+      "out_frame": 278,
+      "crop": [
+        0.15,
+        0.28,
+        0.72,
+        0.72
+      ],
+      "audio_lufs": -24,
+      "start_frame": 1152,
+      "end_frame": 1200
+    },
+    {
+      "source": "chocolate",
+      "in_frame": 240,
+      "out_frame": 288,
+      "crop": [
+        0.12,
+        0.22,
+        0.78,
+        0.78
+      ],
+      "audio_lufs": -25,
+      "start_frame": 1200,
+      "end_frame": 1248
+    },
+    {
+      "source": "jewelry",
+      "in_frame": 240,
+      "out_frame": 288,
+      "crop": [
+        0.12,
+        0.24,
+        0.76,
+        0.76
+      ],
+      "audio_lufs": -28,
+      "start_frame": 1248,
+      "end_frame": 1296
+    }
+  ]
+}
