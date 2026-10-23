@@ -1,0 +1,127 @@
+name: SiteQuiVend | Premier plan produit (LTX)
+
+# Manual ONLY after validating the reference image. No automatic GPU runs.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_spend:
+        description: "Autoriser UNE prise GPU sur Modal (oui/non)"
+        type: choice
+        options: ["non", "oui"]
+        default: "non"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sqv-single-ltx-preview
+  cancel-in-progress: false
+
+jobs:
+  one-shot:
+    if: ${{ inputs.confirm_spend == 'oui' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    env:
+      PYTHONUNBUFFERED: "1"
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      MODAL_WORKSPACE_EXPECTED: kulejean567
+      PVS_MODAL_APP: pvs-ltx
+      PVS_MODAL_LTX_VOLUME: studio-ltx25-models
+      PVS_MODAL_GPU: L40S
+      PVS_MODAL_RENDER_TIMEOUT: "660"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bloquer immédiatement les identifiants manquants
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$MODAL_TOKEN_ID" && test -n "$MODAL_TOKEN_SECRET" || {
+            echo "::error::Secrets GitHub Modal absents — aucune prise GPU lancée."
+            exit 1
+          }
+
+      - name: Installer uniquement Modal (le rendu reste dans le worker existant)
+        run: pip install "modal>=1.0,<2"
+
+      - name: Installer ffmpeg pour le recadrage et le contrôle MP4
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+
+      - name: Préparer une référence produit ORIGINALE et validée (aucun GPU)
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE="assets/sitequivend/produit-reference.png"
+          if [ ! -s "$SOURCE" ]; then
+            echo "::error::Référence absente : ajouter assets/sitequivend/produit-reference.png avant de relancer. AUCUN calcul GPU."
+            exit 1
+          fi
+          mkdir -p artifacts
+          ffmpeg -hide_banner -loglevel error -y \
+            -i "$SOURCE" \
+            -vf "scale=768:1344:force_original_aspect_ratio=increase,crop=768:1344" \
+            -frames:v 1 artifacts/reference-perfume.png
+          test -s artifacts/reference-perfume.png
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height -of csv=p=0 artifacts/reference-perfume.png \
+            | grep -qx '768,1344'
+          echo "Référence originale fournie depuis le dépôt (vérifier sa propriété/licence)." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Une seule prise LTX image-guided — pas de musique, aucun retry
+        shell: bash
+        env:
+          SHOT_PROMPT: >-
+            One single continuous five-second photorealistic luxury fragrance commercial shot.
+            Keep the EXACT bottle from the provided photo unchanged: the same amber glass
+            dimensions, fill level, cap, color and material, same dark environment and props.
+            Genuinely filmed product, not CG: detailed real refraction in thick glass,
+            physically credible micro-reflections and copper highlights, controlled deep blacks.
+            A calibrated slow 5-degree camera arc from right to left and a delicate
+            forward dolly create coherent optical parallax, while a thin warm light strip
+            glides gradually across the amber liquid. The bottle and cap stay absolutely
+            static and do not rotate, deform, shrink, move, sprout objects or change identity.
+            Atmospheric haze moves only faintly behind the product. Natural camera motion,
+            no sudden exposure shifts, no light flashes, no jump cuts, no morphing,
+            no generated text or logos, no hands, no people, no soundtrack or speech.
+        run: |
+          set -euo pipefail
+          modal run deploy/modal_ltx_worker.py \
+            --mode render \
+            --prompt "$SHOT_PROMPT" \
+            --duration 5 \
+            --aspect "9:16" \
+            --seed 812310 \
+            --image-png artifacts/reference-perfume.png \
+            --image-strength 0.85 \
+            --audio-mode silent \
+            --out artifacts/sitequivend-premium-pilot-plan-01.mp4
+
+      - name: Vérifier les médias sans embellir le résultat
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s artifacts/sitequivend-premium-pilot-plan-01.mp4
+          ffprobe -v error -show_entries stream=codec_name,width,height,avg_frame_rate -of default=noprint_wrappers=1 \
+            artifacts/sitequivend-premium-pilot-plan-01.mp4 | tee artifacts/ffprobe.txt
+          ffmpeg -hide_banner -loglevel error -y \
+            -ss 2.0 -i artifacts/sitequivend-premium-pilot-plan-01.mp4 \
+            -frames:v 1 artifacts/frame-2s.jpg
+          echo "### Premier plan LTX rendu" >> "$GITHUB_STEP_SUMMARY"
+          echo "Voir l'artefact MP4 et la frame à 2 secondes, puis VALIDER VISUELLEMENT AVANT de produire les autres plans." >> "$GITHUB_STEP_SUMMARY"
+          echo "La prise native LTX est à 24 fps. 48 fps sera exigé pour le film final, après revue." >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sitequivend-premium-pilot-plan-01
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 14
