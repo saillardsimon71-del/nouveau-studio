@@ -1,0 +1,167 @@
+{
+  "brand": "SiteQuiVend",
+  "date": "2026-10-23",
+  "revision": "2 — morphs refaits apres revue visuelle (autosave Arena)",
+  "scope": "2 films portfolio premium, transitions morph, vertical 9:16",
+  "films": {
+    "sitequivend-food-luxe": {
+      "duration_s": 27.6,
+      "fps": 30,
+      "resolution": "1080x1920",
+      "category": "food / luxury",
+      "morph_count": 4,
+      "shots": [
+        {
+          "name": "jante",
+          "duration_s": 4.8
+        },
+        {
+          "name": "assiette",
+          "duration_s": 7.0
+        },
+        {
+          "name": "tasse",
+          "duration_s": 5.4
+        },
+        {
+          "name": "macro",
+          "duration_s": 7.8
+        },
+        {
+          "name": "hero",
+          "duration_s": 7.8
+        }
+      ],
+      "transitions": [
+        {
+          "name": "jante->assiette",
+          "kind": "spin",
+          "duration_s": 1.1
+        },
+        {
+          "name": "assiette->tasse",
+          "kind": "zoom",
+          "duration_s": 1.5
+        },
+        {
+          "name": "tasse->macro",
+          "kind": "spin",
+          "duration_s": 1.0
+        },
+        {
+          "name": "macro->hero",
+          "kind": "bloom",
+          "duration_s": 1.6
+        }
+      ],
+      "outputs": {
+        "sitequivend-food-luxe.mp4": {
+          "bytes": 35025134,
+          "sha256": "28b2d7dffc81c47b4d493c49979b8f4df08484656316bd88b194490d78343335"
+        },
+        "sitequivend-food-luxe-sans-signature.mp4": {
+          "bytes": 37415970,
+          "sha256": "e465cf185824793ee8c46307f53265926c20ef289d2d602a4e167f947dac171b"
+        },
+        "sitequivend-food-luxe-cover.jpg": {
+          "bytes": 422080,
+          "sha256": "8fa62cd60f0d923ce457de28686f9a87a129127685093c4b1ad90e0c294cdc99"
+        }
+      },
+      "qc": {
+        "verdict": "pass",
+        "loudness": [
+          "-14.1 LUFS"
+        ]
+      },
+      "limitations": [
+        "Plaques 768x1376 remontées en 1080x1920 (1,4x) : le grain et l'accentuation compensent, mais ce n'est pas une captation native.",
+        "Mouvement 2.5D (caméra, parallaxe estimée, couches d'atmosphère) : pas de mouvement de sujet réel, faute de LTX disponible ici.",
+        "Les morphs sont des effets de montage (rotation/zoom/portail/flare) et non des morphs générés par modèle ; le raccord est exact aux deux extrémités.",
+        "Le studio IA historique n'est pas touché : tout est additif dans scripts/portfolio."
+      ]
+    },
+    "sitequivend-automotive-lifestyle": {
+      "duration_s": 26.7,
+      "fps": 30,
+      "resolution": "1080x1920",
+      "category": "automotive / lifestyle",
+      "morph_count": 3,
+      "shots": [
+        {
+          "name": "lunettes",
+          "duration_s": 5.8
+        },
+        {
+          "name": "route",
+          "duration_s": 9.0
+        },
+        {
+          "name": "jante",
+          "duration_s": 6.6
+        },
+        {
+          "name": "hero",
+          "duration_s": 10.0
+        }
+      ],
+      "transitions": [
+        {
+          "name": "lunettes->route",
+          "kind": "zoom",
+          "duration_s": 1.7
+        },
+        {
+          "name": "route->jante",
+          "kind": "bloom",
+          "duration_s": 1.5
+        },
+        {
+          "name": "jante->hero",
+          "kind": "zoom",
+          "duration_s": 1.5
+        }
+      ],
+      "outputs": {
+        "sitequivend-automotive-lifestyle.mp4": {
+          "bytes": 36384582,
+          "sha256": "24bc5d94f69fc0abc3a35240a2fc81dc03d592603d0403150c1e143b58279c5e"
+        },
+        "sitequivend-automotive-lifestyle-sans-signature.mp4": {
+          "bytes": 38505041,
+          "sha256": "616037fe75d9f8208cdc2d1cd3ae7499bc769620eab3ae616ba601c14c7b2349"
+        },
+        "sitequivend-automotive-lifestyle-cover.jpg": {
+          "bytes": 766572,
+          "sha256": "c562132538fa2658fd6aba7a17fbbcecf55377f825474729b16b99e5bfcfbeff"
+        }
+      },
+      "qc": {
+        "verdict": "pass",
+        "loudness": [
+          "-14.0 LUFS"
+        ]
+      },
+      "limitations": [
+        "Plaques 768x1376 remontées en 1080x1920 (1,4x) : le grain et l'accentuation compensent, mais ce n'est pas une captation native.",
+        "Mouvement 2.5D (caméra, parallaxe estimée, couches d'atmosphère) : pas de mouvement de sujet réel, faute de LTX disponible ici.",
+        "Les morphs sont des effets de montage (rotation/zoom/portail/flare) et non des morphs générés par modèle ; le raccord est exact aux deux extrémités.",
+        "Le studio IA historique n'est pas touché : tout est additif dans scripts/portfolio."
+      ]
+    }
+  },
+  "method": {
+    "picture": "scripts/portfolio (moteur morphfilm, CPU) : plaques photo + camera 2.5D + respiration camera epaule + morphs + etalonnage + grain",
+    "plates": "images generees hors depot (outil imagegen) ; prompts conserves dans les JSON d'export",
+    "audio": "score original synthetise numpy/scipy, aucun sample tiers",
+    "ltx": "LTX-2.5 / Modal pvs-ltx non executable depuis l'environnement de build (TLS bloque, aucun jeton) ; script pret: scripts/portfolio/ltx_shots.py"
+  },
+  "cost": {
+    "modal_usd": 0.0,
+    "local_cpu_render_min_per_film": 14,
+    "total_cpu_render_min": 28,
+    "ltx_estimate_usd_per_film": 0.4,
+    "ltx_estimate_basis": "22 s de fonction GPU par seconde de video finale (mesure), L40S a 1.95 USD/h"
+  },
+  "renamed_note": "la premiere video locale luxury-take-1.mp4 n'a pas ete utilisee ni terminee, conformement a la consigne"
+}
