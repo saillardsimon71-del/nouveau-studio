@@ -35,7 +35,6 @@ def main() -> int:
     parser.add_argument("--out", default="out.wav")
     parser.add_argument("--language", default="fr")
     parser.add_argument("--speaker-wav", default=None)
-    parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--cfg-weight", type=float, default=2.0)
     parser.add_argument("--model", default="openbmb/VoxCPM2")
     args = parser.parse_args()
@@ -54,15 +53,12 @@ def main() -> int:
     started = time.time()
     wav = model.generate(
         text=args.text,
-        prompt_wav_path=args.speaker_wav if args.speaker_wav and Path(args.speaker_wav).exists() else None,
-        prompt_text=None,
-        language_id=args.language,
+        reference_wav_path=args.speaker_wav,
         cfg_value=args.cfg_weight,
-        temperature=args.temperature,
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    sf.write(str(out), wav, 48000)
+    sf.write(str(out), wav, model.tts_model.sample_rate)
     print(f"wrote {out} in {time.time() - started:.1f}s (device={device})")
     return 0
 

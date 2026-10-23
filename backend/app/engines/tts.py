@@ -82,7 +82,10 @@ class _LocalVoiceEngine(Engine):
         ref = request.params.get("ref_audio") or request.inputs.get("ref_audio")
         if ref:
             cmd += ["--speaker-wav", str(ref)]
-        for key in ("exaggeration", "cfg_weight", "temperature", "model"):
+        controls = ("cfg_weight", "model") if self.engine_id == "voxcpm2" else (
+            "exaggeration", "cfg_weight", "temperature", "model"
+        )
+        for key in controls:
             if key in request.params and request.params[key] is not None:
                 cmd += [f"--{key.replace('_', '-')}", str(request.params[key])]
         return cmd

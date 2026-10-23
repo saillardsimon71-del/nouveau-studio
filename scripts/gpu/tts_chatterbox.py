@@ -64,7 +64,7 @@ def main() -> int:
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     started = time.time()
-    model = ChatterboxMultilingualTTS.from_pretrained(device=device)
+    model = ChatterboxMultilingualTTS.from_pretrained(device=device, t3_model=args.model)
     kwargs = {
         "language_id": args.language,
         "exaggeration": args.exaggeration,
