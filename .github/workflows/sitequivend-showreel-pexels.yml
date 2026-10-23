@@ -1,0 +1,154 @@
+name: SiteQuiVend | Pexels x LTX 13s showreel
+# Branch pushes check assets with zero GPU; video production requires deliberate manual dispatch.
+on:
+  push:
+    branches: [feat/sitequivend-showreel-pexels-20261023]
+    paths: ['.github/workflows/sitequivend-showreel-pexels.yml', 'scripts/production/sitequivend_showreel_pexels.py']
+  workflow_dispatch:
+    inputs:
+      stage:
+        type: choice
+        description: 'Check assets for free or render the LTX film'
+        options: [preflight, render]
+        default: preflight
+      confirm_spend:
+        type: choice
+        description: 'Explicitly authorize Modal GPU spend'
+        options: ['non', 'oui']
+        default: 'non'
+permissions:
+  contents: read
+concurrency:
+  group: sqv-pexels-showreel-20261023
+  cancel-in-progress: false
+jobs:
+  showreel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      PYTHONUNBUFFERED: '1'
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      MODAL_WORKSPACE_EXPECTED: kulejean567
+      PVS_MODAL_APP: pvs-ltx
+      PVS_MODAL_LTX_VOLUME: studio-ltx25-models
+      PVS_MODAL_GPU: L40S
+      PVS_MODAL_RENDER_TIMEOUT: '480'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install preflight and editing tools
+        run: |
+          set -eu
+          python -m pip install 'Pillow>=11,<13'
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - name: Verify real Pexels photos and licensed music before any GPU
+        run: |
+          set -eu
+          python scripts/production/sitequivend_showreel_pexels.py prepare --out artifacts
+          test -s artifacts/source-provenance.json
+          for name in beauty food coffee; do test -s "artifacts/references/$name-reference.png"; done
+          echo '### Pexels sources verified — zero GPU' >> "$GITHUB_STEP_SUMMARY"
+      - name: Download photos and provenance for visual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: SiteQuiVend-Pexels-references
+          path: |
+            artifacts/references/
+            artifacts/source-provenance.json
+          retention-days: 14
+      - name: Require explicit spend consent and Modal credentials
+        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render'
+        env:
+          SPEND_APPROVAL: ${{ inputs.confirm_spend }}
+        run: |
+          set -eu
+          test "$SPEND_APPROVAL" = 'oui' || { echo "::error::No GPU authorization"; exit 1; }
+          test -n "$MODAL_TOKEN_ID" && test -n "$MODAL_TOKEN_SECRET" || { echo "::error::No Modal secrets"; exit 1; }
+      - name: Install Modal only for paid manual render
+        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        run: python -m pip install 'modal>=1.0,<2'
+      - name: LTX shot 1 - premium amber skincare product
+        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        env:
+          PROMPT: >-
+            A single continuous premium skincare commercial using the EXACT real
+            Pexels reference. The same amber glass serum dropper bottle remains
+            still on the white sunlit surface with its existing white blank label,
+            pipette, angled bottle, transparent glass backdrop and soft shadows.
+            A controlled three-centimeter macro camera slide produces subtle
+            genuine parallax as sunlight glints across the amber glass.
+            Incredibly realistic physical glass, crisp photographic optics,
+            premium e-commerce product film. No brand text, no object changes,
+            no floating objects, no camera shake, no flash, no cuts or music.
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/clips
+          modal run deploy/modal_ltx_worker.py --mode render \
+            --prompt "$PROMPT" --duration 5 --aspect '9:16' --seed 812310 \
+            --image-png artifacts/references/beauty-reference.png \
+            --image-strength 0.85 --audio-mode silent --out artifacts/clips/beauty-ltx.mp4
+      - name: LTX shot 2 - chocolate food macro
+        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        env:
+          PROMPT: >-
+            Five-second continuous luxury food commercial preserving exactly
+            the real photographed stacked chocolate brownies and dripping
+            ganache. A gentle slow macro slider push-in, glossy chocolate
+            highlights naturally shifting and only the existing ganache
+            slowly flowing over existing brownie surfaces. Beautiful authentic
+            edible texture, controlled dark chocolate tones and cinematographic
+            depth of field. The dessert geometry remains unchanged. No new
+            layers, utensils, hands, fake pours, flashing, cuts or music.
+        run: |
+          set -euo pipefail
+          modal run deploy/modal_ltx_worker.py --mode render \
+            --prompt "$PROMPT" --duration 5 --aspect '9:16' --seed 812311 \
+            --image-png artifacts/references/food-reference.png \
+            --image-strength 0.85 --audio-mode silent --out artifacts/clips/food-ltx.mp4
+      - name: LTX shot 3 - authentic espresso extraction
+        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        env:
+          PROMPT: >-
+            Five-second single continuous realistic cinematic coffee ad.
+            Preserve the exact real photographed metallic espresso machine,
+            portafilter, cup and background. Golden espresso naturally flows
+            into the stationary cup with convincing fluid and crema motion.
+            Tiny elegant push-in and restrained optical focus breathing,
+            reflected highlights in real stainless steel. No extra streams,
+            no bending spout, no new objects, no jump cuts, no flash,
+            no people, no artificial music.
+        run: |
+          set -euo pipefail
+          modal run deploy/modal_ltx_worker.py --mode render \
+            --prompt "$PROMPT" --duration 5 --aspect '9:16' --seed 812312 \
+            --image-png artifacts/references/coffee-reference.png \
+            --image-strength 0.85 --audio-mode silent --out artifacts/clips/coffee-ltx.mp4
+      - name: Preserve all real clips even if assembly fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: SiteQuiVend-LTX-source-shots
+          path: artifacts/clips/
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Assemble hard cuts, licensed music and 48fps delivery
+        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        run: |
+          set -euo pipefail
+          python scripts/production/sitequivend_showreel_pexels.py assemble --out artifacts
+          test -s artifacts/exports/SiteQuiVend-Showreel-Pexels-LTX-13s.mp4
+          echo '### Delivered: 13s / 1080x1920 / 48fps interpolated' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Visual approval is still required before publication. Source LTX is native 24fps.' >> "$GITHUB_STEP_SUMMARY"
+          echo "Music: 'Ascension' by Scott Buckley, CC BY 4.0 — attribution required." >> "$GITHUB_STEP_SUMMARY"
+      - name: Download MP4, cover and attribution
+        if: github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SiteQuiVend-Showreel-13s-LTX
+          path: artifacts/exports/
+          if-no-files-found: error
+          retention-days: 30
