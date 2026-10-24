@@ -18,29 +18,29 @@ ASSETS = [
     {
         "name": "revelation",
         "sector": "luxury-fragrance",
-        "pexels_id": 8178744,
-        "photographer": "Muhammad Younas",
-        "page": "https://www.pexels.com/photo/clear-glass-perfume-bottle-on-black-surface-8178744/",
-        "download": "https://images.pexels.com/photos/8178744/pexels-photo-8178744.jpeg",
-        "description": "Full reference: amber-glass bottle on dark background"
+        "pexels_id": 7814730,
+        "photographer": "Mikhail Nilov",
+        "page": "https://www.pexels.com/photo/water-drops-on-an-ornate-glass-bottle-7814730/",
+        "download": "https://images.pexels.com/photos/7814730/pexels-photo-7814730.jpeg",
+        "description": "Real unbranded bottle lying in water droplets on deep charcoal surface"
     },
     {
         "name": "matiere",
         "sector": "luxury-fragrance",
-        "pexels_id": 8178744,
-        "photographer": "Muhammad Younas",
-        "page": "https://www.pexels.com/photo/clear-glass-perfume-bottle-on-black-surface-8178744/",
-        "download": "https://images.pexels.com/photos/8178744/pexels-photo-8178744.jpeg",
-        "description": "Macro crop from same original image: amber glass and cap"
+        "pexels_id": 7814730,
+        "photographer": "Mikhail Nilov",
+        "page": "https://www.pexels.com/photo/water-drops-on-an-ornate-glass-bottle-7814730/",
+        "download": "https://images.pexels.com/photos/7814730/pexels-photo-7814730.jpeg",
+        "description": "Macro crop from same original image: wet glass, droplets and cap"
     },
     {
         "name": "packshot",
         "sector": "luxury-fragrance",
-        "pexels_id": 8178744,
-        "photographer": "Muhammad Younas",
-        "page": "https://www.pexels.com/photo/clear-glass-perfume-bottle-on-black-surface-8178744/",
-        "download": "https://images.pexels.com/photos/8178744/pexels-photo-8178744.jpeg",
-        "description": "Final packshot from same original: consistent bottle geometry"
+        "pexels_id": 7814730,
+        "photographer": "Mikhail Nilov",
+        "page": "https://www.pexels.com/photo/water-drops-on-an-ornate-glass-bottle-7814730/",
+        "download": "https://images.pexels.com/photos/7814730/pexels-photo-7814730.jpeg",
+        "description": "Final packshot from same original: lying bottle, wet black surface"
     }
 ]
 
