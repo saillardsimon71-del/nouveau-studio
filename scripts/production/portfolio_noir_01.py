@@ -255,3 +255,5 @@ if __name__ == "__main__":
 # Production request: one one-time GitHub Actions render, 3 Modal calls, no automatic retry.
 
 # One-time user-authorized portfolio spot launch on 2026-10-24.
+
+# Exactly one GitHub Actions GPU run authorized for the NOIR / 01 spec ad on 2026-10-24.
