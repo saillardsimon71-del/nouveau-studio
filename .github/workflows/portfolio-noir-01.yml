@@ -85,7 +85,7 @@ jobs:
         if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_NOIR_01_ONCE_20261024')
         env:
           PROMPT: >-
-            Luxury fragrance campaign, one photorealistic continuous shot. Preserve exactly the reference perfume bottle including neck, cap, amber glass, surrounding flowers if present, tabletop and reflections. Slow optical dolly-in by a few centimeters, subtle 3-degree sideways parallax and moving warm copper highlights. Glass remains rigid and the product is perfectly stable, no change in writing if present. Fine atmospheric haze in existing dark background. No added props, no labels, no transformations, no logos, no generated text or camera shake.
+            Premium experimental niche-fragrance campaign, photorealistic continuous shot. Preserve exactly the unbranded sculptural glass perfume bottle lying diagonally on a real wet dark surface from the reference, cap and glass outlines unchanged. Very slow cinematic optical push-in with minuscule lateral parallax. Soft warm copper highlights gently move over the droplets and glass. Background remains charcoal-black with subtle natural moisture sparkle. Do not stand up, turn, lift or reshape the bottle. No added objects, no new labels, no cuts, no typography or logo.
         run: |
           set -euo pipefail
           mkdir -p artifacts/clips
@@ -98,7 +98,7 @@ jobs:
         if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_NOIR_01_ONCE_20261024')
         env:
           PROMPT: >-
-            Hyperreal luxury fragrance macro cinematography starting from the exact reference crop of the same glass perfume bottle. Subtle slow focus pull across amber liquid, faceted glass edges and detailed specular reflections; very slight lateral orbit less than 4 degrees. The cap, edges and decorations remain physically unchanged throughout. A few minute condensation highlights may shimmer only if already visible in the source. The geometry stays perfectly rigid and optical. No melting glass, no shape changes, no new objects, no additional labels, no cuts or stylized rendering.
+            Hyperreal perfume advertising macro from the exact reference crop of the SAME lying glass bottle. Preserve the water droplets, curved bottle body, black cap and damp dark ground. Extremely subtle focus pull between small water droplets and the glass edge, gentle optical camera drift under a few centimeters, realistic copper specular caustics. Rigid stable glass geometry, no extra objects, no standing bottle, no melting, no new lettering, no cuts. Continuous premium commercial photography.
         run: |
           set -euo pipefail
           mkdir -p artifacts/clips
@@ -111,7 +111,7 @@ jobs:
         if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_NOIR_01_ONCE_20261024')
         env:
           PROMPT: >-
-            Premium French perfumery hero packshot. Preserve precisely the same reference bottle, cap, amber liquid and real black surface. Slow elegant dolly-out and minute 2-degree camera tilt, refined warm golden bokeh in the existing background and calm physically correct glass reflections. If the dark surface is reflective, soft existing reflections move naturally; do not invent a new pool or brand label. Strong black negative space, high-end still-life cinematography, authentic lighting, stable object silhouette, no new objects, no labels, no text or cuts.
+            Photorealistic luxury niche fragrance final packshot. Preserve exactly the same unbranded perfume bottle lying on a wet charcoal surface, all contours, droplets and cap unchanged from the reference. Slow calm dolly-out with realistic slight shifts in reflections of existing water droplets; distant background darkens gracefully, no invented pool, no product relocation, no levitation. Elegant controlled low-key studio photography with soft amber edge highlights, no transformations, no text, no labels, no cuts.
         run: |
           set -euo pipefail
           mkdir -p artifacts/clips
