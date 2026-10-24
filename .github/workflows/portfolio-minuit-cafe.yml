@@ -3,7 +3,7 @@ name: Portfolio | MINUIT CAFE 15s (Pexels + LTX)
 on:
   push:
     branches: [production/portfolio-minuit-cafe-20261024]
-    paths: ['.github/workflows/sitequivend-showreel-pexels.yml', 'scripts/production/portfolio_minuit_cafe.py']
+    paths: ['.github/workflows/portfolio-minuit-cafe.yml', 'scripts/production/portfolio_minuit_cafe.py']
   workflow_dispatch:
     inputs:
       stage:
