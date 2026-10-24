@@ -243,3 +243,5 @@ if __name__ == "__main__":
         raise
 
 # Production request: one one-time GitHub Actions render, 3 Modal calls, no automatic retry.
+
+# One-time user-authorized portfolio spot launch on 2026-10-24.
