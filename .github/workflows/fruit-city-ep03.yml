@@ -1,0 +1,119 @@
+name: Fruit City | Durian en prison E03 - 55s LTX
+
+on:
+  push:
+    branches: ['production/fruit-city-episode-03-20261024']
+    paths:
+      - 'scripts/production/fruit_city_ep03.py'
+  workflow_dispatch:
+    inputs:
+      stage:
+        type: choice
+        description: 'Preview without GPU or make final film'
+        options: [preflight, render]
+        default: preflight
+      confirm_spend:
+        type: choice
+        description: 'Explicit confirmation for Modal GPU'
+        options: ['non', 'oui']
+        default: 'non'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fruit-city-episode-03-20261024
+  cancel-in-progress: false
+
+jobs:
+  produce_episode:
+    # Ordinary source updates cannot accidentally spend GPU.
+    if: >-
+      (github.event_name == 'push' && github.event.head_commit.message == 'RUN_FRUIT_CITY_EP03_ONCE_20261024') ||
+      (github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PYTHONUNBUFFERED: '1'
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      PVS_MODAL_APP: pvs-ltx
+      PVS_MODAL_LTX_VOLUME: studio-ltx25-models
+      PVS_MODAL_GPU: L40S
+      MODAL_WORKSPACE_EXPECTED: kulejean567
+      PVS_ALLOW_MOCK: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate storyboard and production contract (zero GPU)
+        run: |
+          python scripts/production/fruit_city_ep03.py preflight --out artifacts
+          test -s artifacts/episode-03-storyboard.json
+      - name: Publish storyboard for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fruit-City-E03-Storyboard
+          path: artifacts/episode-03-storyboard.json
+          retention-days: 30
+      - name: Require explicit GPU authorization and credentials
+        if: >-
+          (github.event_name == 'push' && github.event.head_commit.message == 'RUN_FRUIT_CITY_EP03_ONCE_20261024') ||
+          (github.event_name == 'workflow_dispatch' && inputs.stage == 'render')
+        env:
+          APPROVAL: ${{ github.event_name == 'push' && github.event.head_commit.message == 'RUN_FRUIT_CITY_EP03_ONCE_20261024' && 'oui' || inputs.confirm_spend }}
+        run: |
+          set -euo pipefail
+          test "$APPROVAL" = 'oui' || { echo "::error::Explicit GPU spend approval missing"; exit 1; }
+          test -n "$MODAL_TOKEN_ID" && test -n "$MODAL_TOKEN_SECRET" || { echo "::error::Modal credentials missing"; exit 1; }
+      - name: Install rendering, sound and subtitle tools
+        if: >-
+          (github.event_name == 'push' && github.event.head_commit.message == 'RUN_FRUIT_CITY_EP03_ONCE_20261024') ||
+          (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui')
+        run: |
+          set -e
+          python -m pip install --disable-pip-version-check 'modal>=1.0,<2' 'edge-tts>=7.0,<8.0' 'pydub>=0.25,<0.26'
+          if ! command -v ffmpeg >/dev/null || ! command -v espeak-ng >/dev/null || ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf; then
+            timeout 180s sudo apt-get update -qq
+            timeout 180s sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
+          fi
+      - name: Render eleven REAL 5-second shots with LTX-2.5 on Modal
+        if: >-
+          (github.event_name == 'push' && github.event.head_commit.message == 'RUN_FRUIT_CITY_EP03_ONCE_20261024') ||
+          (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui')
+        run: python scripts/production/fruit_city_ep03.py render --out artifacts
+      - name: Preserve raw MP4 clips, provenance and GPU metadata even on errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fruit-City-E03-LTX-11-plans
+          path: |
+            artifacts/clips/
+            artifacts/logs/
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Assemble film, separate French dialogues, sound design and subtitles
+        if: >-
+          (github.event_name == 'push' && github.event.head_commit.message == 'RUN_FRUIT_CITY_EP03_ONCE_20261024') ||
+          (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui')
+        run: python scripts/production/fruit_city_ep03.py assemble --out artifacts
+      - name: Publish 55-second vertical MP4 and delivery package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fruit-City-E03-Film-Final-55s
+          path: artifacts/exports/
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Fruit City / Durian en prison / Episode 3" >> "$GITHUB_STEP_SUMMARY"
+          echo "11 LTX-2.5 clips, 5 s each, 55 s final 9:16. No mock, no publication." >> "$GITHUB_STEP_SUMMARY"
+          echo "GPU cost metadata and all available source clips are stored in artifacts." >> "$GITHUB_STEP_SUMMARY"
+          if test -s artifacts/exports/Fruit-City-Durian-en-Prison-Episode-03.mp4; then
+            echo "✅ Final MP4 exported. Editorial viewing still required." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "⚠️ No final MP4; inspect job logs and source clips." >> "$GITHUB_STEP_SUMMARY"
+          fi
