@@ -1,0 +1,147 @@
+name: Portfolio | MINUIT CAFE 15s (Pexels + LTX)
+# Push only runs 0-GPU preflight, except a SINGLE exact opt-in commit message for this requested production.
+on:
+  push:
+    branches: [production/portfolio-minuit-cafe-20261024]
+    paths: ['.github/workflows/sitequivend-showreel-pexels.yml', 'scripts/production/portfolio_minuit_cafe.py']
+  workflow_dispatch:
+    inputs:
+      stage:
+        type: choice
+        description: 'Check assets for free or render the LTX film'
+        options: [preflight, render]
+        default: preflight
+      confirm_spend:
+        type: choice
+        description: 'Explicitly authorize Modal GPU spend'
+        options: ['non', 'oui']
+        default: 'non'
+permissions:
+  contents: read
+concurrency:
+  # Separate a one-time approved render from an old stuck no-GPU preflight queue.
+  group: portfolio-minuit-cafe-20261024
+  cancel-in-progress: false
+jobs:
+  showreel:
+    # All ordinary pushes remain no-GPU; only the exact approved, one-use commit triggers production.
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MINUIT_CAFE_ONCE_20261024')
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      PYTHONUNBUFFERED: '1'
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      MODAL_WORKSPACE_EXPECTED: kulejean567
+      PVS_MODAL_APP: pvs-ltx
+      PVS_MODAL_LTX_VOLUME: studio-ltx25-models
+      PVS_MODAL_GPU: L40S
+      PVS_MODAL_RENDER_TIMEOUT: '480'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install preflight and editing tools
+        run: |
+          set -eu
+          python -m pip install --disable-pip-version-check --timeout 40 --retries 1 'Pillow>=11,<13'
+          # GitHub's standard Ubuntu image normally already has ffmpeg and DejaVu.
+          # Avoid an unconditional apt-get update, which stalled the earlier preflight.
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null || ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf; then
+            timeout 180s sudo apt-get update -qq
+            timeout 180s sudo apt-get install -y ffmpeg fonts-dejavu-core
+          fi
+          ffmpeg -version | head -n 1
+          test -f /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
+      - name: Verify real Pexels photos and licensed music before any GPU
+        run: |
+          set -eu
+          python scripts/production/portfolio_minuit_cafe.py prepare --out artifacts
+          test -s artifacts/source-provenance.json
+          for name in beans extraction cup; do test -s "artifacts/references/$name-reference.png"; done
+          echo '### Pexels sources verified — zero GPU' >> "$GITHUB_STEP_SUMMARY"
+      - name: Download photos and provenance for visual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: MINUIT-CAFE-Pexels-references
+          path: |
+            artifacts/references/
+            artifacts/source-provenance.json
+          retention-days: 14
+      - name: Require explicit spend consent and Modal credentials
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MINUIT_CAFE_ONCE_20261024')
+        env:
+          # This exact push commit is authorized by the user in chat; any other push is skipped.
+          SPEND_APPROVAL: ${{ github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MINUIT_CAFE_ONCE_20261024' && 'oui' || inputs.confirm_spend }}
+        run: |
+          set -eu
+          test "$SPEND_APPROVAL" = 'oui' || { echo "::error::No GPU authorization"; exit 1; }
+          test -n "$MODAL_TOKEN_ID" && test -n "$MODAL_TOKEN_SECRET" || { echo "::error::No Modal secrets"; exit 1; }
+      - name: Install Modal only for paid manual render
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MINUIT_CAFE_ONCE_20261024')
+        run: python -m pip install 'modal>=1.0,<2'
+      - name: LTX shot 1 - beans
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MINUIT_CAFE_ONCE_20261024')
+        env:
+          PROMPT: >-
+            A luxurious cinematic macro shot of real roasted coffee beans. Preserve the exact beans and scene composition from the reference photograph. The camera makes a very slow precise push-in with subtle optical parallax. Soft warm copper highlights gently roll over real textured roasted surfaces. A little fine atmospheric haze shifts in the deep dark background. No levitating beans, no new objects, no reshaping beans, no typography, no cuts, no hands, completely photorealistic.
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/clips
+          modal run deploy/modal_ltx_worker.py --mode render \
+            --prompt "$PROMPT" --duration 5 --aspect '9:16' --seed 731001 \
+            --image-png artifacts/references/beans-reference.png \
+            --image-strength 0.85 --audio-mode silent --out artifacts/clips/beans-ltx.mp4
+
+      - name: LTX shot 2 - extraction
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MINUIT_CAFE_ONCE_20261024')
+        env:
+          PROMPT: >-
+            Premium espresso advertising shot starting exactly from the reference image. Preserve the real machine spout and the same glass cup, with realistic correct geometry. A fine continuous amber espresso stream flows naturally into the cup; crema subtly ripples and rises. Camera performs a restrained smooth five-centimeter lateral tracking motion, true optical parallax. Deep warm highlights, soft shadows, genuine macro commercial photography, no extra spouts, no added hands, no text, no cuts.
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/clips
+          modal run deploy/modal_ltx_worker.py --mode render \
+            --prompt "$PROMPT" --duration 5 --aspect '9:16' --seed 731002 \
+            --image-png artifacts/references/extraction-reference.png \
+            --image-strength 0.85 --audio-mode silent --out artifacts/clips/extraction-ltx.mp4
+
+      - name: LTX shot 3 - cup
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MINUIT_CAFE_ONCE_20261024')
+        env:
+          PROMPT: >-
+            Elegant luxury espresso commercial. Preserve exactly the finished espresso cup and saucer, shape, color, tabletop, and surroundings from the original photograph. Slow smooth cinematic dolly-in of a few centimeters, with delicate natural steam drifting upward and subtle shimmering highlights on the crema. The cup remains rigid and unchanged, no liquid overflow and no surreal effects. Restrained high-end food photography, deep black and warm copper, optical realism, no hand, no logos, no added objects, no text, no cut.
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/clips
+          modal run deploy/modal_ltx_worker.py --mode render \
+            --prompt "$PROMPT" --duration 5 --aspect '9:16' --seed 731003 \
+            --image-png artifacts/references/cup-reference.png \
+            --image-strength 0.85 --audio-mode silent --out artifacts/clips/cup-ltx.mp4
+
+      - name: Preserve all real clips even if assembly fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MINUIT-CAFE-LTX-source-shots
+          path: artifacts/clips/
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Assemble hard cuts, licensed music and 48fps delivery
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MINUIT_CAFE_ONCE_20261024')
+        run: |
+          set -euo pipefail
+          python scripts/production/portfolio_minuit_cafe.py assemble --out artifacts
+          test -s artifacts/exports/MINUIT-CAFE-Spot-15s-LTX.mp4
+          echo '### Delivered: 15s / 1080x1920 / 48fps interpolated' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Visual approval is still required before publication. Source LTX is native 24fps.' >> "$GITHUB_STEP_SUMMARY"
+          echo "Music: 'Ascension' by Scott Buckley, CC BY 4.0 — attribution required." >> "$GITHUB_STEP_SUMMARY"
+      - name: Download MP4, cover and attribution
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MINUIT_CAFE_ONCE_20261024')
+        uses: actions/upload-artifact@v4
+        with:
+          name: MINUIT-CAFE-15s-LTX
+          path: artifacts/exports/
+          if-no-files-found: error
+          retention-days: 30
