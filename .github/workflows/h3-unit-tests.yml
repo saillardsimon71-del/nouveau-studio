@@ -1,0 +1,24 @@
+name: MiniMax H3 | Pure Engine Contract Tests
+on:
+  push:
+    branches: [feat/modal-h3-engine-20261025]
+    paths:
+      - ".github/workflows/h3-unit-tests.yml"
+      - "tests/test_modal_h3_local.py"
+      - "deploy/modal_h3_worker.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test H3 request, FL2VA graph and artifacts without GPU or secrets
+        run: |
+          python -m unittest discover -s tests -p "test_modal_h3_local.py" -v
+          python -m py_compile deploy/modal_h3_worker.py backend/app/engines/registry.py backend/app/engines/modal_remote.py
