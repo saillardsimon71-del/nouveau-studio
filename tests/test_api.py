@@ -117,7 +117,7 @@ def test_full_export_flow(client, project):
         f"/api/projects/{project['id']}/storyboard",
         json=proposal["storyboard"],
     ).json()["shots"]:
-        job = client.post(f"/api/shots/{shot['id']}/generate", json={}).json()
+        job = client.post(f"/api/shots/{shot['id']}/generate", json={'params': {'performance_mode': 'legacy'}}).json()
         assert wait_job(client, job["id"], timeout=240)["status"] == "succeeded"
 
     export_job = client.post(

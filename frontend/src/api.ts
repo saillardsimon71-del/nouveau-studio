@@ -44,6 +44,10 @@ export const api = {
     request<import("./types").Job>(`/api/shots/${shotId}/generate`, { method: "POST", body: JSON.stringify(body) }),
   generateVoice: (shotId: string, body: Record<string, unknown> = {}) =>
     request<import("./types").Job>(`/api/shots/${shotId}/voice`, { method: "POST", body: JSON.stringify(body) }),
+  reviewVoice: (shotId: string, artifactId: string, body: Record<string, unknown>) =>
+    request<import('./types').Artifact>(`/api/shots/${shotId}/voice/${artifactId}/review`, {
+      method: 'POST', body: JSON.stringify(body),
+    }),
   retakeShot: (shotId: string, body: Record<string, unknown>) =>
     request<import("./types").Job>(`/api/shots/${shotId}/retake`, { method: "POST", body: JSON.stringify(body) }),
   selectArtifact: (shotId: string, artifactId: string) =>

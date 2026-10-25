@@ -31,6 +31,15 @@ export interface Artifact {
   created_at: string;
 }
 
+export interface VoicePerformance {
+  expected_text: string;
+  transcript: string | null;
+  duration_s: number;
+  accepted: boolean;
+  human_approved: boolean;
+  source_sha256: string;
+}
+
 export interface Shot {
   id: string;
   project_id: string;

@@ -9,7 +9,7 @@ from app.ad_references.performance import dialogue_plan
     ("Vêtements haut de gamme, manteau, 20 secondes", "premium_fashion"),
     ("Publicité narrative avec deux personnages, une tasse, 20 secondes", "storytelling"),
 ])
-def test_director_produces_traceable_h3_prompts(brief, category):
+def test_director_produces_traceable_prompts_without_forcing_presenters_to_h3(brief, category):
     result = propose(brief, use_llm=False, use_references=True)
     assert result.reference_context["category"] == category
     assert result.reference_context["recipes"]
@@ -17,11 +17,14 @@ def test_director_produces_traceable_h3_prompts(brief, category):
     for shot in result.storyboard.shots:
         assert 4 <= shot.duration_s <= 15
         assert shot.creative_provenance
-        assert shot.engine_hint == "modal_h3"
+        assert shot.engine_hint == ('modal_avatar' if category == 'ugc_presenter' else 'modal_h3')
         assert len(shot.prompt) <= 7000
         if shot.dialogue:
-            assert "French" in shot.prompt
-            assert shot.dialogue in shot.prompt
+            if shot.performance_mode == 'voice_first':
+                assert shot.dialogue not in shot.prompt
+            else:
+                assert 'French' in shot.prompt
+                assert shot.dialogue in shot.prompt
             assert shot.performance["timing"]["fits"]
 
 
@@ -73,8 +76,9 @@ def test_llm_receives_only_bounded_context_and_recipe_affects_prompt(monkeypatch
     assert chosen_recipe["recipe_id"] in payloads[0]["messages"][1]["content"]
     assert "entre 4 et 12" in payloads[0]["messages"][0]["content"]
     assert chosen_recipe["rules"][0]["instruction"] in result.storyboard.shots[0].prompt
-    assert result.storyboard.shots[0].kind == "b_roll"
-    assert result.storyboard.shots[0].engine_hint == "modal_h3"
+    assert result.storyboard.shots[0].kind == 'avatar'
+    assert result.storyboard.shots[0].engine_hint == ''
+    assert result.storyboard.shots[0].performance_mode == 'voice_first'
 
 
 def test_invalid_library_falls_back_with_visible_note(tmp_path, monkeypatch):
@@ -95,14 +99,14 @@ def test_narrative_keeps_two_speakers_when_character_is_selected():
     assert result.storyboard.shots[1].character_id is None
 
 
-def test_selected_character_photo_reaches_h3_video_request(client, project, monkeypatch):
+def test_selected_character_photo_reaches_cinematic_video_request(client, project, monkeypatch):
     from pathlib import Path
     from types import SimpleNamespace
     from app import jobs
     from app.engines.base import EngineOutput
     photo = Path(__file__).resolve().parents[1] / "benchmark_assets/character_reference.png"
     character = client.post("/api/characters", json={"name": "Selected", "base_image": str(photo)}).json()
-    proposal = client.post("/api/director/propose", json={"brief": "UGC cosmétique 20 secondes",
+    proposal = client.post("/api/director/propose", json={"brief": "Mode premium vêtements 20 secondes",
         "character_id": character["id"], "use_llm": False, "use_references": True}).json()
     applied = client.post(f"/api/projects/{project['id']}/storyboard", json=proposal["storyboard"]).json()
     shot = applied["shots"][0]

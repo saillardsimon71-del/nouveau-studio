@@ -1,9 +1,11 @@
 import base64
 import json
+import os
 import time
 from pathlib import Path
 
 from .. import media
+from ..avatar import plan_audio
 from ..config import _env_flag
 from ..cost import Usage
 from .base import Engine, EngineInfo, EngineOutput
@@ -12,7 +14,7 @@ from .base import Engine, EngineInfo, EngineOutput
 class ModalEngine(Engine):
     def __init__(self, kind):
         self.kind = kind
-        self.app_name = "pvs-longcat-avatar" if kind == "avatar" else "pvs-ltx"
+        self.app_name = os.environ.get('PVS_MODAL_AVATAR_APP', 'pvs-longcat-avatar') if kind == 'avatar' else 'pvs-ltx'
         self.function_name = "render_avatar" if kind == "avatar" else "render_clip"
         self.info = EngineInfo(
             name="modal_avatar" if kind == "avatar" else "modal_ltx", kind=kind,
@@ -20,7 +22,8 @@ class ModalEngine(Engine):
             capabilities=["image_to_video", "lip_sync"] if kind == "avatar" else ["text_to_video", "image_to_video"],
             requires_gpu=True, provider="modal", gpu="A100_80GB" if kind == "avatar" else "L40S",
             verified=True,
-            notes="Un segment de 3.72 s maximum" if kind == "avatar" else "Rendu distant sans GitHub Actions",
+            notes=('Voix validée, maximum ' + ('6.92 s' if os.environ.get('PVS_MODAL_AVATAR_MAX_SEGMENTS') == '2' else '3.72 s'))
+            if kind == 'avatar' else 'Rendu distant sans GitHub Actions',
         )
 
     def function(self):
@@ -46,14 +49,14 @@ class ModalEngine(Engine):
             if not audio.is_file():
                 raise ValueError("Avatar: piste audio manquante")
             duration = media.probe(audio).duration_s
-            if not 0 < duration <= 3.72:
-                raise ValueError("Ce pilote LongCat accepte une voix de 3.72 secondes maximum. Raccourcir le dialogue.")
+            plan = plan_audio(duration, max_segments=int(os.environ.get('PVS_MODAL_AVATAR_MAX_SEGMENTS', '1')))
             reference = request.inputs.get("reference_image") or request.params.get("reference_image")
             if not reference or not Path(reference).is_file():
                 raise ValueError("Avatar: sélectionner un personnage avec une image de référence")
             png = request.out("reference.png")
             media.run_ffmpeg(["-i", str(reference), "-frames:v", "1", str(png)])
-            return (base64.b64encode(png.read_bytes()).decode(), base64.b64encode(audio.read_bytes()).decode(), request.prompt)
+            args = (base64.b64encode(png.read_bytes()).decode(), base64.b64encode(audio.read_bytes()).decode(), request.prompt)
+            return (*args, 2) if plan['num_segments'] == 2 else args
         payload = {
             "prompt": request.prompt, "duration_s": request.duration_s,
             "aspect_ratio": request.project.get("format", "9:16"),
@@ -185,7 +188,7 @@ class FrenchEdgeVoice(Engine):
         ctx.check_cancelled()
         ctx.log("Synthèse française Henri", progress=0.1, stage="tts")
         mp3 = request.out("voice_fr.mp3")
-        edge_tts.Communicate(text, voice="fr-FR-HenriNeural").save_sync(str(mp3))
+        edge_tts.Communicate(text, voice=str(request.params.get('voice') or 'fr-FR-HenriNeural')).save_sync(str(mp3))
         wav = request.out("voice_fr.wav")
         media.run_ffmpeg(["-i", str(mp3), "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le", str(wav)])
         out = EngineOutput()

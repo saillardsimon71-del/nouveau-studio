@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, artifactUrl, exportUrl } from "../api";
-import type { Character, Job, Project, Shot, SystemInfo } from "../types";
+import type { Character, Job, Project, Shot, SystemInfo, Voice, VoicePerformance } from "../types";
 
 const ACTIVE = new Set(["queued", "running"]);
 
@@ -17,9 +17,11 @@ export default function Studio({
 }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [voices, setVoices] = useState<Voice[]>([]);
   const [busyShot, setBusyShot] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [voiceTranscripts, setVoiceTranscripts] = useState<Record<string, string>>({});
   const [musicGain, setMusicGain] = useState(-20);
   const [subtitles, setSubtitles] = useState(true);
   const [transitionsOn, setTransitionsOn] = useState(true);
@@ -37,6 +39,7 @@ export default function Studio({
   useEffect(() => {
     void loadJobs();
     void api.characters().then(setCharacters).catch((err: Error) => setError(err.message));
+    void api.voices().then(setVoices).catch((err: Error) => setError(err.message));
   }, [loadJobs]);
 
   const hasActive = jobs.some((job) => ACTIVE.has(job.status));
@@ -57,7 +60,7 @@ export default function Studio({
     setBusyShot(shot.id);
     setError(null);
     try {
-      if (kind === "video") await api.generateShot(shot.id, {params: {force_tts: shot.kind === "avatar"}});
+      if (kind === 'video') await api.generateShot(shot.id);
       if (kind === "voice") await api.generateVoice(shot.id);
       await loadJobs();
     } catch (err) {
@@ -67,10 +70,10 @@ export default function Studio({
     }
   };
 
-  const upload = async (shot: Shot, file: File) => {
+  const upload = async (shot: Shot, file: File, kind = 'video') => {
     setError(null);
     try {
-      await api.uploadShot(shot.id, file, "video");
+      await api.uploadShot(shot.id, file, kind);
       reload();
     } catch (err) {
       setError((err as Error).message);
@@ -170,6 +173,14 @@ export default function Studio({
             const selected = shot.artifacts?.find((artifact) => artifact.id === shot.selected_artifact);
             const latestVideo = shot.artifacts?.find((artifact) => artifact.kind === "video");
             const media = selected ?? latestVideo;
+            const audio = shot.artifacts?.find((artifact) => artifact.id === shot.params.audio_artifact_id)
+              ?? shot.artifacts?.find((artifact) => artifact.kind === 'audio');
+            const performance = audio?.meta.performance as VoicePerformance | undefined;
+            const voiceReady = performance?.accepted === true && performance.expected_text === shot.dialogue;
+            const voiceFirst = Boolean(shot.dialogue && (shot.params.audio_artifact_id ||
+              shot.params.performance_mode === 'voice_first' ||
+              (shot.voice_id && !['legacy', 'native'].includes(String(shot.params.performance_mode ?? '')))));
+            const avatar = Boolean(shot.dialogue && (voiceFirst || shot.kind === 'avatar'));
             return (
               <article key={shot.id} className="card shot">
                 <div className="row between">
@@ -202,14 +213,14 @@ export default function Studio({
                   <select className="input" value={String(shot.params?.engine_hint || "")}
                     disabled={running} onChange={(event) => void editShot(shot, {params: {...shot.params, engine_hint: event.target.value}})}>
                     <option value="">Automatique</option>
-                    {system?.engines.filter((engine) => engine.kind === (shot.kind === "avatar" ? "avatar" : "video")).map((engine) => (
+                    {system?.engines.filter((engine) => engine.kind === (avatar ? "avatar" : "video")).map((engine) => (
                       <option key={engine.name} value={engine.name} disabled={!engine.available}>
                         {engine.label}{engine.simulated ? " (simulation)" : ""}{!engine.available ? " (indisponible)" : ""}
                       </option>
                     ))}
                   </select>
                 </label>
-                {shot.kind === "avatar" && (
+                {avatar && (
                   <label className="field">
                     <span className="muted small">Personnage</span>
                     <select className="input" value={shot.character_id || ""} disabled={running}
@@ -222,9 +233,11 @@ export default function Studio({
                 <label className="field">
                   <span className="muted small">Durée du plan (secondes)</span>
                   <input className="input" type="number" min={1} max={60} step={0.01} defaultValue={shot.duration_s}
-                    disabled={running} onBlur={(event) => void editShot(shot, {duration_s: Number(event.target.value)})} />
+                    disabled={running || voiceFirst} onBlur={(event) => void editShot(shot, {duration_s: Number(event.target.value)})} />
                 </label>
-                {shot.params?.engine_hint === "modal_avatar" && <p className="muted small">LongCat : phrase courte, voix de 3,72 s maximum. Aucun rendu GPU si la voix dépasse cette durée.</p>}
+                {shot.params?.engine_hint === 'modal_avatar' && <p className="muted small">
+                  {system?.engines.find((engine) => engine.name === 'modal_avatar')?.notes}
+                </p>}
 
                 <label className="field">
                   <span className="muted small">Dialogue (français)</span>
@@ -235,6 +248,49 @@ export default function Studio({
                     onBlur={(event) => void saveDialogue(shot, event.target.value)}
                   />
                 </label>
+
+                {shot.dialogue && (
+                  <div className="field">
+                    <span className="muted small">Voix avant animation</span>
+                    <select className="input" value={shot.voice_id ?? ''} disabled={running}
+                      onChange={(event) => void editShot(shot, {voice_id: event.target.value || null,
+                        params: {...shot.params, performance_mode: 'voice_first'}})}>
+                      <option value="">Voix automatique ou WAV importé</option>
+                      {voices.map((voice) => <option key={voice.id} value={voice.id}>{voice.name}</option>)}
+                    </select>
+                    {audio && <audio src={artifactUrl(audio.id)} controls preload="metadata" />}
+                    {audio && <>
+                      <textarea className="input" rows={2} placeholder="Transcription réellement entendue"
+                        value={voiceTranscripts[audio.id] ?? performance?.transcript ?? ''}
+                        onChange={(event) => setVoiceTranscripts({...voiceTranscripts, [audio.id]: event.target.value})} />
+                      <button className="btn ghost small" disabled={running} onClick={async () => {
+                        try {
+                          await api.reviewVoice(shot.id, audio.id, {
+                            transcript: voiceTranscripts[audio.id] ?? performance?.transcript ?? '',
+                            human_approved: true, speaker_id: shot.voice_id ?? '',
+                          });
+                          reload();
+                        } catch (err) { setError((err as Error).message); }
+                      }}>Valider les mots et le naturel après écoute</button>
+                      <span className="muted small">{voiceReady ? 'Voix validée' : 'Voix à vérifier avant animation'}</span>
+                    </>}
+                    <label className="btn ghost small file">Importer un WAV
+                      <input type="file" accept=".wav,audio/wav" disabled={running} onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        if (file) void upload(shot, file, 'audio');
+                        event.target.value = '';
+                      }} />
+                    </label>
+                    <select className="input" value={String(shot.params.performance_mode ?? 'legacy')}
+                      disabled={running} onChange={(event) => void editShot(shot, {
+                        params: {...shot.params, performance_mode: event.target.value},
+                      })}>
+                      <option value="voice_first">Voix validée avant animation</option>
+                      <option value="legacy">Compatibilité ancien projet</option>
+                      <option value="native">Voix native du moteur vidéo</option>
+                    </select>
+                  </div>
+                )}
 
                 <details>
                   <summary className="muted small">Prompt & caméra</summary>
@@ -255,11 +311,11 @@ export default function Studio({
                   <button
                     className="btn primary small"
                     onClick={() => void act(shot, "video")}
-                    disabled={busyShot === shot.id || running}
+                    disabled={busyShot === shot.id || running || (voiceFirst && !voiceReady)}
                   >
                     {running ? "En cours" : shot.selected_artifact ? "Régénérer" : "Générer"}
                   </button>
-                  {shot.kind === "avatar" && (
+                  {shot.dialogue && (
                     <button className="btn ghost small" onClick={() => void act(shot, "voice")} disabled={running}>
                       Voix
                     </button>

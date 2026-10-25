@@ -3,7 +3,7 @@
 ## Etat réellement prouvé
 - LTX-2.5 text-to-video (3 s) : MP4 réel validé sur Modal.
 - LTX-2.5 image-to-video (5 s) : MP4 réel disponible via GitHub Actions #39829988746 ; fidélité du visage à vérifier visuellement.
-- LongCat-Video-Avatar-1.5 : **non validé par GPU**. Le code et le workflow ci-dessous sont une voie de test, **pas une preuve de qualité**.
+- LongCat-Video-Avatar-1.5 : un ancien MP4 réel de 3,72 s est archivé dans le [run 39839348041](https://github.com/saillardsimon71-del/nouveau-studio/actions/runs/39839348041). La qualité du jeu n'est pas démontrée. L'état du parcours voix validée et de la continuation figure dans [HUMAN_PERFORMANCE.md](HUMAN_PERFORMANCE.md).
 
 ## Isolation des ressources
 - Workspace existant : `kulejean567`.

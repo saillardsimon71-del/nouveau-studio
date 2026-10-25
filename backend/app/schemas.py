@@ -93,6 +93,7 @@ class ShotSpec(BaseModel):
     performance: dict[str, Any] = Field(default_factory=dict)
     creative_provenance: list[dict[str, Any]] = Field(default_factory=list)
     character_id: str | None = None
+    performance_mode: Literal['legacy', 'voice_first', 'native'] = 'legacy'
 
 
 class Storyboard(BaseModel):
@@ -122,6 +123,12 @@ class StoryboardRequest(BaseModel):
 class GenerateRequest(BaseModel):
     engine: str | None = None
     params: dict[str, Any] = Field(default_factory=dict)
+
+
+class VoiceReviewRequest(BaseModel):
+    transcript: str | None = None
+    human_approved: bool = False
+    speaker_id: str = ''
 
 
 class ExportRequest(BaseModel):

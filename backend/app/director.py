@@ -34,6 +34,8 @@ Contraintes absolues:
   (cadrage, optique, lumière, mouvement de caméra, texture). Pas de texte dans l'image.
 - Chaque plan dure entre 2 et 12 secondes; la somme des durées doit approcher la durée cible.
 - Un seul présentateur récurrent pour les plans "avatar".
+- Les plans avatar ont performance_mode="voice_first" : préparer et valider la voix avant animation.
+- Le dialogue exact apparaît uniquement dans dialogue, jamais dans le prompt visuel d'un avatar.
 - Les démonstrations logicielles sont des captures d'écran réelles: kind "screen_capture",
   prompt décrivant ce que l'écran doit montrer, jamais inventées par un modèle vidéo.
 
@@ -102,6 +104,9 @@ def propose(
             result.notes = f"LLM indisponible ({exc.__class__.__name__}: {exc}) — storyboard heuristique utilisé."
     else:
         result = local_result()
+    for shot in result.storyboard.shots:
+        if shot.kind == 'avatar' and shot.dialogue:
+            shot.performance_mode = 'voice_first'
     if context:
         from .ad_references.performance import enrich_storyboard
         result.storyboard = enrich_storyboard(result.storyboard, context, character)
