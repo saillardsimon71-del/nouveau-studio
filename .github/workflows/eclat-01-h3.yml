@@ -18,13 +18,13 @@ concurrency:
 
 jobs:
   production:
-    if: \${{ github.event.head_commit.message == 'CHECK_ECLAT_01_20261025' || github.event.head_commit.message == 'RUN_ECLAT_01_H3_20261025' }}
+    if: ${{ github.event.head_commit.message == 'CHECK_ECLAT_01_20261025' || github.event.head_commit.message == 'RUN_ECLAT_01_H3_20261025' }}
     runs-on: ubuntu-latest
     timeout-minutes: 100
     env:
       PYTHONUNBUFFERED: "1"
-      MODAL_TOKEN_ID: \${{ secrets.MODAL_TOKEN_ID }}
-      MODAL_TOKEN_SECRET: \${{ secrets.MODAL_TOKEN_SECRET }}
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -42,21 +42,8 @@ jobs:
         run: python -m py_compile scripts/production/eclat_01_h3.py
       - name: Prepare real photo, two exact first-frames and licensed music
         run: python scripts/production/eclat_01_h3.py preflight
-      - name: Retrieve already-produced French H3 avatar video (NO new render)
-        uses: actions/download-artifact@v4
-        with:
-          name: H3-FRENCH-NATIVE-VOICE-TEST-20261025
-          run-id: 40192700348
-          github-token: \${{ secrets.GITHUB_TOKEN }}
-          path: artifacts/eclat01/hero/
-      - name: Validate restored portrait video
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -s artifacts/eclat01/hero/H3-AVATAR-VOIX-FR-TEST.mp4
-          ffprobe -v error -show_entries format=duration:stream=codec_type,width,height -of json artifacts/eclat01/hero/H3-AVATAR-VOIX-FR-TEST.mp4
       - name: Verify available Modal H3 batch GPU function (no inference)
-        if: \${{ github.event.head_commit.message == 'RUN_ECLAT_01_H3_20261025' }}
+        if: ${{ github.event.head_commit.message == 'RUN_ECLAT_01_H3_20261025' }}
         run: |
           set -euo pipefail
           modal token info >/dev/null 2>&1
@@ -66,13 +53,13 @@ jobs:
           print("H3 batch GPU ready")
           PY
       - name: Generate TWO full-quality authentic-photo H3 scenes (one Modal L40S batch)
-        if: \${{ github.event.head_commit.message == 'RUN_ECLAT_01_H3_20261025' }}
+        if: ${{ github.event.head_commit.message == 'RUN_ECLAT_01_H3_20261025' }}
         run: python scripts/production/eclat_01_h3.py render
       - name: Edit and master genuine French commercial with score + web version
-        if: \${{ github.event.head_commit.message == 'RUN_ECLAT_01_H3_20261025' }}
+        if: ${{ github.event.head_commit.message == 'RUN_ECLAT_01_H3_20261025' }}
         run: python scripts/production/eclat_01_h3.py assemble
       - name: Inspect the final MP4 metadata
-        if: \${{ github.event.head_commit.message == 'RUN_ECLAT_01_H3_20261025' }}
+        if: ${{ github.event.head_commit.message == 'RUN_ECLAT_01_H3_20261025' }}
         run: |
           set -euo pipefail
           test -s artifacts/eclat01/exports/ECLAT-01-SITEQUIVEND-FRENCH-AD-H3.mp4
@@ -95,5 +82,5 @@ jobs:
         if: always()
         run: |
           echo "## ECLAT / 01 | SiteQuiVend portfolio" >> "$GITHUB_STEP_SUMMARY"
-          echo "Authentic Pexels first-frames, 20-step MiniMax H3, Modal L40S; one reused French speaking H3 video, two fresh scenes." >> "$GITHUB_STEP_SUMMARY"
+          echo "Authentic Pexels first-frames, 20-step MiniMax H3, Modal L40S; two fresh scenes with native French speech, no prior artifact dependency." >> "$GITHUB_STEP_SUMMARY"
           echo "Human QC of French voice, lips, hands, packaging and music remains mandatory." >> "$GITHUB_STEP_SUMMARY"
