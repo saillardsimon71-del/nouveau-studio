@@ -31,11 +31,11 @@
   "dialogue_present": null,
   "voice": {
     "language": "en",
-    "speech_present": true,
+    "speech_present": null,
     "transcript": "Music",
     "segments": [
       {
-        "start_s": 10.0,
+        "start_s": 10,
         "end_s": 11.4,
         "text": "Music",
         "speaker": null,
@@ -45,7 +45,7 @@
     "words": [
       {
         "word": "Music",
-        "start_s": 10.0,
+        "start_s": 10,
         "end_s": 11.4,
         "confidence": 0.0057979244738817215,
         "speaker": null
@@ -54,7 +54,7 @@
     "word_count": 1,
     "speech_span_s": 1.4,
     "words_per_minute_clip": 1.54,
-    "words_per_minute_speech_span": 42.86,
+    "words_per_minute_speech_span": null,
     "word_timing_coverage": 1,
     "word_articulation_s": 1.4,
     "pauses": [],
@@ -62,7 +62,7 @@
     "sentence_pauses": [],
     "segment_pace": [
       {
-        "start_s": 10.0,
+        "start_s": 10,
         "end_s": 11.4,
         "wpm": 42.86
       }
@@ -71,9 +71,10 @@
     "vocal_energy": null,
     "limitations": [
       "ASR is fallible. Segment spans include internal pauses; speaker overlap affects WPM.",
-      "Breathing, emotion, accent and vocal intention require listening or labeled inference."
+      "Breathing, emotion, accent and vocal intention require listening or labeled inference.",
+      "Only ASR token was 'Music' with confidence 0.0058: not verified speech; pace must not guide Director."
     ],
-    "transcription_source": "whisper_local_cpu"
+    "transcription_source": "whisper_local_cpu_insufficient_evidence"
   },
   "observations": [
     {
@@ -85,26 +86,11 @@
       "evidence": {
         "url": "",
         "locator": "analysis.json#/visual/shots",
-        "start_s": 0.0,
+        "start_s": 0,
         "end_s": 39.087,
         "media_sha256": "e066cde26c9a98c57d91c4e0bd649b7b57bbed7f394df66dae328eccdaf23221"
       },
       "uncertainty": "Threshold-based cuts, not human-verified transitions."
-    },
-    {
-      "id": "licensed_001_pace",
-      "domain": "voice",
-      "value": "Observed ASR segment-span pace: 42.86 words/minute.",
-      "basis": "acoustic_measurement",
-      "confidence": 0.7,
-      "evidence": {
-        "url": "",
-        "locator": "analysis.json#/voice",
-        "start_s": 0.0,
-        "end_s": 39.087,
-        "media_sha256": "e066cde26c9a98c57d91c4e0bd649b7b57bbed7f394df66dae328eccdaf23221"
-      },
-      "uncertainty": "ASR-derived timing includes pauses; inspect transcription."
     }
   ],
   "limitations": [
