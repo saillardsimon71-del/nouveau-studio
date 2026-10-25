@@ -1,0 +1,50 @@
+name: H3 | One fashion real-photo Modal GPU smoke test
+on:
+  push:
+    branches: [production/h3-fashion-smoke-20261025]
+    paths:
+      - ".github/workflows/h3-fashion-smoke.yml"
+      - "scripts/production/h3_fashion_smoke.py"
+permissions:
+  contents: read
+concurrency:
+  group: pvs-h3-first-gpu-smoke
+  cancel-in-progress: false
+jobs:
+  render:
+    if: ${{ github.event.head_commit.message == 'H3_RENDER_ONE_REAL_PHOTO_20261025' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    env:
+      PYTHONUNBUFFERED: "1"
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python deps for real Pexels photo and Modal call
+        run: pip install "modal>=1.0,<2" "Pillow>=11,<13"
+      - name: Validate Modal workspace and deployment without GPU
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${MODAL_TOKEN_ID:-}" =~ ^ak-[A-Za-z0-9_-]+$ ]] || exit 1
+          [[ "${MODAL_TOKEN_SECRET:-}" =~ ^as-[A-Za-z0-9_-]+$ ]] || exit 1
+          modal token info >/dev/null 2>&1
+          modal app list | grep -q 'pvs-minimax-h3'
+      - name: ONE GPU H3 render - authentic Pexels fashion photo
+        run: python scripts/production/h3_fashion_smoke.py
+      - name: Check real MP4 video and audio stream with ffprobe
+        run: |
+          set -euo pipefail
+          test -s artifacts/h3-fashion-smoke/MAISON-01-H3-SMOKE-4s.mp4
+          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height -of json artifacts/h3-fashion-smoke/MAISON-01-H3-SMOKE-4s.mp4
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: H3-MAISON-01-real-photo-GPU-test
+          path: artifacts/h3-fashion-smoke/
+          if-no-files-found: warn
+          retention-days: 30
