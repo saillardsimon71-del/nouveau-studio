@@ -1,0 +1,26 @@
+{
+  "recipe_id": "licensed_007_observed",
+  "category": "ugc_presenter",
+  "title": "Teensy House Buyers (2017) - observed patterns",
+  "basis": "analyzed_media",
+  "reference_ids": [
+    "licensed_007"
+  ],
+  "rules": [
+    {
+      "instruction": "Observed 8 cut candidates over 15.033s; adapt shot pacing to the brief.",
+      "reference_id": "licensed_007",
+      "observation_id": "licensed_007_rhythm",
+      "adaptation": "Observation to adapt, not a performance guarantee"
+    },
+    {
+      "instruction": "Observed ASR segment-span pace: 184.36 words/minute.",
+      "reference_id": "licensed_007",
+      "observation_id": "licensed_007_pace",
+      "adaptation": "Observation to adapt, not a performance guarantee"
+    }
+  ],
+  "limitations": [
+    "One reference; transfer to another product requires editorial review."
+  ]
+}

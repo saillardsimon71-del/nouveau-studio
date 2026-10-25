@@ -1,0 +1,863 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "licensed_002",
+  "category": "storytelling",
+  "brand": "Jordan Tourism Board",
+  "title": "Jordan — The Bucket List (30s)",
+  "source": {
+    "url": "https://commons.wikimedia.org/wiki/File:Jordan_The_Bucket_List_30s.webm",
+    "origin_url": null,
+    "license": "CC BY-SA 4.0",
+    "rights_note": "CC BY-SA 4.0 — Jordan Tourism Board, attribution required; no endorsement. Rights in people, brands and soundtrack not independently cleared.",
+    "analysis_access": "full_video",
+    "media_authorized": true,
+    "authorization_evidence": "Commons metadata verified: https://creativecommons.org/licenses/by-sa/4.0/; https://commons.wikimedia.org/wiki/File:Jordan_The_Bucket_List_30s.webm",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": null,
+  "publication_date_basis": "unknown",
+  "duration_seconds": 30.371,
+  "duration_basis": "PyAV probe",
+  "platform": "local authorized file",
+  "format": null,
+  "ad_type": "operator_import",
+  "concept": "Awaiting editorial annotation",
+  "hook": {},
+  "narrative": {},
+  "commercial_message": "Unannotated",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {
+    "language": "en",
+    "speech_present": true,
+    "transcript": "So, you say you've got a bucket list. You say you'd love to see the world wonders. You dream about diving deep into ancient stories, or how they're diving into deep blue sea. You talk about wanting to lose yourself, or find yourself to gaze at and know the stars, or maybe float at the lowest point on earth. Is this your wish list? Or is this your do list? Well, what are you waiting for? Welcome to Jordan.",
+    "segments": [
+      {
+        "start_s": 0.0,
+        "end_s": 2.02,
+        "text": "So, you say you've got a bucket list.",
+        "speaker": null,
+        "confidence": -0.30415583465058926
+      },
+      {
+        "start_s": 2.44,
+        "end_s": 4.2,
+        "text": "You say you'd love to see the world wonders.",
+        "speaker": null,
+        "confidence": -0.30415583465058926
+      },
+      {
+        "start_s": 4.66,
+        "end_s": 7.18,
+        "text": "You dream about diving deep into ancient stories,",
+        "speaker": null,
+        "confidence": -0.30415583465058926
+      },
+      {
+        "start_s": 7.34,
+        "end_s": 9.72,
+        "text": "or how they're diving into deep blue sea.",
+        "speaker": null,
+        "confidence": -0.30415583465058926
+      },
+      {
+        "start_s": 10.24,
+        "end_s": 11.76,
+        "text": "You talk about wanting to lose yourself,",
+        "speaker": null,
+        "confidence": -0.30415583465058926
+      },
+      {
+        "start_s": 12.04,
+        "end_s": 15.56,
+        "text": "or find yourself to gaze at and know the stars,",
+        "speaker": null,
+        "confidence": -0.30415583465058926
+      },
+      {
+        "start_s": 15.96,
+        "end_s": 17.74,
+        "text": "or maybe float at the lowest point on earth.",
+        "speaker": null,
+        "confidence": -0.30415583465058926
+      },
+      {
+        "start_s": 18.38,
+        "end_s": 19.38,
+        "text": "Is this your wish list?",
+        "speaker": null,
+        "confidence": -0.30415583465058926
+      },
+      {
+        "start_s": 20.42,
+        "end_s": 21.7,
+        "text": "Or is this your do list?",
+        "speaker": null,
+        "confidence": -0.30415583465058926
+      },
+      {
+        "start_s": 22.54,
+        "end_s": 24.82,
+        "text": "Well, what are you waiting for?",
+        "speaker": null,
+        "confidence": -0.30415583465058926
+      },
+      {
+        "start_s": 25.84,
+        "end_s": 26.62,
+        "text": "Welcome to Jordan.",
+        "speaker": null,
+        "confidence": -0.30415583465058926
+      }
+    ],
+    "words": [
+      {
+        "word": "So,",
+        "start_s": 0.0,
+        "end_s": 0.44,
+        "confidence": 0.8344869017601013,
+        "speaker": null
+      },
+      {
+        "word": "you",
+        "start_s": 0.78,
+        "end_s": 1.0,
+        "confidence": 0.9374802708625793,
+        "speaker": null
+      },
+      {
+        "word": "say",
+        "start_s": 1.0,
+        "end_s": 1.12,
+        "confidence": 0.8529150485992432,
+        "speaker": null
+      },
+      {
+        "word": "you've",
+        "start_s": 1.12,
+        "end_s": 1.26,
+        "confidence": 0.9519025683403015,
+        "speaker": null
+      },
+      {
+        "word": "got",
+        "start_s": 1.26,
+        "end_s": 1.36,
+        "confidence": 0.8104423880577087,
+        "speaker": null
+      },
+      {
+        "word": "a",
+        "start_s": 1.36,
+        "end_s": 1.46,
+        "confidence": 0.9040172100067139,
+        "speaker": null
+      },
+      {
+        "word": "bucket",
+        "start_s": 1.46,
+        "end_s": 1.68,
+        "confidence": 0.9519948959350586,
+        "speaker": null
+      },
+      {
+        "word": "list.",
+        "start_s": 1.68,
+        "end_s": 2.02,
+        "confidence": 0.9282563328742981,
+        "speaker": null
+      },
+      {
+        "word": "You",
+        "start_s": 2.44,
+        "end_s": 2.56,
+        "confidence": 0.9812915325164795,
+        "speaker": null
+      },
+      {
+        "word": "say",
+        "start_s": 2.56,
+        "end_s": 2.7,
+        "confidence": 0.9728536009788513,
+        "speaker": null
+      },
+      {
+        "word": "you'd",
+        "start_s": 2.7,
+        "end_s": 2.88,
+        "confidence": 0.9781085252761841,
+        "speaker": null
+      },
+      {
+        "word": "love",
+        "start_s": 2.88,
+        "end_s": 3.14,
+        "confidence": 0.9889265298843384,
+        "speaker": null
+      },
+      {
+        "word": "to",
+        "start_s": 3.14,
+        "end_s": 3.34,
+        "confidence": 0.9979585409164429,
+        "speaker": null
+      },
+      {
+        "word": "see",
+        "start_s": 3.34,
+        "end_s": 3.5,
+        "confidence": 0.9974972605705261,
+        "speaker": null
+      },
+      {
+        "word": "the",
+        "start_s": 3.5,
+        "end_s": 3.64,
+        "confidence": 0.9871525168418884,
+        "speaker": null
+      },
+      {
+        "word": "world",
+        "start_s": 3.64,
+        "end_s": 3.78,
+        "confidence": 0.9355735778808594,
+        "speaker": null
+      },
+      {
+        "word": "wonders.",
+        "start_s": 3.78,
+        "end_s": 4.2,
+        "confidence": 0.9749938249588013,
+        "speaker": null
+      },
+      {
+        "word": "You",
+        "start_s": 4.66,
+        "end_s": 4.8,
+        "confidence": 0.9911823272705078,
+        "speaker": null
+      },
+      {
+        "word": "dream",
+        "start_s": 4.8,
+        "end_s": 5.2,
+        "confidence": 0.9732534885406494,
+        "speaker": null
+      },
+      {
+        "word": "about",
+        "start_s": 5.2,
+        "end_s": 5.54,
+        "confidence": 0.997815728187561,
+        "speaker": null
+      },
+      {
+        "word": "diving",
+        "start_s": 5.54,
+        "end_s": 5.84,
+        "confidence": 0.9910309314727783,
+        "speaker": null
+      },
+      {
+        "word": "deep",
+        "start_s": 5.84,
+        "end_s": 6.16,
+        "confidence": 0.8504402041435242,
+        "speaker": null
+      },
+      {
+        "word": "into",
+        "start_s": 6.16,
+        "end_s": 6.4,
+        "confidence": 0.9973536729812622,
+        "speaker": null
+      },
+      {
+        "word": "ancient",
+        "start_s": 6.4,
+        "end_s": 6.68,
+        "confidence": 0.937384843826294,
+        "speaker": null
+      },
+      {
+        "word": "stories,",
+        "start_s": 6.68,
+        "end_s": 7.18,
+        "confidence": 0.9979211688041687,
+        "speaker": null
+      },
+      {
+        "word": "or",
+        "start_s": 7.34,
+        "end_s": 7.54,
+        "confidence": 0.9724421501159668,
+        "speaker": null
+      },
+      {
+        "word": "how",
+        "start_s": 7.54,
+        "end_s": 7.98,
+        "confidence": 0.603545606136322,
+        "speaker": null
+      },
+      {
+        "word": "they're",
+        "start_s": 7.98,
+        "end_s": 8.16,
+        "confidence": 0.4437275677919388,
+        "speaker": null
+      },
+      {
+        "word": "diving",
+        "start_s": 8.16,
+        "end_s": 8.44,
+        "confidence": 0.9917437434196472,
+        "speaker": null
+      },
+      {
+        "word": "into",
+        "start_s": 8.44,
+        "end_s": 8.7,
+        "confidence": 0.985988438129425,
+        "speaker": null
+      },
+      {
+        "word": "deep",
+        "start_s": 8.7,
+        "end_s": 9.14,
+        "confidence": 0.9603378772735596,
+        "speaker": null
+      },
+      {
+        "word": "blue",
+        "start_s": 9.14,
+        "end_s": 9.5,
+        "confidence": 0.839846670627594,
+        "speaker": null
+      },
+      {
+        "word": "sea.",
+        "start_s": 9.5,
+        "end_s": 9.72,
+        "confidence": 0.964629590511322,
+        "speaker": null
+      },
+      {
+        "word": "You",
+        "start_s": 10.24,
+        "end_s": 10.38,
+        "confidence": 0.99024498462677,
+        "speaker": null
+      },
+      {
+        "word": "talk",
+        "start_s": 10.38,
+        "end_s": 10.56,
+        "confidence": 0.8726534247398376,
+        "speaker": null
+      },
+      {
+        "word": "about",
+        "start_s": 10.56,
+        "end_s": 10.76,
+        "confidence": 0.9865067005157471,
+        "speaker": null
+      },
+      {
+        "word": "wanting",
+        "start_s": 10.76,
+        "end_s": 10.98,
+        "confidence": 0.9415041208267212,
+        "speaker": null
+      },
+      {
+        "word": "to",
+        "start_s": 10.98,
+        "end_s": 11.14,
+        "confidence": 0.9993312358856201,
+        "speaker": null
+      },
+      {
+        "word": "lose",
+        "start_s": 11.14,
+        "end_s": 11.32,
+        "confidence": 0.9865258932113647,
+        "speaker": null
+      },
+      {
+        "word": "yourself,",
+        "start_s": 11.32,
+        "end_s": 11.76,
+        "confidence": 0.8320543169975281,
+        "speaker": null
+      },
+      {
+        "word": "or",
+        "start_s": 12.04,
+        "end_s": 12.28,
+        "confidence": 0.9922906756401062,
+        "speaker": null
+      },
+      {
+        "word": "find",
+        "start_s": 12.28,
+        "end_s": 12.84,
+        "confidence": 0.991515040397644,
+        "speaker": null
+      },
+      {
+        "word": "yourself",
+        "start_s": 12.84,
+        "end_s": 13.34,
+        "confidence": 0.9893744587898254,
+        "speaker": null
+      },
+      {
+        "word": "to",
+        "start_s": 13.34,
+        "end_s": 13.98,
+        "confidence": 0.5673502087593079,
+        "speaker": null
+      },
+      {
+        "word": "gaze",
+        "start_s": 13.98,
+        "end_s": 14.18,
+        "confidence": 0.7789950966835022,
+        "speaker": null
+      },
+      {
+        "word": "at",
+        "start_s": 14.18,
+        "end_s": 14.44,
+        "confidence": 0.7325868010520935,
+        "speaker": null
+      },
+      {
+        "word": "and",
+        "start_s": 14.44,
+        "end_s": 14.64,
+        "confidence": 0.14153748750686646,
+        "speaker": null
+      },
+      {
+        "word": "know",
+        "start_s": 14.64,
+        "end_s": 14.86,
+        "confidence": 0.20880955457687378,
+        "speaker": null
+      },
+      {
+        "word": "the",
+        "start_s": 14.86,
+        "end_s": 15.12,
+        "confidence": 0.5905746221542358,
+        "speaker": null
+      },
+      {
+        "word": "stars,",
+        "start_s": 15.12,
+        "end_s": 15.56,
+        "confidence": 0.9866125583648682,
+        "speaker": null
+      },
+      {
+        "word": "or",
+        "start_s": 15.96,
+        "end_s": 16.02,
+        "confidence": 0.9735218286514282,
+        "speaker": null
+      },
+      {
+        "word": "maybe",
+        "start_s": 16.02,
+        "end_s": 16.36,
+        "confidence": 0.9886184930801392,
+        "speaker": null
+      },
+      {
+        "word": "float",
+        "start_s": 16.36,
+        "end_s": 16.62,
+        "confidence": 0.653964102268219,
+        "speaker": null
+      },
+      {
+        "word": "at",
+        "start_s": 16.62,
+        "end_s": 16.82,
+        "confidence": 0.5456252694129944,
+        "speaker": null
+      },
+      {
+        "word": "the",
+        "start_s": 16.82,
+        "end_s": 16.92,
+        "confidence": 0.995448648929596,
+        "speaker": null
+      },
+      {
+        "word": "lowest",
+        "start_s": 16.92,
+        "end_s": 17.14,
+        "confidence": 0.938828706741333,
+        "speaker": null
+      },
+      {
+        "word": "point",
+        "start_s": 17.14,
+        "end_s": 17.36,
+        "confidence": 0.9751768708229065,
+        "speaker": null
+      },
+      {
+        "word": "on",
+        "start_s": 17.36,
+        "end_s": 17.56,
+        "confidence": 0.9722273349761963,
+        "speaker": null
+      },
+      {
+        "word": "earth.",
+        "start_s": 17.56,
+        "end_s": 17.74,
+        "confidence": 0.6429126262664795,
+        "speaker": null
+      },
+      {
+        "word": "Is",
+        "start_s": 18.38,
+        "end_s": 18.58,
+        "confidence": 0.6588422060012817,
+        "speaker": null
+      },
+      {
+        "word": "this",
+        "start_s": 18.58,
+        "end_s": 18.68,
+        "confidence": 0.8292664289474487,
+        "speaker": null
+      },
+      {
+        "word": "your",
+        "start_s": 18.68,
+        "end_s": 18.82,
+        "confidence": 0.9294127225875854,
+        "speaker": null
+      },
+      {
+        "word": "wish",
+        "start_s": 18.82,
+        "end_s": 19.04,
+        "confidence": 0.9874598979949951,
+        "speaker": null
+      },
+      {
+        "word": "list?",
+        "start_s": 19.04,
+        "end_s": 19.38,
+        "confidence": 0.8174470663070679,
+        "speaker": null
+      },
+      {
+        "word": "Or",
+        "start_s": 20.42,
+        "end_s": 20.64,
+        "confidence": 0.9838036298751831,
+        "speaker": null
+      },
+      {
+        "word": "is",
+        "start_s": 20.64,
+        "end_s": 20.8,
+        "confidence": 0.9636574387550354,
+        "speaker": null
+      },
+      {
+        "word": "this",
+        "start_s": 20.8,
+        "end_s": 20.96,
+        "confidence": 0.9483444094657898,
+        "speaker": null
+      },
+      {
+        "word": "your",
+        "start_s": 20.96,
+        "end_s": 21.06,
+        "confidence": 0.9977604150772095,
+        "speaker": null
+      },
+      {
+        "word": "do",
+        "start_s": 21.06,
+        "end_s": 21.34,
+        "confidence": 0.3152516484260559,
+        "speaker": null
+      },
+      {
+        "word": "list?",
+        "start_s": 21.34,
+        "end_s": 21.7,
+        "confidence": 0.876073956489563,
+        "speaker": null
+      },
+      {
+        "word": "Well,",
+        "start_s": 22.54,
+        "end_s": 22.98,
+        "confidence": 0.307696670293808,
+        "speaker": null
+      },
+      {
+        "word": "what",
+        "start_s": 23.94,
+        "end_s": 24.2,
+        "confidence": 0.983730137348175,
+        "speaker": null
+      },
+      {
+        "word": "are",
+        "start_s": 24.2,
+        "end_s": 24.28,
+        "confidence": 0.9039291739463806,
+        "speaker": null
+      },
+      {
+        "word": "you",
+        "start_s": 24.28,
+        "end_s": 24.3,
+        "confidence": 0.9924956560134888,
+        "speaker": null
+      },
+      {
+        "word": "waiting",
+        "start_s": 24.3,
+        "end_s": 24.46,
+        "confidence": 0.9766924381256104,
+        "speaker": null
+      },
+      {
+        "word": "for?",
+        "start_s": 24.46,
+        "end_s": 24.82,
+        "confidence": 0.9998952150344849,
+        "speaker": null
+      },
+      {
+        "word": "Welcome",
+        "start_s": 25.84,
+        "end_s": 26.28,
+        "confidence": 0.9525521993637085,
+        "speaker": null
+      },
+      {
+        "word": "to",
+        "start_s": 26.28,
+        "end_s": 26.44,
+        "confidence": 0.99275803565979,
+        "speaker": null
+      },
+      {
+        "word": "Jordan.",
+        "start_s": 26.44,
+        "end_s": 26.62,
+        "confidence": 0.2645808160305023,
+        "speaker": null
+      }
+    ],
+    "word_count": 79,
+    "speech_span_s": 20.84,
+    "words_per_minute_clip": 156.07,
+    "words_per_minute_speech_span": 227.45,
+    "word_timing_coverage": 1,
+    "word_articulation_s": 19.54,
+    "pauses": [
+      {
+        "start_s": 2.02,
+        "end_s": 2.44,
+        "duration_s": 0.42
+      },
+      {
+        "start_s": 4.2,
+        "end_s": 4.66,
+        "duration_s": 0.46
+      },
+      {
+        "start_s": 9.72,
+        "end_s": 10.24,
+        "duration_s": 0.52
+      },
+      {
+        "start_s": 11.76,
+        "end_s": 12.04,
+        "duration_s": 0.28
+      },
+      {
+        "start_s": 15.56,
+        "end_s": 15.96,
+        "duration_s": 0.4
+      },
+      {
+        "start_s": 17.74,
+        "end_s": 18.38,
+        "duration_s": 0.64
+      },
+      {
+        "start_s": 19.38,
+        "end_s": 20.42,
+        "duration_s": 1.04
+      },
+      {
+        "start_s": 21.7,
+        "end_s": 22.54,
+        "duration_s": 0.84
+      },
+      {
+        "start_s": 24.82,
+        "end_s": 25.84,
+        "duration_s": 1.02
+      }
+    ],
+    "pause_basis": "gaps_between_asr_segments_not_sentence_boundaries",
+    "sentence_pauses": [
+      {
+        "start_s": 2.02,
+        "end_s": 2.44,
+        "duration_s": 0.42
+      },
+      {
+        "start_s": 4.2,
+        "end_s": 4.66,
+        "duration_s": 0.46
+      },
+      {
+        "start_s": 9.72,
+        "end_s": 10.24,
+        "duration_s": 0.52
+      },
+      {
+        "start_s": 17.74,
+        "end_s": 18.38,
+        "duration_s": 0.64
+      },
+      {
+        "start_s": 19.38,
+        "end_s": 20.42,
+        "duration_s": 1.04
+      },
+      {
+        "start_s": 21.7,
+        "end_s": 22.54,
+        "duration_s": 0.84
+      },
+      {
+        "start_s": 24.82,
+        "end_s": 25.84,
+        "duration_s": 1.02
+      }
+    ],
+    "segment_pace": [
+      {
+        "start_s": 0.0,
+        "end_s": 2.02,
+        "wpm": 237.62
+      },
+      {
+        "start_s": 2.44,
+        "end_s": 4.2,
+        "wpm": 306.82
+      },
+      {
+        "start_s": 4.66,
+        "end_s": 7.18,
+        "wpm": 190.48
+      },
+      {
+        "start_s": 7.34,
+        "end_s": 9.72,
+        "wpm": 201.68
+      },
+      {
+        "start_s": 10.24,
+        "end_s": 11.76,
+        "wpm": 276.32
+      },
+      {
+        "start_s": 12.04,
+        "end_s": 15.56,
+        "wpm": 170.45
+      },
+      {
+        "start_s": 15.96,
+        "end_s": 17.74,
+        "wpm": 303.37
+      },
+      {
+        "start_s": 18.38,
+        "end_s": 19.38,
+        "wpm": 300.0
+      },
+      {
+        "start_s": 20.42,
+        "end_s": 21.7,
+        "wpm": 281.25
+      },
+      {
+        "start_s": 22.54,
+        "end_s": 24.82,
+        "wpm": 157.89
+      },
+      {
+        "start_s": 25.84,
+        "end_s": 26.62,
+        "wpm": 230.77
+      }
+    ],
+    "pitch": null,
+    "vocal_energy": null,
+    "limitations": [
+      "ASR is fallible. Segment spans include internal pauses; speaker overlap affects WPM.",
+      "Breathing, emotion, accent and vocal intention require listening or labeled inference."
+    ],
+    "transcription_source": "whisper_local_cpu"
+  },
+  "observations": [
+    {
+      "id": "licensed_002_rhythm",
+      "domain": "visual",
+      "value": "Observed 14 cut candidates over 30.371s; adapt shot pacing to the brief.",
+      "basis": "video_observation",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "",
+        "locator": "analysis.json#/visual/shots",
+        "start_s": 0.0,
+        "end_s": 30.371,
+        "media_sha256": "b80ffec972458c684403cb91519c31abfac6a56c9dfad700f5feb01621e348f4"
+      },
+      "uncertainty": "Threshold-based cuts, not human-verified transitions."
+    },
+    {
+      "id": "licensed_002_pace",
+      "domain": "voice",
+      "value": "Observed ASR segment-span pace: 227.45 words/minute.",
+      "basis": "acoustic_measurement",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "",
+        "locator": "analysis.json#/voice",
+        "start_s": 0.0,
+        "end_s": 30.371,
+        "media_sha256": "b80ffec972458c684403cb91519c31abfac6a56c9dfad700f5feb01621e348f4"
+      },
+      "uncertainty": "ASR-derived timing includes pauses; inspect transcription."
+    }
+  ],
+  "limitations": [
+    "Scene threshold produces cut candidates; fades and movement can cause errors.",
+    "Midpoint frames do not establish continuous actions or lip synchronization.",
+    "No automatic face, gaze, gesture, product, camera or marketing inference was run."
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "licensed_003",
+  "category": "product_demo",
+  "brand": "McDonald's",
+  "title": "Big Tasty Chicken",
+  "source": {
+    "url": "https://commons.wikimedia.org/wiki/File:McDonald's_-_Big_Tasty_Chicken.webm",
+    "origin_url": null,
+    "license": "CC BY 2.0",
+    "rights_note": "CC BY 2.0 — Caramel Pictures, attribution required; no endorsement. Rights in people, brands and soundtrack not independently cleared.",
+    "analysis_access": "full_video",
+    "media_authorized": true,
+    "authorization_evidence": "Commons metadata verified: https://creativecommons.org/licenses/by/2.0/; https://commons.wikimedia.org/wiki/File:McDonald's_-_Big_Tasty_Chicken.webm",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": null,
+  "publication_date_basis": "unknown",
+  "duration_seconds": 30.033,
+  "duration_basis": "PyAV probe",
+  "platform": "local authorized file",
+  "format": null,
+  "ad_type": "operator_import",
+  "concept": "Awaiting editorial annotation",
+  "hook": {},
+  "narrative": {},
+  "commercial_message": "Unannotated",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {
+    "speech_present": null,
+    "word_count": null,
+    "pitch": null,
+    "vocal_energy": null,
+    "limitations": [
+      "No ASR performed: audio presence does not establish speech presence."
+    ]
+  },
+  "observations": [
+    {
+      "id": "licensed_003_rhythm",
+      "domain": "visual",
+      "value": "Observed 10 cut candidates over 30.033s; adapt shot pacing to the brief.",
+      "basis": "video_observation",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "",
+        "locator": "analysis.json#/visual/shots",
+        "start_s": 0.0,
+        "end_s": 30.033,
+        "media_sha256": "547856972da2d0faa016ec341defff9d471fda114307bf773dc62a9b8323eebb"
+      },
+      "uncertainty": "Threshold-based cuts, not human-verified transitions."
+    }
+  ],
+  "limitations": [
+    "Scene threshold produces cut candidates; fades and movement can cause errors.",
+    "Midpoint frames do not establish continuous actions or lip synchronization.",
+    "No automatic face, gaze, gesture, product, camera or marketing inference was run."
+  ]
+}

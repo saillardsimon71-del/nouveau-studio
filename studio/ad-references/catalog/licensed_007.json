@@ -1,0 +1,436 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "licensed_007",
+  "category": "ugc_presenter",
+  "brand": "World of Tanks",
+  "title": "Teensy House Buyers (2017)",
+  "source": {
+    "url": "https://commons.wikimedia.org/wiki/File:World_of_Tanks_2017_Super_Bowl_Commercial_-_%E2%80%9CTeensy_House_Buyers%E2%80%9D.webm",
+    "origin_url": null,
+    "license": "CC BY 3.0",
+    "rights_note": "CC BY 3.0 — World of Tanks North America, attribution required; no endorsement. Rights in people, brands and soundtrack not independently cleared.",
+    "analysis_access": "full_video",
+    "media_authorized": true,
+    "authorization_evidence": "Commons metadata verified: https://creativecommons.org/licenses/by/3.0/; https://commons.wikimedia.org/wiki/File:World_of_Tanks_2017_Super_Bowl_Commercial_-_%E2%80%9CTeensy_House_Buyers%E2%80%9D.webm",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": null,
+  "publication_date_basis": "unknown",
+  "duration_seconds": 15.033,
+  "duration_basis": "PyAV probe",
+  "platform": "local authorized file",
+  "format": null,
+  "ad_type": "operator_import",
+  "concept": "Awaiting editorial annotation",
+  "hook": {},
+  "narrative": {},
+  "commercial_message": "Unannotated",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {
+    "language": "en",
+    "speech_present": true,
+    "transcript": "On the next teensy house buyers, carry in Derek make a big decision on a teensy house. So is this your teensy house? In a world of tanks. Tanks rule! Ready to tea.",
+    "segments": [
+      {
+        "start_s": 0.0,
+        "end_s": 1.82,
+        "text": "On the next teensy house buyers,",
+        "speaker": null,
+        "confidence": -0.6967033658708844
+      },
+      {
+        "start_s": 1.92,
+        "end_s": 4.5,
+        "text": "carry in Derek make a big decision on a teensy house.",
+        "speaker": null,
+        "confidence": -0.6967033658708844
+      },
+      {
+        "start_s": 4.58,
+        "end_s": 6.98,
+        "text": "So is this your teensy house?",
+        "speaker": null,
+        "confidence": -0.6967033658708844
+      },
+      {
+        "start_s": 8.8,
+        "end_s": 10.72,
+        "text": "In a world of tanks.",
+        "speaker": null,
+        "confidence": -0.6967033658708844
+      },
+      {
+        "start_s": 11.780000000000003,
+        "end_s": 12.9,
+        "text": "Tanks rule!",
+        "speaker": null,
+        "confidence": -0.6967033658708844
+      },
+      {
+        "start_s": 14.040000000000001,
+        "end_s": 14.94,
+        "text": "Ready to tea.",
+        "speaker": null,
+        "confidence": -0.6967033658708844
+      }
+    ],
+    "words": [
+      {
+        "word": "On",
+        "start_s": 0.0,
+        "end_s": 0.32,
+        "confidence": 0.7945714592933655,
+        "speaker": null
+      },
+      {
+        "word": "the",
+        "start_s": 0.32,
+        "end_s": 0.48,
+        "confidence": 0.9755852818489075,
+        "speaker": null
+      },
+      {
+        "word": "next",
+        "start_s": 0.48,
+        "end_s": 0.78,
+        "confidence": 0.9411028623580933,
+        "speaker": null
+      },
+      {
+        "word": "teensy",
+        "start_s": 0.78,
+        "end_s": 1.2,
+        "confidence": 0.6846341192722321,
+        "speaker": null
+      },
+      {
+        "word": "house",
+        "start_s": 1.2,
+        "end_s": 1.44,
+        "confidence": 0.9472404718399048,
+        "speaker": null
+      },
+      {
+        "word": "buyers,",
+        "start_s": 1.44,
+        "end_s": 1.82,
+        "confidence": 0.6392790079116821,
+        "speaker": null
+      },
+      {
+        "word": "carry",
+        "start_s": 1.92,
+        "end_s": 2.1,
+        "confidence": 0.2893698215484619,
+        "speaker": null
+      },
+      {
+        "word": "in",
+        "start_s": 2.1,
+        "end_s": 2.3,
+        "confidence": 0.3732993006706238,
+        "speaker": null
+      },
+      {
+        "word": "Derek",
+        "start_s": 2.3,
+        "end_s": 2.5,
+        "confidence": 0.4756920039653778,
+        "speaker": null
+      },
+      {
+        "word": "make",
+        "start_s": 2.5,
+        "end_s": 2.7,
+        "confidence": 0.647692859172821,
+        "speaker": null
+      },
+      {
+        "word": "a",
+        "start_s": 2.7,
+        "end_s": 2.82,
+        "confidence": 0.9970531463623047,
+        "speaker": null
+      },
+      {
+        "word": "big",
+        "start_s": 2.82,
+        "end_s": 3.04,
+        "confidence": 0.9968791007995605,
+        "speaker": null
+      },
+      {
+        "word": "decision",
+        "start_s": 3.04,
+        "end_s": 3.38,
+        "confidence": 0.9939071536064148,
+        "speaker": null
+      },
+      {
+        "word": "on",
+        "start_s": 3.38,
+        "end_s": 3.62,
+        "confidence": 0.9948887228965759,
+        "speaker": null
+      },
+      {
+        "word": "a",
+        "start_s": 3.62,
+        "end_s": 3.7,
+        "confidence": 0.9951149225234985,
+        "speaker": null
+      },
+      {
+        "word": "teensy",
+        "start_s": 3.7,
+        "end_s": 4.08,
+        "confidence": 0.9597041606903076,
+        "speaker": null
+      },
+      {
+        "word": "house.",
+        "start_s": 4.08,
+        "end_s": 4.5,
+        "confidence": 0.9918825030326843,
+        "speaker": null
+      },
+      {
+        "word": "So",
+        "start_s": 4.58,
+        "end_s": 4.8,
+        "confidence": 0.9293863773345947,
+        "speaker": null
+      },
+      {
+        "word": "is",
+        "start_s": 4.8,
+        "end_s": 5.02,
+        "confidence": 0.8993615508079529,
+        "speaker": null
+      },
+      {
+        "word": "this",
+        "start_s": 5.02,
+        "end_s": 5.42,
+        "confidence": 0.9955731630325317,
+        "speaker": null
+      },
+      {
+        "word": "your",
+        "start_s": 5.42,
+        "end_s": 5.66,
+        "confidence": 0.5224834680557251,
+        "speaker": null
+      },
+      {
+        "word": "teensy",
+        "start_s": 5.66,
+        "end_s": 6.44,
+        "confidence": 0.9609828591346741,
+        "speaker": null
+      },
+      {
+        "word": "house?",
+        "start_s": 6.44,
+        "end_s": 6.98,
+        "confidence": 0.9947799444198608,
+        "speaker": null
+      },
+      {
+        "word": "In",
+        "start_s": 8.8,
+        "end_s": 9.36,
+        "confidence": 0.33808383345603943,
+        "speaker": null
+      },
+      {
+        "word": "a",
+        "start_s": 9.36,
+        "end_s": 9.5,
+        "confidence": 0.9916480779647827,
+        "speaker": null
+      },
+      {
+        "word": "world",
+        "start_s": 9.5,
+        "end_s": 9.86,
+        "confidence": 0.9036532640457153,
+        "speaker": null
+      },
+      {
+        "word": "of",
+        "start_s": 9.86,
+        "end_s": 10.3,
+        "confidence": 0.9977999329566956,
+        "speaker": null
+      },
+      {
+        "word": "tanks.",
+        "start_s": 10.3,
+        "end_s": 10.72,
+        "confidence": 0.9756351113319397,
+        "speaker": null
+      },
+      {
+        "word": "Tanks",
+        "start_s": 11.780000000000003,
+        "end_s": 12.340000000000002,
+        "confidence": 0.5834389552474022,
+        "speaker": null
+      },
+      {
+        "word": "rule!",
+        "start_s": 12.340000000000002,
+        "end_s": 12.9,
+        "confidence": 0.36734241247177124,
+        "speaker": null
+      },
+      {
+        "word": "Ready",
+        "start_s": 14.040000000000001,
+        "end_s": 14.6,
+        "confidence": 0.04582160711288452,
+        "speaker": null
+      },
+      {
+        "word": "to",
+        "start_s": 14.6,
+        "end_s": 14.78,
+        "confidence": 0.9157724976539612,
+        "speaker": null
+      },
+      {
+        "word": "tea.",
+        "start_s": 14.78,
+        "end_s": 14.94,
+        "confidence": 0.1192888543009758,
+        "speaker": null
+      }
+    ],
+    "word_count": 33,
+    "speech_span_s": 10.74,
+    "words_per_minute_clip": 131.71,
+    "words_per_minute_speech_span": 184.36,
+    "word_timing_coverage": 1,
+    "word_articulation_s": 10.74,
+    "pauses": [
+      {
+        "start_s": 6.98,
+        "end_s": 8.8,
+        "duration_s": 1.82
+      },
+      {
+        "start_s": 10.72,
+        "end_s": 11.780000000000003,
+        "duration_s": 1.06
+      },
+      {
+        "start_s": 12.9,
+        "end_s": 14.040000000000001,
+        "duration_s": 1.14
+      }
+    ],
+    "pause_basis": "gaps_between_asr_segments_not_sentence_boundaries",
+    "sentence_pauses": [
+      {
+        "start_s": 4.5,
+        "end_s": 4.58,
+        "duration_s": 0.08
+      },
+      {
+        "start_s": 6.98,
+        "end_s": 8.8,
+        "duration_s": 1.82
+      },
+      {
+        "start_s": 10.72,
+        "end_s": 11.780000000000003,
+        "duration_s": 1.06
+      },
+      {
+        "start_s": 12.9,
+        "end_s": 14.040000000000001,
+        "duration_s": 1.14
+      }
+    ],
+    "segment_pace": [
+      {
+        "start_s": 0.0,
+        "end_s": 1.82,
+        "wpm": 197.8
+      },
+      {
+        "start_s": 1.92,
+        "end_s": 4.5,
+        "wpm": 255.81
+      },
+      {
+        "start_s": 4.58,
+        "end_s": 6.98,
+        "wpm": 150.0
+      },
+      {
+        "start_s": 8.8,
+        "end_s": 10.72,
+        "wpm": 156.25
+      },
+      {
+        "start_s": 11.780000000000003,
+        "end_s": 12.9,
+        "wpm": 107.14
+      },
+      {
+        "start_s": 14.040000000000001,
+        "end_s": 14.94,
+        "wpm": 200.0
+      }
+    ],
+    "pitch": null,
+    "vocal_energy": null,
+    "limitations": [
+      "ASR is fallible. Segment spans include internal pauses; speaker overlap affects WPM.",
+      "Breathing, emotion, accent and vocal intention require listening or labeled inference."
+    ],
+    "transcription_source": "whisper_local_cpu"
+  },
+  "observations": [
+    {
+      "id": "licensed_007_rhythm",
+      "domain": "visual",
+      "value": "Observed 8 cut candidates over 15.033s; adapt shot pacing to the brief.",
+      "basis": "video_observation",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "",
+        "locator": "analysis.json#/visual/shots",
+        "start_s": 0.0,
+        "end_s": 15.033,
+        "media_sha256": "6fab8e7ccc8f1d2f74e7f9fb9659953c8822cc88ef177c435c8bbcd8e97e36f2"
+      },
+      "uncertainty": "Threshold-based cuts, not human-verified transitions."
+    },
+    {
+      "id": "licensed_007_pace",
+      "domain": "voice",
+      "value": "Observed ASR segment-span pace: 184.36 words/minute.",
+      "basis": "acoustic_measurement",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "",
+        "locator": "analysis.json#/voice",
+        "start_s": 0.0,
+        "end_s": 15.033,
+        "media_sha256": "6fab8e7ccc8f1d2f74e7f9fb9659953c8822cc88ef177c435c8bbcd8e97e36f2"
+      },
+      "uncertainty": "ASR-derived timing includes pauses; inspect transcription."
+    }
+  ],
+  "limitations": [
+    "Scene threshold produces cut candidates; fades and movement can cause errors.",
+    "Midpoint frames do not establish continuous actions or lip synchronization.",
+    "No automatic face, gaze, gesture, product, camera or marketing inference was run."
+  ]
+}

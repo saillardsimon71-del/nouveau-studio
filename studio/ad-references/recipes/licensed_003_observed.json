@@ -1,0 +1,20 @@
+{
+  "recipe_id": "licensed_003_observed",
+  "category": "product_demo",
+  "title": "Big Tasty Chicken - observed patterns",
+  "basis": "analyzed_media",
+  "reference_ids": [
+    "licensed_003"
+  ],
+  "rules": [
+    {
+      "instruction": "Observed 10 cut candidates over 30.033s; adapt shot pacing to the brief.",
+      "reference_id": "licensed_003",
+      "observation_id": "licensed_003_rhythm",
+      "adaptation": "Observation to adapt, not a performance guarantee"
+    }
+  ],
+  "limitations": [
+    "One reference; transfer to another product requires editorial review."
+  ]
+}
