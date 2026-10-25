@@ -1,0 +1,118 @@
+name: MiniMax H3 | Official API (no self-hosted weights)
+
+# H3 Community License excludes EU self-hosting without extra authorization.
+# This workflow ONLY uses the official provider-hosted, pay-as-you-go API.
+# Push is PRE-FLIGHT ONLY and never incurs paid API usage.
+on:
+  push:
+    branches: [integration/minimax-h3-official-api-20261025]
+    paths:
+      - ".github/workflows/minimax-h3-official-api.yml"
+      - "scripts/production/minimax_h3_official_api.py"
+      - "tests/test_minimax_h3_official_api.py"
+  workflow_dispatch:
+    inputs:
+      stage:
+        type: choice
+        description: "preflight costs $0; render requests a paid official API generation"
+        options: [preflight, render]
+        default: preflight
+      confirm_spend:
+        type: choice
+        description: "Required to submit a billable API request"
+        options: ["non", "oui"]
+        default: "non"
+      prompt:
+        type: string
+        description: "Describe ONE cinematic shot using the photographed model/outfit"
+        default: "Luxury editorial film for a fictional fashion house. Preserve the actual adult fashion model and outfit from the real reference photo. Subtle head turn, confident gaze toward camera, refined slow camera motion, accurate human anatomy, impeccable fabric and accessory details. No logos, no text, no identity transformation."
+      image_url:
+        type: string
+        description: "Public HTTPS URL of REAL source photograph, e.g. Pexels. Empty = text-to-video."
+        default: ""
+      duration:
+        type: choice
+        options: ["4", "5", "6", "8", "10", "12", "15"]
+        default: "5"
+      resolution:
+        type: choice
+        options: ["768P", "2K"]
+        default: "768P"
+      aspect:
+        type: choice
+        options: ["9:16", "16:9", "1:1"]
+        default: "9:16"
+permissions:
+  contents: read
+concurrency:
+  group: minimax-h3-api-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pure Python tests (NO NETWORK, NO GPU, NO BILLING)
+        run: python -m unittest discover -s tests -p "test_minimax_h3_official_api.py" -v
+      - name: Verify valid official H3 request schema without an API call
+        env:
+          PROMPT: ${{ inputs.prompt }}
+          IMAGE_URL: ${{ inputs.image_url }}
+          DURATION: ${{ inputs.duration || '5' }}
+          RESOLUTION: ${{ inputs.resolution || '768P' }}
+          ASPECT: ${{ inputs.aspect || '9:16' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/production/minimax_h3_official_api.py --mode preflight \
+            --prompt "${PROMPT:-Fashion campaign with true photographic reference.}" \
+            --image-url "${IMAGE_URL:-}" --duration "$DURATION" \
+            --resolution "$RESOLUTION" --aspect "$ASPECT"
+  render:
+    needs: preflight
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
+      PROMPT: ${{ inputs.prompt }}
+      IMAGE_URL: ${{ inputs.image_url }}
+      DURATION: ${{ inputs.duration }}
+      RESOLUTION: ${{ inputs.resolution }}
+      ASPECT: ${{ inputs.aspect }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Confirm API secret is configured WITHOUT printing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${MINIMAX_API_KEY:-}" || { echo "::error::Add official MINIMAX_API_KEY to Actions secrets. NO BILLABLE REQUEST WAS MADE."; exit 1; }
+      - name: One billable MiniMax H3 API render from REAL Pexels image
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/production/minimax_h3_official_api.py --mode render \
+            --confirm-spend oui --model MiniMax-H3 --prompt "$PROMPT" \
+            --image-url "$IMAGE_URL" --duration "$DURATION" \
+            --resolution "$RESOLUTION" --aspect "$ASPECT" \
+            --out artifacts/MINIMAX-H3-shot.mp4
+      - name: Verify output stream has valid video codec
+        run: |
+          set -euo pipefail
+          test -s artifacts/MINIMAX-H3-shot.mp4
+          command -v ffprobe
+          ffprobe -v error -select_streams v:0 -show_entries stream=codec_name,width,height -of json artifacts/MINIMAX-H3-shot.mp4
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: MINIMAX-H3-official-api-video-${{ github.run_number }}
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 21
