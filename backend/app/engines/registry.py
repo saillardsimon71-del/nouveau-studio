@@ -18,11 +18,11 @@ from .comfyui import ComfyUIEngine
 from .longcat import LongCatAvatarEngine
 from .ltx_native import LTXNativeEngine
 from .mock import build_engines as build_mock_engines
-from .modal_remote import ModalEngine, FrenchEdgeVoice
+from .modal_remote import ModalEngine, ModalH3Engine, FrenchEdgeVoice
 from .tts import ChatterboxEngine, VoxCPMEngine
 
 _PREFERENCE: dict[str, list[str]] = {
-    "video": ["modal_ltx", "ltx_native", "comfyui", "mock"],
+    "video": ["modal_h3", "modal_ltx", "ltx_native", "comfyui", "mock"],
     "avatar": ["modal_avatar", "longcat_avatar", "mock_avatar"],
     "tts": ["edge_tts_fr", "chatterbox", "voxcpm2", "mock_tts"],
     "image": ["comfyui", "mock_image"],
@@ -36,6 +36,7 @@ def _build() -> dict[str, Engine]:
     global _instances
     if not _instances:
         engines: list[Engine] = [
+            ModalH3Engine(),
             ModalEngine("video"),
             ModalEngine("avatar"),
             FrenchEdgeVoice(),
