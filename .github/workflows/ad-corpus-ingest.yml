@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: sitequivend-licensed-ad-ingest
-  # First execute network-free syntax/schema preflight before ingest
+  # Static validation passed on run 40215481416; now one opt-in real video ingest.
   cancel-in-progress: false
 
 jobs:
