@@ -17,6 +17,7 @@ python scripts/run_modal_studio.py
 ```
 
 Ouvrir http://127.0.0.1:8787. Cliquer sur "Préparer un avatar français", puis
+préparer ou importer la voix, l'écouter et valider les mots et le naturel, puis
 "Générer". La préparation crée un plan et sélectionne le portrait synthétique
 versionné. Elle ne lance aucun GPU. Les identifiants Modal restent côté serveur.
 Le lanceur désactive les simulations et la relance automatique des anciens jobs.
@@ -30,8 +31,9 @@ Un autre portrait se choisit dans "Personnages & voix", puis dans le plan.
 ## Limites du pilote validé
 
 - LongCat : un segment, 93 images à 25 images/s, voix de 3,72 s maximum.
-- Une phrase trop longue échoue avant l'appel GPU. Raccourcir le dialogue.
-- Voix synthétique française Henri, sans clonage de voix.
+- Une voix trop longue échoue avant l'appel GPU ; ne pas l'accélérer pour la faire rentrer.
+- Voix enregistrées sélectionnables et import WAV ; transcription et écoute validées avant animation.
+- Le parcours diagnostique et la limite expérimentale à deux segments sont décrits dans [HUMAN_PERFORMANCE.md](HUMAN_PERFORMANCE.md). La continuation n'est pas validée par un nouveau rendu et reste désactivée sur l'ancien service.
 - LTX : 1 à 15 s, formats 9:16, 16:9 et 1:1.
 - Un worker local et un conteneur maximum par moteur ; aucun GPU maintenu chaud.
 - Les coûts affichés sont estimés à partir de la durée mesurée et des tarifs
