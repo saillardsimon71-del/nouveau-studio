@@ -1,0 +1,112 @@
+name: MAISON 01 | Premium Fashion Film (Pexels + own Modal H3)
+
+# EXACTLY ONE intentional production launch. Subsequent edits do not spend GPU.
+on:
+  push:
+    branches: [production/maison-01-h3-premium-20261025]
+    paths:
+      - ".github/workflows/maison-01-h3-premium.yml"
+      - "scripts/production/maison_01_h3_premium.py"
+      - "deploy/modal_h3_worker.py"
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [preflight]
+        default: preflight
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: maison-01-h3-premium-production-once
+  cancel-in-progress: false
+
+jobs:
+  production:
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_MAISON_01_H3_PREMIUM_20261025') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PYTHONUNBUFFERED: "1"
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install FFmpeg, typography, photo handling and Modal
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check "modal>=1.0,<2" "Pillow>=11,<13"
+          ffprobe -version | head -1
+      - name: Validate code and native H3 contract (0 GPU)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/production/maison_01_h3_premium.py deploy/modal_h3_worker.py
+          python -m unittest discover -s tests -p "test_modal_h3_local.py" -v
+      - name: Preflight three genuine Pexels keyframes and legal soundtrack (0 GPU)
+        run: python scripts/production/maison_01_h3_premium.py prepare
+      - name: Recover PREVIOUSLY APPROVED fashion hero video (reuse, no GPU)
+        uses: actions/download-artifact@v4
+        with:
+          name: H3-MAISON-01-real-photo-GPU-test
+          run-id: 40186176902
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: artifacts/maison-01/hero-cache/
+      - name: Verify approved hero is a real MP4 (0 GPU)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s artifacts/maison-01/hero-cache/MAISON-01-H3-SMOKE-4s.mp4
+          ffprobe -v error -show_entries format=duration:stream=codec_type,width,height -of json artifacts/maison-01/hero-cache/MAISON-01-H3-SMOKE-4s.mp4
+      - name: Validate Modal workspace (no GPU)
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${MODAL_TOKEN_ID:-}" =~ ^ak-[A-Za-z0-9_-]+$ ]] || { echo "::error::MODAL_TOKEN_ID missing"; exit 1; }
+          [[ "${MODAL_TOKEN_SECRET:-}" =~ ^as-[A-Za-z0-9_-]+$ ]] || { echo "::error::MODAL_TOKEN_SECRET missing"; exit 1; }
+          modal token info >/dev/null 2>&1
+          modal volume list | grep -q 'pvs-minimax-h3-models'
+      - name: Deploy improved H3 warm batch function (no render yet)
+        if: ${{ github.event_name == 'push' }}
+        run: modal deploy deploy/modal_h3_worker.py
+      - name: Generate all three new H3 scenes in ONE warmed Modal GPU process
+        if: ${{ github.event_name == 'push' }}
+        run: python scripts/production/maison_01_h3_premium.py render
+      - name: Produce the actual premium edit, licensed music, poster, web MP4
+        if: ${{ github.event_name == 'push' }}
+        run: python scripts/production/maison_01_h3_premium.py assemble
+      - name: Inspect export metadata and audio/video streams
+        if: ${{ github.event_name == 'push' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s artifacts/maison-01/exports/MAISON-01-FASHION-FILM-H3.mp4
+          ffprobe -v error -show_entries format=duration,size:stream=codec_name,codec_type,width,height -of json artifacts/maison-01/exports/MAISON-01-FASHION-FILM-H3.mp4
+          cat artifacts/maison-01/exports/delivery.json
+      - name: Deliver even partial shots and provenance if postprocessing fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MAISON-01-premium-H3-shots-and-final
+          path: |
+            artifacts/maison-01/exports/
+            artifacts/maison-01/clips/
+            artifacts/maison-01/render-report.json
+            artifacts/maison-01/sources.json
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 0
+      - name: Describe result for GitHub
+        if: always()
+        shell: bash
+        run: |
+          echo "## MAISON / 01 — H3 premium" >> "$GITHUB_STEP_SUMMARY"
+          echo "4 real H3 tableaux, including one reused paid-and-approved shot." >> "$GITHUB_STEP_SUMMARY"
+          echo "No AI-generated stills. No MiniMax paid API. GPU Modal only." >> "$GITHUB_STEP_SUMMARY"
+          echo "Inspect arms, faces, wardrobe, gaze, transitions and music before publishing on SiteQuiVend." >> "$GITHUB_STEP_SUMMARY"
