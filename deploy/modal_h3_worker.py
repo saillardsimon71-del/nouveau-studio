@@ -74,7 +74,7 @@ def verify_models() -> dict:
             "ready": all(x["exists"] for x in files.values())}
 
 
-@app.function(image=prep_image, cpu=2, memory=4096, timeout=180)
+@app.function(image=prep_image, cpu=2, memory=4096, timeout=180, volumes={str(MOUNT): VOLUME})
 def doctor() -> dict:
     """No GPU. Verify volume and all four selected weights."""
     return verify_models()
