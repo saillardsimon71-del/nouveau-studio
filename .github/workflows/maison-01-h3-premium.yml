@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   production:
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_MAISON_01_H3_PREMIUM_20261025') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (github.event.head_commit.message == 'CHECK_MAISON_01_H3_PREMIUM_20261025' || github.event.head_commit.message == 'RUN_MAISON_01_H3_PREMIUM_20261025')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
@@ -73,16 +73,16 @@ jobs:
           modal token info >/dev/null 2>&1
           modal volume list | grep -q 'pvs-minimax-h3-models'
       - name: Deploy improved H3 warm batch function (no render yet)
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && github.event.head_commit.message == 'RUN_MAISON_01_H3_PREMIUM_20261025' }}
         run: modal deploy deploy/modal_h3_worker.py
       - name: Generate all three new H3 scenes in ONE warmed Modal GPU process
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && github.event.head_commit.message == 'RUN_MAISON_01_H3_PREMIUM_20261025' }}
         run: python scripts/production/maison_01_h3_premium.py render
       - name: Produce the actual premium edit, licensed music, poster, web MP4
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && github.event.head_commit.message == 'RUN_MAISON_01_H3_PREMIUM_20261025' }}
         run: python scripts/production/maison_01_h3_premium.py assemble
       - name: Inspect export metadata and audio/video streams
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && github.event.head_commit.message == 'RUN_MAISON_01_H3_PREMIUM_20261025' }}
         shell: bash
         run: |
           set -euo pipefail
