@@ -12,15 +12,10 @@
       "reference_id": "licensed_001",
       "observation_id": "licensed_001_rhythm",
       "adaptation": "Observation to adapt, not a performance guarantee"
-    },
-    {
-      "instruction": "Observed ASR segment-span pace: 42.86 words/minute.",
-      "reference_id": "licensed_001",
-      "observation_id": "licensed_001_pace",
-      "adaptation": "Observation to adapt, not a performance guarantee"
     }
   ],
   "limitations": [
-    "One reference; transfer to another product requires editorial review."
+    "One reference; transfer to another product requires editorial review.",
+    "Voice timing removed: ASR detected only one low-confidence non-dialogue token."
   ]
 }
