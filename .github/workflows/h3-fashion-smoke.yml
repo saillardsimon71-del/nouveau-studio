@@ -44,7 +44,25 @@ jobs:
         run: |
           set -euo pipefail
           test -s artifacts/h3-fashion-smoke/MAISON-01-H3-SMOKE-4s.mp4
-          ffprobe -v error -show_entries stream=codec_name,codec_type,width,height -of json artifacts/h3-fashion-smoke/MAISON-01-H3-SMOKE-4s.mp4
+          if ! command -v ffprobe >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y ffmpeg
+          fi
+          python - <<'PY'
+          import json, subprocess
+          video = "artifacts/h3-fashion-smoke/MAISON-01-H3-SMOKE-4s.mp4"
+          r = subprocess.run([
+              "ffprobe", "-v", "error",
+              "-show_entries", "format=duration,size:stream=codec_name,codec_type,width,height",
+              "-of", "json", video
+          ], check=True, text=True, capture_output=True)
+          info = json.loads(r.stdout)
+          streams = info.get("streams", [])
+          assert any(s.get("codec_type") == "video" and s.get("width") == 768 and s.get("height") == 1344 for s in streams), "Video track missing or wrong size"
+          assert any(s.get("codec_type") == "audio" for s in streams), "Audio track missing"
+          assert float(info["format"]["duration"]) > 3, "Video too short"
+          print("PASS: valid MiniMax H3 video and audio, duration", info["format"]["duration"], "s")
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
