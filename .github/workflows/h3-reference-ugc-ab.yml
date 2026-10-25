@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: h3-ugc-reference-AB-once
-  # No-GPU preflight before deliberate paired H3 production
+  # No-GPU preflight passed on run 40216614525; launch one explicit paired render
   cancel-in-progress: false
 
 jobs:
