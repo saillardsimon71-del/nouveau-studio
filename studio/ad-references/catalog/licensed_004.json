@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "licensed_004",
+  "category": "product_demo",
+  "brand": "Loulou Restaurant",
+  "title": "Publicité Loulou Carrousel du Louvre",
+  "source": {
+    "url": "https://commons.wikimedia.org/wiki/File:Publicit%C3%A9_nouveau_restaurant_Carrousel_du_Louvre_Loulou.webm",
+    "origin_url": null,
+    "license": "CC BY 3.0",
+    "rights_note": "CC BY 3.0 — Romain Vesin, attribution required; no endorsement. Rights in people, brands and soundtrack not independently cleared.",
+    "analysis_access": "full_video",
+    "media_authorized": true,
+    "authorization_evidence": "Commons metadata verified: https://creativecommons.org/licenses/by/3.0/; https://commons.wikimedia.org/wiki/File:Publicit%C3%A9_nouveau_restaurant_Carrousel_du_Louvre_Loulou.webm",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": null,
+  "publication_date_basis": "unknown",
+  "duration_seconds": 86.216,
+  "duration_basis": "PyAV probe",
+  "platform": "local authorized file",
+  "format": null,
+  "ad_type": "operator_import",
+  "concept": "Awaiting editorial annotation",
+  "hook": {},
+  "narrative": {},
+  "commercial_message": "Unannotated",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {
+    "language": "fr",
+    "speech_present": false,
+    "transcript": "",
+    "segments": [],
+    "words": [],
+    "word_count": 0,
+    "speech_span_s": 0,
+    "words_per_minute_clip": 0.0,
+    "words_per_minute_speech_span": null,
+    "word_timing_coverage": 0,
+    "word_articulation_s": null,
+    "pauses": [],
+    "pause_basis": "gaps_between_asr_segments_not_sentence_boundaries",
+    "sentence_pauses": null,
+    "segment_pace": [],
+    "pitch": null,
+    "vocal_energy": null,
+    "limitations": [
+      "ASR is fallible. Segment spans include internal pauses; speaker overlap affects WPM.",
+      "Breathing, emotion, accent and vocal intention require listening or labeled inference."
+    ],
+    "transcription_source": "whisper_local_cpu"
+  },
+  "observations": [
+    {
+      "id": "licensed_004_rhythm",
+      "domain": "visual",
+      "value": "Observed 5 cut candidates over 86.216s; adapt shot pacing to the brief.",
+      "basis": "video_observation",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "",
+        "locator": "analysis.json#/visual/shots",
+        "start_s": 0.0,
+        "end_s": 86.216,
+        "media_sha256": "2df8cd096a0b95537a594840d7e3b6e97bd9b97ac16a2079d725900994d62ba0"
+      },
+      "uncertainty": "Threshold-based cuts, not human-verified transitions."
+    }
+  ],
+  "limitations": [
+    "Scene threshold produces cut candidates; fades and movement can cause errors.",
+    "Midpoint frames do not establish continuous actions or lip synchronization.",
+    "No automatic face, gaze, gesture, product, camera or marketing inference was run."
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "licensed_006",
+  "category": "storytelling",
+  "brand": "Canal+",
+  "title": "The Bear",
+  "source": {
+    "url": "https://commons.wikimedia.org/wiki/File:Ad_-_Canal_-_-_The_Bear.webm",
+    "origin_url": null,
+    "license": "CC BY 3.0",
+    "rights_note": "CC BY 3.0 — Mikros, attribution required; no endorsement. Rights in people, brands and soundtrack not independently cleared.",
+    "analysis_access": "full_video",
+    "media_authorized": true,
+    "authorization_evidence": "Commons metadata verified: https://creativecommons.org/licenses/by/3.0/; https://commons.wikimedia.org/wiki/File:Ad_-_Canal_-_-_The_Bear.webm",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": null,
+  "publication_date_basis": "unknown",
+  "duration_seconds": 78.45,
+  "duration_basis": "PyAV probe",
+  "platform": "local authorized file",
+  "format": null,
+  "ad_type": "operator_import",
+  "concept": "Awaiting editorial annotation",
+  "hook": {},
+  "narrative": {},
+  "commercial_message": "Unannotated",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {
+    "speech_present": null,
+    "word_count": null,
+    "pitch": null,
+    "vocal_energy": null,
+    "limitations": [
+      "No ASR performed: audio presence does not establish speech presence."
+    ]
+  },
+  "observations": [
+    {
+      "id": "licensed_006_rhythm",
+      "domain": "visual",
+      "value": "Observed 21 cut candidates over 78.45s; adapt shot pacing to the brief.",
+      "basis": "video_observation",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "",
+        "locator": "analysis.json#/visual/shots",
+        "start_s": 0.0,
+        "end_s": 78.45,
+        "media_sha256": "41e15f0193b6bcab3bc589f803612b55dbb4cd9d3d5f69982d2ecf25bc003e55"
+      },
+      "uncertainty": "Threshold-based cuts, not human-verified transitions."
+    }
+  ],
+  "limitations": [
+    "Scene threshold produces cut candidates; fades and movement can cause errors.",
+    "Midpoint frames do not establish continuous actions or lip synchronization.",
+    "No automatic face, gaze, gesture, product, camera or marketing inference was run."
+  ]
+}

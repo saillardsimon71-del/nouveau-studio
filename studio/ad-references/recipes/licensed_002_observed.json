@@ -1,0 +1,26 @@
+{
+  "recipe_id": "licensed_002_observed",
+  "category": "storytelling",
+  "title": "Jordan — The Bucket List (30s) - observed patterns",
+  "basis": "analyzed_media",
+  "reference_ids": [
+    "licensed_002"
+  ],
+  "rules": [
+    {
+      "instruction": "Observed 14 cut candidates over 30.371s; adapt shot pacing to the brief.",
+      "reference_id": "licensed_002",
+      "observation_id": "licensed_002_rhythm",
+      "adaptation": "Observation to adapt, not a performance guarantee"
+    },
+    {
+      "instruction": "Observed ASR segment-span pace: 227.45 words/minute.",
+      "reference_id": "licensed_002",
+      "observation_id": "licensed_002_pace",
+      "adaptation": "Observation to adapt, not a performance guarantee"
+    }
+  ],
+  "limitations": [
+    "One reference; transfer to another product requires editorial review."
+  ]
+}

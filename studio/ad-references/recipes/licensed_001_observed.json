@@ -1,0 +1,21 @@
+{
+  "recipe_id": "licensed_001_observed",
+  "category": "premium_fashion",
+  "title": "GQ x FOSSILS with Shruti Hassan - observed patterns",
+  "basis": "analyzed_media",
+  "reference_ids": [
+    "licensed_001"
+  ],
+  "rules": [
+    {
+      "instruction": "Observed 23 cut candidates over 39.087s; adapt shot pacing to the brief.",
+      "reference_id": "licensed_001",
+      "observation_id": "licensed_001_rhythm",
+      "adaptation": "Observation to adapt, not a performance guarantee"
+    }
+  ],
+  "limitations": [
+    "One reference; transfer to another product requires editorial review.",
+    "Voice timing removed: ASR detected only one low-confidence non-dialogue token."
+  ]
+}

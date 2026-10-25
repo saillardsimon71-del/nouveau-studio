@@ -68,9 +68,11 @@ def test_llm_receives_only_bounded_context_and_recipe_affects_prompt(monkeypatch
     original_client = httpx.Client
     monkeypatch.setattr(httpx, "Client", lambda **kw: original_client(transport=httpx.MockTransport(respond), **kw))
     result = propose("UGC cosmétique", target_duration_s=5, use_llm=True, use_references=True)
-    assert "presenter_documentary_v1" in payloads[0]["messages"][1]["content"]
+    from app.ad_references.library import Library
+    chosen_recipe = Library().retrieve("UGC cosmétique")["recipes"][0]
+    assert chosen_recipe["recipe_id"] in payloads[0]["messages"][1]["content"]
     assert "entre 4 et 12" in payloads[0]["messages"][0]["content"]
-    assert "Tie a product benefit" in result.storyboard.shots[0].prompt
+    assert chosen_recipe["rules"][0]["instruction"] in result.storyboard.shots[0].prompt
     assert result.storyboard.shots[0].kind == "b_roll"
     assert result.storyboard.shots[0].engine_hint == "modal_h3"
 

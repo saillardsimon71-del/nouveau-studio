@@ -1,0 +1,20 @@
+{
+  "recipe_id": "licensed_004_observed",
+  "category": "product_demo",
+  "title": "Publicité Loulou Carrousel du Louvre - observed patterns",
+  "basis": "analyzed_media",
+  "reference_ids": [
+    "licensed_004"
+  ],
+  "rules": [
+    {
+      "instruction": "Observed 5 cut candidates over 86.216s; adapt shot pacing to the brief.",
+      "reference_id": "licensed_004",
+      "observation_id": "licensed_004_rhythm",
+      "adaptation": "Observation to adapt, not a performance guarantee"
+    }
+  ],
+  "limitations": [
+    "One reference; transfer to another product requires editorial review."
+  ]
+}

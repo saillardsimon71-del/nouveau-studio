@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "licensed_008",
+  "category": "storytelling",
+  "brand": "HILT Theatre Prague",
+  "title": "Black Light Theatre — Commercial",
+  "source": {
+    "url": "https://commons.wikimedia.org/wiki/File:Black_light_theatre_Prague_-_Teatro_negro_de_Praga_-_Schwarzlichttheater_Prag_-_Cerne_divadlo_-_HILT_fun_commercial_01.webm",
+    "origin_url": null,
+    "license": "CC BY-SA 4.0",
+    "rights_note": "CC BY-SA 4.0 — Black light theatre Prague, attribution required; no endorsement. Rights in people, brands and soundtrack not independently cleared.",
+    "analysis_access": "full_video",
+    "media_authorized": true,
+    "authorization_evidence": "Commons metadata verified: https://creativecommons.org/licenses/by-sa/4.0/; https://commons.wikimedia.org/wiki/File:Black_light_theatre_Prague_-_Teatro_negro_de_Praga_-_Schwarzlichttheater_Prag_-_Cerne_divadlo_-_HILT_fun_commercial_01.webm",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": null,
+  "publication_date_basis": "unknown",
+  "duration_seconds": 214.302,
+  "duration_basis": "PyAV probe",
+  "platform": "local authorized file",
+  "format": null,
+  "ad_type": "operator_import",
+  "concept": "Awaiting editorial annotation",
+  "hook": {},
+  "narrative": {},
+  "commercial_message": "Unannotated",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {
+    "speech_present": null,
+    "word_count": null,
+    "pitch": null,
+    "vocal_energy": null,
+    "limitations": [
+      "No ASR performed: audio presence does not establish speech presence."
+    ]
+  },
+  "observations": [
+    {
+      "id": "licensed_008_rhythm",
+      "domain": "visual",
+      "value": "Observed 18 cut candidates over 214.302s; adapt shot pacing to the brief.",
+      "basis": "video_observation",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "",
+        "locator": "analysis.json#/visual/shots",
+        "start_s": 0.0,
+        "end_s": 214.302,
+        "media_sha256": "3e00c0138e199e1513c1f09b8a94a11c27aaebb4d83eca2f2b40b1dd4d143b9c"
+      },
+      "uncertainty": "Threshold-based cuts, not human-verified transitions."
+    }
+  ],
+  "limitations": [
+    "Scene threshold produces cut candidates; fades and movement can cause errors.",
+    "Midpoint frames do not establish continuous actions or lip synchronization.",
+    "No automatic face, gaze, gesture, product, camera or marketing inference was run."
+  ]
+}

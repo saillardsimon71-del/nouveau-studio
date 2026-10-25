@@ -1,0 +1,20 @@
+{
+  "recipe_id": "licensed_005_observed",
+  "category": "product_demo",
+  "title": "Drops of Sustainability - observed patterns",
+  "basis": "analyzed_media",
+  "reference_ids": [
+    "licensed_005"
+  ],
+  "rules": [
+    {
+      "instruction": "Observed 1 cut candidates over 30.856s; adapt shot pacing to the brief.",
+      "reference_id": "licensed_005",
+      "observation_id": "licensed_005_rhythm",
+      "adaptation": "Observation to adapt, not a performance guarantee"
+    }
+  ],
+  "limitations": [
+    "One reference; transfer to another product requires editorial review."
+  ]
+}
