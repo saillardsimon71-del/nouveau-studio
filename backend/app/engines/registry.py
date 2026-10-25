@@ -63,6 +63,25 @@ def names() -> set[str]:
     return set(_build().keys())
 
 
+def route_shot(shot, params, requested=None):
+    values = {**(shot.get('params') or {}), **params}
+    mode = values.get('performance_mode')
+    external = values.get('audio_artifact_id') or shot.get('voice_id')
+    if values.get('audio_artifact_id') or (external and mode not in ('legacy', 'native')):
+        mode = 'voice_first'
+    mode = mode or 'legacy'
+    talking = bool(shot.get('dialogue', '').strip())
+    kind = 'avatar' if talking and (mode == 'voice_first' or shot.get('kind') == 'avatar') else 'video'
+    hint = requested or values.get('engine_hint')
+    if hint not in names():
+        hint = None
+    if hint and get(hint).info.kind != kind:
+        if requested:
+            raise ValueError('Le moteur choisi ne prend pas en charge ce plan audio-conditionné')
+        hint = None
+    return kind, hint, mode
+
+
 def engines_of_kind(kind: str) -> list[Engine]:
     return [e for e in _build().values() if e.info.kind == kind]
 

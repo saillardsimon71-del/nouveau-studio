@@ -10,7 +10,7 @@ from typing import Any
 from fastapi import APIRouter, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse
 
-from . import cost, db, jobs, media, qc
+from . import cost, db, jobs, media, qc, voice
 from .config import get_settings
 from .director import propose
 from .engines import registry
@@ -26,6 +26,7 @@ from .schemas import (
     Storyboard,
     StoryboardRequest,
     VoiceCreate,
+    VoiceReviewRequest,
 )
 
 router = APIRouter(prefix="/api")
@@ -142,7 +143,7 @@ def create_avatar_demo() -> dict[str, Any]:
         prompt="Photorealistic presenter speaking naturally to camera, subtle head motion, cinematic studio lighting.",
         character_id=character["id"],
     ))
-    db.update("shots", shot["id"], {"params": {"engine_hint": "modal_avatar"}})
+    db.update("shots", shot["id"], {"params": {"engine_hint": "modal_avatar", 'performance_mode': 'voice_first'}})
     return get_project(project["id"])
 
 
@@ -214,7 +215,8 @@ def apply_storyboard(project_id: str, body: Storyboard, replace: bool = Query(de
                 "transition": spec.transition,
                 "status": "draft",
                 "params": {"engine_hint": spec.engine_hint, "notes": spec.notes,
-                           "performance": spec.performance, "creative_provenance": spec.creative_provenance},
+                           "performance": spec.performance, "creative_provenance": spec.creative_provenance,
+                           "performance_mode": spec.performance_mode},
                 "created_at": now,
                 "updated_at": now,
             },
@@ -278,16 +280,16 @@ def delete_shot(shot_id: str) -> dict[str, bool]:
 def generate_shot(shot_id: str, body: GenerateRequest | None = None) -> dict[str, Any]:
     shot = _require("shots", shot_id)
     body = body or GenerateRequest()
-    job_type = "avatar" if shot["kind"] == "avatar" else "video"
-    if shot["kind"] in ("title",):
-        job_type = "video"
     params: dict[str, Any] = dict(body.params)
-    hint = (shot.get("params") or {}).get("engine_hint") or ""
-    # an engine_hint may name a *kind* ("avatar", "screen_capture") rather than an
-    # engine; only honour it when it resolves to an actual adapter
-    requested = body.engine or (hint if hint in registry.names() else None)
+    try:
+        job_type, requested, mode = registry.route_shot(shot, params, body.engine)
+        if mode == 'voice_first':
+            voice.selected_voice(shot, params)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    params['performance_mode'] = mode
     params["engine"] = requested
-    if job_type == "avatar" and not shot.get("dialogue"):
+    if shot['kind'] == 'avatar' and not shot.get('dialogue'):
         raise HTTPException(400, "plan avatar sans dialogue : écrire le texte avant de générer")
     return jobs.enqueue(project_id=shot["project_id"], shot_id=shot_id, job_type=job_type,
                         engine=body.engine, params=params)
@@ -301,6 +303,29 @@ def generate_voice(shot_id: str, body: GenerateRequest | None = None) -> dict[st
     body = body or GenerateRequest()
     return jobs.enqueue(project_id=shot["project_id"], shot_id=shot_id, job_type="tts",
                         engine=body.engine, params=dict(body.params))
+
+
+@router.post('/shots/{shot_id}/voice/{artifact_id}/review')
+def review_voice(shot_id: str, artifact_id: str, body: VoiceReviewRequest):
+    shot = _require('shots', shot_id)
+    artifact = _require('artifacts', artifact_id)
+    if artifact.get('shot_id') != shot_id or artifact.get('kind') != 'audio':
+        raise HTTPException(400, 'La piste audio doit appartenir à ce plan')
+    try:
+        report = voice.inspect_voice(artifact['path'], shot.get('dialogue', ''),
+                                     transcript=body.transcript, human_approved=body.human_approved,
+                                     speaker_id=body.speaker_id or shot.get('voice_id') or '',
+                                     previous=(artifact.get('meta') or {}).get('performance'),
+                                     intentions=(shot.get('params') or {}).get('performance'))
+    except (ValueError, EOFError) as exc:
+        raise HTTPException(400, str(exc)) from exc
+    artifact = db.update('artifacts', artifact_id, {'meta': {**(artifact.get('meta') or {}), 'performance': report}})
+    params = {**(shot.get('params') or {}), 'performance_mode': 'voice_first', 'audio_artifact_id': artifact_id}
+    patch = {'params': params, 'status': 'voiced' if report['accepted'] else 'voice_review'}
+    if report['accepted']:
+        patch['duration_s'] = report['duration_s']
+    db.update('shots', shot_id, patch)
+    return artifact
 
 
 @router.post("/shots/{shot_id}/retake", status_code=202)
@@ -332,6 +357,17 @@ async def upload_shot_media(shot_id: str, file: UploadFile = File(...), kind: st
         project_id=shot["project_id"], shot_id=shot_id,
         meta={"source": "upload", "filename": file.filename},
     )
+    if artifact_kind == 'audio':
+        canonical = stored.with_name(stored.stem + '-voice.wav')
+        media.run_ffmpeg(['-i', str(stored), '-vn', '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', str(canonical)])
+        artifact = db.update('artifacts', artifact['id'], {'path': str(canonical), 'mime': 'audio/wav',
+            'bytes': canonical.stat().st_size, 'meta': {**artifact['meta'], 'original_path': str(stored)}})
+        if shot.get('dialogue', '').strip():
+            report = voice.inspect_voice(canonical, shot['dialogue'], speaker_id=shot.get('voice_id') or '',
+                                         intentions=(shot.get('params') or {}).get('performance'))
+            artifact = db.update('artifacts', artifact['id'], {'meta': {**artifact['meta'], 'performance': report}})
+        db.update('shots', shot_id, {'status': 'voice_review', 'params': {
+            **(shot.get('params') or {}), 'performance_mode': 'voice_first', 'audio_artifact_id': artifact['id']}})
     if artifact_kind == "video":
         inspection = qc.inspect_clip(stored, expected_duration_s=shot.get("duration_s"))
         db.update("shots", shot_id, {"selected_artifact": artifact["id"], "status": "generated",

@@ -24,7 +24,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
-from . import cost, db, media, qc
+from . import cost, db, media, qc, voice
 from .config import get_settings
 from .engines import registry
 from .engines.assembly import AssemblyEngine, splice_region
@@ -242,6 +242,20 @@ def _dispatch(job: dict[str, Any], ctx: Ctx) -> tuple[EngineOutput, str, str, bo
 
     kind = {"video": "video", "image": "image", "tts": "tts", "avatar": "avatar"}[job_type]
     requested = params.get("engine") or (job.get("engine") if job.get("engine") not in (None, "auto") else None)
+    mode = 'legacy'
+    selected_audio = None
+    if job_type in ('video', 'avatar'):
+        kind, requested, mode = registry.route_shot(shot or {}, params, requested)
+        job_type = kind
+        if mode == 'voice_first':
+            selected_audio, performance = voice.selected_voice(shot, params)
+            params['duration_s'] = performance['duration_s']
+    if job_type == 'tts' and shot.get('voice_id'):
+        selection = db.get('voices', shot['voice_id'])
+        if selection:
+            requested = requested or selection.get('engine')
+            params.setdefault('ref_audio', _resolve_media(selection.get('ref_audio')))
+            params.setdefault('language', selection.get('language', 'fr'))
     engine, fallback = registry.resolve(kind, requested)
     if fallback:
         ctx.log(f"Repli moteur: {fallback}", stage="engine")
@@ -253,8 +267,8 @@ def _dispatch(job: dict[str, Any], ctx: Ctx) -> tuple[EngineOutput, str, str, bo
 
     # avatar shots need a voice first: run TTS inside the same job
     if job_type == "avatar":
-        audio_artifact = _latest_artifact(job["shot_id"], kinds=("audio",))
-        if audio_artifact and not params.get("force_tts"):
+        audio_artifact = selected_audio or _latest_artifact(job["shot_id"], kinds=("audio",))
+        if audio_artifact and (mode == 'voice_first' or not params.get('force_tts')):
             inputs["audio_path"] = audio_artifact["path"]
             ctx.log("Voix existante réutilisée", stage="tts")
         else:
@@ -262,11 +276,11 @@ def _dispatch(job: dict[str, Any], ctx: Ctx) -> tuple[EngineOutput, str, str, bo
             tts_params.setdefault("text", shot.get("dialogue", ""))
             if not str(tts_params.get("text", "")).strip():
                 raise ValueError("plan avatar sans dialogue: écrire le texte avant de générer")
-            voice = db.get("voices", shot.get("voice_id")) if shot.get("voice_id") else None
-            if voice:
-                tts_params.setdefault("ref_audio", _resolve_media(voice.get("ref_audio")))
-                tts_params.setdefault("language", voice.get("language", "fr"))
-                tts_params.setdefault("engine", voice.get("engine"))
+            voice_selection = db.get('voices', shot.get('voice_id')) if shot.get('voice_id') else None
+            if voice_selection:
+                tts_params.setdefault('ref_audio', _resolve_media(voice_selection.get('ref_audio')))
+                tts_params.setdefault('language', voice_selection.get('language', 'fr'))
+                tts_params.setdefault('engine', voice_selection.get('engine'))
             tts_engine, tts_fallback = registry.resolve("tts", tts_params.get("engine"))
             if tts_fallback:
                 engine_fallback = (engine_fallback + "; " + tts_fallback).strip("; ")
@@ -309,6 +323,21 @@ def _dispatch(job: dict[str, Any], ctx: Ctx) -> tuple[EngineOutput, str, str, bo
     output = engine.run(request, ctx)
     if isinstance(output, tuple):  # pragma: no cover - defensive
         output = output[0]
+    if job_type == 'tts' and not sim:
+        for artifact in output.artifacts:
+            if artifact['kind'] == 'audio':
+                canonical = request.out('performance.wav')
+                media.run_ffmpeg(['-i', artifact['path'], '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', str(canonical)])
+                report = voice.inspect_voice(canonical, shot.get('dialogue', ''), speaker_id=shot.get('voice_id') or requested_name,
+                                             intentions=(shot.get('params') or {}).get('performance'))
+                artifact.update(path=str(canonical), bytes=canonical.stat().st_size,
+                                meta={**artifact.get('meta', {}), 'performance': report, 'source': 'synthetic'})
+    for artifact in output.artifacts:
+        if artifact['kind'] == 'video':
+            artifact['meta']['performance_mode'] = mode
+            if selected_audio:
+                artifact['meta'].update(source_audio_artifact=selected_audio['id'],
+                                        source_audio_sha256=performance['source_sha256'])
     return output, requested_name, engine_fallback, sim
 
 
@@ -326,6 +355,13 @@ def _run_assembly(job: dict[str, Any], params: dict[str, Any], project: dict[str
         if artifact is None:
             missing.append(f"plan {shot['idx'] + 1} ({shot.get('title') or shot.get('kind')})")
             continue
+        metadata = artifact.get('meta') or {}
+        mode = metadata.get('performance_mode') or registry.route_shot(shot, {})[2]
+        if mode == 'voice_first' or (shot.get('params') or {}).get('audio_artifact_id'):
+            audio, report = voice.selected_voice(shot)
+            if (metadata.get('source_audio_sha256') != report['source_sha256'] or
+                    metadata.get('source_audio_artifact') != audio['id']):
+                raise ValueError(f"Plan {shot['idx'] + 1}: vidéo non liée à la voix validée actuelle")
         clips.append(
             {
                 "path": artifact["path"],
@@ -457,8 +493,14 @@ def _link_shot(job: dict[str, Any], primary: dict[str, Any] | None, output: Engi
         inspection = qc.inspect_clip(primary["path"], expected_duration_s=shot.get("duration_s"))
         inspection["simulated"] = simulated
         patch["qc"] = inspection
+        if (shot.get('params') or {}).get('performance_mode') == 'voice_first':
+            patch['duration_s'] = media.probe(primary['path']).duration_s
     elif primary["kind"] == "audio":
-        patch["status"] = "voiced" if shot.get("status") == "draft" else shot.get("status")
+        if (primary.get('meta') or {}).get('performance'):
+            patch['status'] = 'voice_review'
+            patch['params'] = {**(shot.get('params') or {}), 'audio_artifact_id': primary['id']}
+        else:
+            patch["status"] = "voiced" if shot.get("status") == "draft" else shot.get("status")
     db.update("shots", shot_id, patch)
 
 

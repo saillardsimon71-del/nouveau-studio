@@ -50,6 +50,7 @@ def main() -> int:
     parser.add_argument("--cfg-weight", type=float, default=0.5)
     parser.add_argument("--temperature", type=float, default=0.8)
     parser.add_argument("--model", default="v3")
+    parser.add_argument('--model-dir', default=None)
     args = parser.parse_args()
 
     if args.check:
@@ -64,7 +65,8 @@ def main() -> int:
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     started = time.time()
-    model = ChatterboxMultilingualTTS.from_pretrained(device=device, t3_model=args.model)
+    model = (ChatterboxMultilingualTTS.from_local(args.model_dir, device=device, t3_model=args.model)
+             if args.model_dir else ChatterboxMultilingualTTS.from_pretrained(device=device, t3_model=args.model))
     kwargs = {
         "language_id": args.language,
         "exaggeration": args.exaggeration,

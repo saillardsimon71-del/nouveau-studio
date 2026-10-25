@@ -60,6 +60,11 @@ def local_storyboard(brief, target, category, character=None):
                       performance={"speaker_role": "B" if category == "storytelling" and index == 1 else "A"})
              for index, (title, kind, dialogue, visual) in enumerate(scenes)]
     shots[-1].duration_s = round(target - sum(s.duration_s for s in shots[:-1]), 2)
+    if category == 'ugc_presenter':
+        for shot in shots:
+            shot.kind = 'avatar'
+            shot.engine_hint = 'modal_avatar'
+            shot.performance_mode = 'voice_first'
     return Storyboard(concept=brief, script=" ".join(s.dialogue for s in shots if s.dialogue),
                       style_guide="Reference-informed local template; claims and casting require client review.", shots=shots)
 
@@ -70,11 +75,6 @@ def enrich_storyboard(storyboard, context, character=None):
     for index, shot in enumerate(storyboard.shots):
         if shot.kind in {"screen_capture", "title"}:
             continue
-        if shot.kind == "avatar":
-            shot.kind = "b_roll"
-        shot.engine_hint = "modal_h3"
-        if not 4 <= shot.duration_s <= 15:
-            raise ValueError(f"H3 shot {index + 1} must last 4..15 seconds")
         measured_pace = context.get("measured_pace_wpm")
         wpm = round(max(120, min(190, measured_pace))) if measured_pace else (150 if context["category"] == "storytelling" else 165)
         timing = dialogue_plan(shot.dialogue, shot.duration_s, target_wpm=wpm)
@@ -82,7 +82,7 @@ def enrich_storyboard(storyboard, context, character=None):
             timing["basis"] = "reference_asr_segment_span_with_editorial_clamp_120_190"
             timing["observed_reference_wpm"] = measured_pace
             timing["reference_id"] = context["measured_pace_reference_id"]
-        if not timing["fits"]:
+        if not timing["fits"] and shot.kind != 'avatar' and shot.performance_mode != 'voice_first':
             raise ValueError(f"Shot {index + 1}: dialogue requires {timing['required_seconds']}s; "
                              f"only {shot.duration_s}s available. Shorten text or extend the shot.")
         role = shot.performance.get("speaker_role") or shot.performance.get("speaker") or "A"
@@ -92,19 +92,27 @@ def enrich_storyboard(storyboard, context, character=None):
             if role not in {"A", "B"}:
                 raise ValueError("Narrative speaker_role must be A or B")
         speaker = ((character or {}).get("name") or "A") if role == "A" else "B"
-        shot.character_id = (character or {}).get("id") if role == "A" else None
+        shot.character_id = shot.character_id or ((character or {}).get("id") if role == "A" else None)
+        original_performance = dict(shot.performance)
         shot.performance = {"speaker": speaker, "speaker_role": role,
                             "language": "fr", "accent": "contemporary metropolitan French",
                             "timbre": "warm conversational adult voice, no imitation of reference actor",
                             "intent": "curious question then reassurance" if index == 0 else "warm, engaged invitation",
                             "timing": timing}
+        shot.performance.update(original_performance)
         shot.creative_provenance = [
             {"decision": rule["instruction"], "recipe_id": recipe[0]["recipe_id"],
              "reference_id": rule["reference_id"], "observation_id": rule["observation_id"],
              "basis": recipe[0]["basis"]} for rule in rules[:3]]
         shot.creative_provenance.append({"decision": "speech timing and restrained acting directions",
                                          "basis": "editorial_rule", "rule_id": "natural_delivery_v1"})
-        if shot.dialogue:
+        if shot.dialogue and (shot.kind == 'avatar' or shot.performance_mode == 'voice_first'):
+            shot.prompt += (
+                ' Animate the supplied voice recording; preserve its timing. '
+                f"Acting intention: {shot.performance['intent']}; a small motivated gesture, relaxed shoulders. "
+                'Maintain the same face and scene. No text or camera cut.'
+            )
+        elif shot.dialogue:
             if context["category"] == "storytelling":
                 shot.prompt += f" Casting: A is {(character or {}).get('name') or 'adult A'}; B is a distinct adult with a separate voice."
             shot.prompt += (

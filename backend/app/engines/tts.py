@@ -88,6 +88,8 @@ class _LocalVoiceEngine(Engine):
         for key in controls:
             if key in request.params and request.params[key] is not None:
                 cmd += [f"--{key.replace('_', '-')}", str(request.params[key])]
+        if self.engine_id == 'chatterbox' and request.params.get('model_dir'):
+            cmd += ['--model-dir', str(request.params['model_dir'])]
         return cmd
 
     def run(self, request: EngineRequest, ctx) -> EngineOutput:
