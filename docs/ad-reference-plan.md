@@ -19,7 +19,7 @@ de base vectorielle ni d'agent ajouté.
   inventé ; trois démonstrations locales et documentation d'audit/licences.
 - [x] Tests des cas muets, musique seule, timestamps incomplets, dialogue trop
   long, catalogue absent/invalide, mode désactivé et persistance API ; suite complète.
-- [ ] Commits, push et PR sans fusion ni déclenchement de production.
+- [x] Commits, push et PR sans fusion ni déclenchement de production.
 
 Les publicités de marque restent des liens documentés. Ni vitesse vocale ni jeu
 d'acteur ne seront déduits d'un descriptif. Les plages de débit des démonstrations
@@ -39,3 +39,8 @@ exclusion des débits non vérifiés et validation des règles de recette.
 Choix : FFmpeg déjà présent plutôt qu'une dépendance PySceneDetect ; pas de
 service Qwen déployé sans besoin d'inférence autorisée. Les observations visuelles
 et marketing détaillées restent à annoter sur les futurs médias autorisés.
+
+Branche publiée : `feat/ad-reference-learning`. PR ouverte, sans fusion :
+[PR #9](https://github.com/saillardsimon71-del/nouveau-studio/pull/9).
+Le [workflow CPU GitHub](https://github.com/saillardsimon71-del/nouveau-studio/actions/runs/40207082758)
+a réussi, incluant la suite complète et les trois démonstrations locales.
