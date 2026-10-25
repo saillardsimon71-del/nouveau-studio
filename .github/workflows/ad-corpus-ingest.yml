@@ -1,0 +1,84 @@
+name: Licensed real ad corpus | CPU ingest and reference A-B
+
+on:
+  push:
+    branches: [feat/real-ad-reference-corpus-20261025]
+    paths:
+      - ".github/workflows/ad-corpus-ingest.yml"
+      - "scripts/ingest_licensed_ad_corpus.py"
+      - "studio/ad-references/research/licensed-commons-corpus.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sitequivend-licensed-ad-ingest
+  cancel-in-progress: false
+
+jobs:
+  real-ad-corpus:
+    if: ${{ github.event.head_commit.message == 'CHECK_LICENSED_AD_INGEST_20261025' || github.event.head_commit.message == 'RUN_LICENSED_AD_INGEST_20261025' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      PVS_MODAL_ENABLED: "0"
+      PVS_LLM_API_KEY: ""
+      CUDA_VISIBLE_DEVICES: ""
+      OMP_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install only existing studio CPU dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install -r backend/requirements.txt
+      - name: Compile and validate eight sourced Creative Commons entries (zero network download)
+        run: |
+          python -m py_compile scripts/ingest_licensed_ad_corpus.py
+          python scripts/ingest_licensed_ad_corpus.py check
+      - name: Install tiny Whisper CPU ASR (only for approved media)
+        if: ${{ github.event.head_commit.message == 'RUN_LICENSED_AD_INGEST_20261025' }}
+        run: python -m pip install -r backend/requirements-ad-analysis.txt
+      - name: Download actual Commons videos, verify live licenses, perform real CPU analysis and A-B prompt comparisons
+        if: ${{ github.event.head_commit.message == 'RUN_LICENSED_AD_INGEST_20261025' }}
+        run: python scripts/ingest_licensed_ad_corpus.py ingest
+      - name: Persist attributable derived corpus into review branch (never raw videos)
+        if: ${{ github.event.head_commit.message == 'RUN_LICENSED_AD_INGEST_20261025' && success() }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add studio/ad-references/catalog/licensed_*.json studio/ad-references/recipes/licensed_*_observed.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: measured shots and speech from attributed licensed ads (CPU)"
+            git push origin HEAD:feat/real-ad-reference-corpus-20261025
+          fi
+      - name: Upload observed metrics, analysis reports and fair prompt A-B (no model GPU used)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: licensed-ads-measured-corpus-and-AB-prompts
+          path: |
+            artifacts/ad-licensed-research/ingestion-report.json
+            artifacts/ad-licensed-research/ab-prompts/
+            artifacts/ad-licensed-research/analysis/
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 6
+      - name: GitHub summary
+        if: always()
+        shell: bash
+        run: |
+          echo "## Real creative-commons advertising video analysis" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f artifacts/ad-licensed-research/ingestion-report.json ]; then
+            python -c "import json; x=json.load(open('artifacts/ad-licensed-research/ingestion-report.json')); print('Analysed actual videos:',x['analyzed_count'],'/8; with CPU ASR:',x['asr_count'],'; failures:',len(x['failures']))" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "No video model trained. No Modal GPU render. Do not confuse prompt A-B with proof of generated output quality." >> "$GITHUB_STEP_SUMMARY"
