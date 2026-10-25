@@ -1,0 +1,35 @@
+{
+  "recipe_id": "story_documentary_v1",
+  "category": "storytelling",
+  "title": "Situation, contraste, réaction",
+  "basis": "source_description",
+  "reference_ids": [
+    "ad_013",
+    "ad_012"
+  ],
+  "rules": [
+    {
+      "instruction": "Establish one shared obstacle or situation before the resolution.",
+      "reference_id": "ad_013",
+      "observation_id": "ad_013_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    },
+    {
+      "instruction": "Use a difference in viewpoints to motivate an emotional reaction.",
+      "reference_id": "ad_012",
+      "observation_id": "ad_012_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    },
+    {
+      "instruction": "Let the product or garment belong to the characters situation rather than adding unsupported claims.",
+      "reference_id": "ad_013",
+      "observation_id": "ad_013_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    }
+  ],
+  "limitations": [
+    "Provisional documentary synthesis; no full-video measurements.",
+    "Voice pace, pauses and acting guidance come from separate editorial rules, not these references.",
+    "No automatic conversion improvement claimed."
+  ]
+}

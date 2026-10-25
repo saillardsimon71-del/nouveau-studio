@@ -1,0 +1,44 @@
+{
+  "validation_type": "synthetic_cpu_engineering_fixture_not_ad_reference",
+  "speech_source": "Original text synthesized locally with Microsoft Hortense Desktop, Rate=1",
+  "video_source": "FFmpeg gray frame with locally synthesized speech; no model-generated video",
+  "duration_seconds": 9.023,
+  "media_sha256": "a34a0e32511e4fe2d5d6b4bbf3b06503acbc85b81858649211bde4eef041f9da",
+  "expected_dialogue": "Votre routine mérite plus de simplicité. Regardez comment je l'utilise. Découvrez les détails et choisissez votre routine.",
+  "observed_dialogue": "votre routine mérite plus de simplicité. Regardez comment je l'utilise. Découvrez les détails et choisissez votre routine.",
+  "metrics": {
+    "speech_present": true,
+    "word_count": 17,
+    "words_per_minute_clip": 113.04,
+    "words_per_minute_speech_span": 150.44,
+    "speech_span_s": 6.78,
+    "pause_count": 2,
+    "pitch_p10_p90_semitones": 5.61,
+    "shot_count": 1,
+    "shot_durations_s": [
+      9.023
+    ]
+  },
+  "word_error_rate": 0.0,
+  "pitch_median_hz": 218.18,
+  "analysis_config": {
+    "scene_threshold": 0.3,
+    "speech_only": true,
+    "asr_model": "base.pt",
+    "asr_model_sha256": "ed3a0b6b1c0edf879ad9b11b1af5a0e6ab5db9205f891f668f8b0e6c6326e34e",
+    "language": "fr",
+    "ffmpeg": "ffmpeg version 8.1.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+    "transcription_method": "whisper_local_cpu",
+    "packages": {
+      "av": "18.1.0",
+      "numpy": "2.4.6",
+      "openai-whisper": "20250625",
+      "librosa": "0.11.0"
+    }
+  },
+  "video_generated_with_h3": false,
+  "limits": [
+    "One synthetic voice validates execution only, not natural acting or a real campaign.",
+    "No media redistributed; local data/ contains the complete analysis."
+  ]
+}

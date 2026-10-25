@@ -1,0 +1,348 @@
+{
+  "demo_id": "premium_fashion",
+  "brief": "Vêtements haut de gamme, un manteau en laine, 20 secondes",
+  "source": "heuristic",
+  "notes": "Template local enrichi; origine documentaire ou mesurée précisée dans la provenance.",
+  "reference_context": {
+    "category": "premium_fashion",
+    "references": [
+      {
+        "reference_id": "ad_009",
+        "brand": "Burberry",
+        "title": "Open Spaces",
+        "url": "https://themill.netlify.app/the-mill/work/burberry-open-spaces/",
+        "access": "metadata_only",
+        "insights": [
+          {
+            "id": "ad_009_concept",
+            "value": "La chorégraphie des corps et des vêtements exprime la liberté.",
+            "basis": "source_description",
+            "confidence": 0.7,
+            "evidence": {
+              "locator": "Campaign description / Overview / Information on linked page",
+              "start_s": null,
+              "end_s": null,
+              "media_sha256": null
+            }
+          }
+        ]
+      },
+      {
+        "reference_id": "ad_010",
+        "brand": "Lacoste",
+        "title": "Timeless (2017)",
+        "url": "https://www.strategies.fr/creations/campagnes/1065634/betc-pour-lacoste-mai-2017.html",
+        "access": "metadata_only",
+        "insights": [
+          {
+            "id": "ad_010_concept",
+            "value": "Un vêtement stable relie les changements d'époque de la narration.",
+            "basis": "source_description",
+            "confidence": 0.7,
+            "evidence": {
+              "locator": "Campaign description / Overview / Information on linked page",
+              "start_s": null,
+              "end_s": null,
+              "media_sha256": null
+            }
+          }
+        ]
+      },
+      {
+        "reference_id": "ad_011",
+        "brand": "Levi Strauss",
+        "title": "Levi's 501 - Launderette",
+        "url": "https://www.hatads.org.uk/catalogue/record/8b6cf19d-f7bd-433a-865d-fe2e5fade22a",
+        "access": "metadata_only",
+        "insights": [
+          {
+            "id": "ad_011_concept",
+            "value": "Un geste d'usage du vêtement crée une scène et des réactions autour du produit.",
+            "basis": "source_description",
+            "confidence": 0.7,
+            "evidence": {
+              "locator": "Campaign description / Overview / Information on linked page",
+              "start_s": null,
+              "end_s": null,
+              "media_sha256": null
+            }
+          }
+        ]
+      }
+    ],
+    "recipes": [
+      {
+        "recipe_id": "fashion_documentary_v1",
+        "title": "Vêtement comme fil conducteur",
+        "basis": "source_description",
+        "reference_ids": [
+          "ad_010",
+          "ad_011",
+          "ad_009"
+        ],
+        "rules": [
+          {
+            "instruction": "Keep the same garment as the visual anchor across shots.",
+            "reference_id": "ad_010",
+            "observation_id": "ad_010_concept"
+          },
+          {
+            "instruction": "Let one plausible garment interaction create a motivated reaction.",
+            "reference_id": "ad_011",
+            "observation_id": "ad_011_concept"
+          },
+          {
+            "instruction": "Use garment movement to express the concept; adapt to restrained physical motion suitable for H3.",
+            "reference_id": "ad_009",
+            "observation_id": "ad_009_concept"
+          }
+        ]
+      }
+    ],
+    "measured_pace_wpm": null,
+    "measured_pace_reference_id": null,
+    "limitations": [
+      "Documentary patterns are provisional; measured patterns require editorial adaptation. No conversion claim."
+    ]
+  },
+  "storyboard": {
+    "concept": "Vêtements haut de gamme, un manteau en laine, 20 secondes",
+    "script": "",
+    "style_guide": "Reference-informed local template; claims and casting require client review.",
+    "shots": [
+      {
+        "kind": "b_roll",
+        "title": "Silhouette",
+        "duration_s": 5.0,
+        "dialogue": "",
+        "prompt": "Photorealistic commercial. Adult model in the client's garment, full silhouette, natural balanced stance; slow dolly in. Client brief: Vêtements haut de gamme, un manteau en laine, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. No speech. Motivated, restrained expression and physically plausible gestures. Creative adaptation: Keep the same garment as the visual anchor across shots. Let one plausible garment interaction create a motivated reaction. Use garment movement to express the concept; adapt to restrained physical motion suitable for H3.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: fashion_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "A",
+          "speaker_role": "A",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "curious question then reassurance",
+          "timing": {
+            "word_count": 0,
+            "target_wpm": 165,
+            "pause_budget_s": 0,
+            "required_seconds": 0.0,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Keep the same garment as the visual anchor across shots.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_010",
+            "observation_id": "ad_010_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Let one plausible garment interaction create a motivated reaction.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_011",
+            "observation_id": "ad_011_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Use garment movement to express the concept; adapt to restrained physical motion suitable for H3.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_009",
+            "observation_id": "ad_009_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      },
+      {
+        "kind": "product",
+        "title": "Matière",
+        "duration_s": 5.0,
+        "dialogue": "",
+        "prompt": "Photorealistic commercial. Close-up of the actual garment fabric and stitching, a single gentle hand adjustment. Client brief: Vêtements haut de gamme, un manteau en laine, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. No speech. Motivated, restrained expression and physically plausible gestures. Creative adaptation: Keep the same garment as the visual anchor across shots. Let one plausible garment interaction create a motivated reaction. Use garment movement to express the concept; adapt to restrained physical motion suitable for H3.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: fashion_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "A",
+          "speaker_role": "A",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "warm, engaged invitation",
+          "timing": {
+            "word_count": 0,
+            "target_wpm": 165,
+            "pause_budget_s": 0,
+            "required_seconds": 0.0,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Keep the same garment as the visual anchor across shots.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_010",
+            "observation_id": "ad_010_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Let one plausible garment interaction create a motivated reaction.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_011",
+            "observation_id": "ad_011_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Use garment movement to express the concept; adapt to restrained physical motion suitable for H3.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_009",
+            "observation_id": "ad_009_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      },
+      {
+        "kind": "b_roll",
+        "title": "Mouvement",
+        "duration_s": 5.0,
+        "dialogue": "",
+        "prompt": "Photorealistic commercial. Same model and outfit, one measured walking step, physically plausible fabric movement. Client brief: Vêtements haut de gamme, un manteau en laine, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. No speech. Motivated, restrained expression and physically plausible gestures. Creative adaptation: Keep the same garment as the visual anchor across shots. Let one plausible garment interaction create a motivated reaction. Use garment movement to express the concept; adapt to restrained physical motion suitable for H3.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: fashion_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "A",
+          "speaker_role": "A",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "warm, engaged invitation",
+          "timing": {
+            "word_count": 0,
+            "target_wpm": 165,
+            "pause_budget_s": 0,
+            "required_seconds": 0.0,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Keep the same garment as the visual anchor across shots.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_010",
+            "observation_id": "ad_010_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Let one plausible garment interaction create a motivated reaction.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_011",
+            "observation_id": "ad_011_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Use garment movement to express the concept; adapt to restrained physical motion suitable for H3.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_009",
+            "observation_id": "ad_009_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      },
+      {
+        "kind": "product",
+        "title": "Signature",
+        "duration_s": 5.0,
+        "dialogue": "",
+        "prompt": "Photorealistic commercial. Same garment, composed medium shot, model settles and holds a calm gaze. Client brief: Vêtements haut de gamme, un manteau en laine, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. No speech. Motivated, restrained expression and physically plausible gestures. Creative adaptation: Keep the same garment as the visual anchor across shots. Let one plausible garment interaction create a motivated reaction. Use garment movement to express the concept; adapt to restrained physical motion suitable for H3.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: fashion_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "A",
+          "speaker_role": "A",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "warm, engaged invitation",
+          "timing": {
+            "word_count": 0,
+            "target_wpm": 165,
+            "pause_budget_s": 0,
+            "required_seconds": 0.0,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Keep the same garment as the visual anchor across shots.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_010",
+            "observation_id": "ad_010_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Let one plausible garment interaction create a motivated reaction.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_011",
+            "observation_id": "ad_011_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Use garment movement to express the concept; adapt to restrained physical motion suitable for H3.",
+            "recipe_id": "fashion_documentary_v1",
+            "reference_id": "ad_009",
+            "observation_id": "ad_009_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      }
+    ]
+  },
+  "video_generated": false
+}

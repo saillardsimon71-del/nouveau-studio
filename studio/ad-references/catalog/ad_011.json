@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "ad_011",
+  "category": "premium_fashion",
+  "brand": "Levi Strauss",
+  "title": "Levi's 501 - Launderette",
+  "source": {
+    "url": "https://www.hatads.org.uk/catalogue/record/8b6cf19d-f7bd-433a-865d-fe2e5fade22a",
+    "origin_url": null,
+    "license": "No reproduction or commercial dataset license established",
+    "rights_note": "Link and original metadata only. Brand/agency/platform rights remain reserved. Obtain file authorization before ingestion.",
+    "analysis_access": "metadata_only",
+    "media_authorized": false,
+    "authorization_evidence": "",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": null,
+  "publication_date_basis": "unknown",
+  "duration_seconds": 50,
+  "duration_basis": "archive record HAT59/010/003/003, specific 50s version",
+  "platform": "TV / cinéma",
+  "format": null,
+  "ad_type": "cinematic_denim",
+  "concept": "Un jeune homme lave son jean dans une laverie, suscitant les réactions des clients.",
+  "hook": {
+    "type": "situation sociale inattendue",
+    "basis": "source_description",
+    "opening_seconds": null
+  },
+  "narrative": {
+    "summary": "Un geste d'usage du vêtement crée une scène et des réactions autour du produit.",
+    "basis": "source_description",
+    "timed_structure": null
+  },
+  "commercial_message": "Mettre le jean 501 au centre d'une scène mémorable.",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {},
+  "observations": [
+    {
+      "id": "ad_011_concept",
+      "domain": "marketing",
+      "value": "Un geste d'usage du vêtement crée une scène et des réactions autour du produit.",
+      "basis": "source_description",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "https://www.hatads.org.uk/catalogue/record/8b6cf19d-f7bd-433a-865d-fe2e5fade22a",
+        "locator": "Campaign description / Overview / Information on linked page",
+        "start_s": null,
+        "end_s": null,
+        "media_sha256": null
+      },
+      "uncertainty": "Documentary interpretation; complete film, editing, acting and voice not inspected."
+    }
+  ],
+  "limitations": [
+    "No media downloaded or full-video analysis. Duration/format/dialogue are unknown unless sourced.",
+    "No sales, conversion or creative performance data validated.",
+    "Category is editorial; UGC/presenter group includes professionally scripted presenters, not verified customer UGC."
+  ]
+}

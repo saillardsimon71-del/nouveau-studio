@@ -1,0 +1,4 @@
+# Optional CPU analysis. Existing backend requirements remain unchanged.
+# Versions used for local verification; no model is downloaded by the CLI.
+openai-whisper==20250625
+librosa==0.11.0

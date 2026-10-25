@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "ad_003",
+  "category": "ugc_presenter",
+  "brand": "Poo-Pourri",
+  "title": "Girls Do Poop - Spoken Word",
+  "source": {
+    "url": "https://pourri.com/blogs/girls-do-poop",
+    "origin_url": "https://pourri.com/blogs/girls-do-poop",
+    "license": "No reproduction or commercial dataset license established",
+    "rights_note": "Link and original metadata only. Brand/agency/platform rights remain reserved. Obtain file authorization before ingestion.",
+    "analysis_access": "metadata_only",
+    "media_authorized": false,
+    "authorization_evidence": "",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": null,
+  "publication_date_basis": "unknown",
+  "duration_seconds": null,
+  "duration_basis": "unknown; variants not resolved",
+  "platform": "YouTube / web",
+  "format": null,
+  "ad_type": "scripted_spoken_word",
+  "concept": "Un texte parlé déconstruit la honte liée aux toilettes.",
+  "hook": {
+    "type": "tabou verbal",
+    "basis": "source_description",
+    "opening_seconds": null
+  },
+  "narrative": {
+    "summary": "Une prise de parole affirme un problème partagé et invite le public à raconter son expérience.",
+    "basis": "source_description",
+    "timed_structure": null
+  },
+  "commercial_message": "Dédramatiser le sujet dans un univers de marque humoristique.",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {},
+  "observations": [
+    {
+      "id": "ad_003_concept",
+      "domain": "marketing",
+      "value": "Une prise de parole affirme un problème partagé et invite le public à raconter son expérience.",
+      "basis": "source_description",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "https://pourri.com/blogs/girls-do-poop",
+        "locator": "Campaign description / Overview / Information on linked page",
+        "start_s": null,
+        "end_s": null,
+        "media_sha256": null
+      },
+      "uncertainty": "Documentary interpretation; complete film, editing, acting and voice not inspected."
+    }
+  ],
+  "limitations": [
+    "No media downloaded or full-video analysis. Duration/format/dialogue are unknown unless sourced.",
+    "No sales, conversion or creative performance data validated.",
+    "Category is editorial; UGC/presenter group includes professionally scripted presenters, not verified customer UGC."
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "$defs": {
+    "Evidence": {
+      "properties": {
+        "url": {
+          "default": "",
+          "title": "Url",
+          "type": "string"
+        },
+        "locator": {
+          "title": "Locator",
+          "type": "string"
+        },
+        "start_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start S"
+        },
+        "end_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End S"
+        },
+        "media_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Media Sha256"
+        }
+      },
+      "required": [
+        "locator"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "domain": {
+      "enum": [
+        "visual",
+        "voice",
+        "marketing",
+        "narrative"
+      ],
+      "title": "Domain",
+      "type": "string"
+    },
+    "value": {
+      "title": "Value"
+    },
+    "basis": {
+      "enum": [
+        "source_description",
+        "video_observation",
+        "acoustic_measurement",
+        "model_inference"
+      ],
+      "title": "Basis",
+      "type": "string"
+    },
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "evidence": {
+      "$ref": "#/$defs/Evidence"
+    },
+    "uncertainty": {
+      "default": "",
+      "title": "Uncertainty",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "domain",
+    "value",
+    "basis",
+    "confidence",
+    "evidence"
+  ],
+  "title": "Observation",
+  "type": "object"
+}

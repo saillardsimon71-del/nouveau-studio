@@ -90,6 +90,9 @@ class ShotSpec(BaseModel):
     transition: Transition = "cut"
     engine_hint: str = ""
     notes: str = ""
+    performance: dict[str, Any] = Field(default_factory=dict)
+    creative_provenance: list[dict[str, Any]] = Field(default_factory=list)
+    character_id: str | None = None
 
 
 class Storyboard(BaseModel):
@@ -112,6 +115,8 @@ class StoryboardRequest(BaseModel):
     character_id: str | None = None
     extra_instructions: str = ""
     use_llm: bool | None = None  # None = auto (use LLM when a key is configured)
+    use_references: bool = False
+    ad_category: Literal["ugc_presenter", "premium_beauty", "premium_fashion", "storytelling", "product_demo"] | None = None
 
 
 class GenerateRequest(BaseModel):

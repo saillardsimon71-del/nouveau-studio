@@ -43,11 +43,13 @@ modal = types.ModuleType("modal")
 modal.Image = FakeImage
 modal.App = FakeApp
 modal.Volume = FakeVolume
-sys.modules.setdefault("modal", modal)
 path = Path(__file__).resolve().parents[1] / "deploy" / "modal_h3_worker.py"
 spec = importlib.util.spec_from_file_location("h3_worker_for_tests", path)
 h3 = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(h3)
+from unittest.mock import patch
+
+with patch.dict(sys.modules, {"modal": modal}):
+    spec.loader.exec_module(h3)
 
 
 class H3NativeContractTests(unittest.TestCase):

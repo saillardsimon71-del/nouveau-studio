@@ -1,0 +1,94 @@
+{
+  "$defs": {
+    "RecipeRule": {
+      "properties": {
+        "instruction": {
+          "title": "Instruction",
+          "type": "string"
+        },
+        "reference_id": {
+          "title": "Reference Id",
+          "type": "string"
+        },
+        "observation_id": {
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "adaptation": {
+          "title": "Adaptation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "instruction",
+        "reference_id",
+        "observation_id"
+      ],
+      "title": "RecipeRule",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "recipe_id": {
+      "title": "Recipe Id",
+      "type": "string"
+    },
+    "category": {
+      "enum": [
+        "ugc_presenter",
+        "premium_beauty",
+        "premium_fashion",
+        "storytelling",
+        "product_demo"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "basis": {
+      "enum": [
+        "source_description",
+        "analyzed_media"
+      ],
+      "title": "Basis",
+      "type": "string"
+    },
+    "reference_ids": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Reference Ids",
+      "type": "array"
+    },
+    "rules": {
+      "items": {
+        "$ref": "#/$defs/RecipeRule"
+      },
+      "maxItems": 8,
+      "minItems": 1,
+      "title": "Rules",
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "recipe_id",
+    "category",
+    "title",
+    "basis",
+    "reference_ids",
+    "rules"
+  ],
+  "title": "Recipe",
+  "type": "object"
+}

@@ -1,0 +1,36 @@
+{
+  "recipe_id": "fashion_documentary_v1",
+  "category": "premium_fashion",
+  "title": "Vêtement comme fil conducteur",
+  "basis": "source_description",
+  "reference_ids": [
+    "ad_010",
+    "ad_011",
+    "ad_009"
+  ],
+  "rules": [
+    {
+      "instruction": "Keep the same garment as the visual anchor across shots.",
+      "reference_id": "ad_010",
+      "observation_id": "ad_010_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    },
+    {
+      "instruction": "Let one plausible garment interaction create a motivated reaction.",
+      "reference_id": "ad_011",
+      "observation_id": "ad_011_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    },
+    {
+      "instruction": "Use garment movement to express the concept; adapt to restrained physical motion suitable for H3.",
+      "reference_id": "ad_009",
+      "observation_id": "ad_009_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    }
+  ],
+  "limitations": [
+    "Provisional documentary synthesis; no full-video measurements.",
+    "Voice pace, pauses and acting guidance come from separate editorial rules, not these references.",
+    "No automatic conversion improvement claimed."
+  ]
+}

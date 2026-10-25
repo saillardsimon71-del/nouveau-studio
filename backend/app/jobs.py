@@ -297,6 +297,10 @@ def _dispatch(job: dict[str, Any], ctx: Ctx) -> tuple[EngineOutput, str, str, bo
         params=request_params, inputs=inputs,
     )
     if job_type == "video":
+        if (shot.get("params") or {}).get("performance"):
+            reference = params.get("reference_image") or _character_reference(shot)
+            if reference:
+                request.inputs["reference_image"] = reference
         request.params.setdefault("prompt", shot.get("prompt", ""))
         if not request.params.get("prompt"):
             raise ValueError("plan sans prompt vidéo")

@@ -1,0 +1,138 @@
+{
+  "checked_on": "2026-10-25",
+  "method": "GitHub public repository REST metadata; latest pushed_at is activity, not a support guarantee",
+  "repositories": [
+    {
+      "full_name": "yunlong10/Ads-1k",
+      "html_url": "https://github.com/yunlong10/Ads-1k",
+      "archived": false,
+      "pushed_at": "2023-04-14T05:26:06Z",
+      "updated_at": "2026-09-24T11:08:56Z",
+      "license": {
+        "key": "bsd-2-clause",
+        "name": "BSD 2-Clause \"Simplified\" License",
+        "spdx_id": "BSD-2-Clause",
+        "url": "https://api.github.com/licenses/bsd-2-clause",
+        "node_id": "MDc6TGljZW5zZTQ="
+      },
+      "default_branch": "main"
+    },
+    {
+      "full_name": "ostadabbas/AdShot",
+      "html_url": "https://github.com/ostadabbas/AdShot",
+      "archived": false,
+      "pushed_at": "2026-10-13T18:23:56Z",
+      "updated_at": "2026-10-21T17:06:26Z",
+      "license": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "TsinghuaC3I/AdsQA",
+      "html_url": "https://github.com/TsinghuaC3I/AdsQA",
+      "archived": false,
+      "pushed_at": "2025-10-30T03:21:46Z",
+      "updated_at": "2026-08-14T13:49:18Z",
+      "license": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "librosa/librosa",
+      "html_url": "https://github.com/librosa/librosa",
+      "archived": false,
+      "pushed_at": "2026-10-06T15:53:10Z",
+      "updated_at": "2026-10-25T08:12:51Z",
+      "license": {
+        "key": "isc",
+        "name": "ISC License",
+        "spdx_id": "ISC",
+        "url": "https://api.github.com/licenses/isc",
+        "node_id": "MDc6TGljZW5zZTEw"
+      },
+      "default_branch": "main"
+    },
+    {
+      "full_name": "KlingAIResearch/LivePortrait",
+      "html_url": "https://github.com/KlingAIResearch/LivePortrait",
+      "archived": false,
+      "pushed_at": "2026-06-01T17:25:09Z",
+      "updated_at": "2026-10-25T11:53:37Z",
+      "license": {
+        "key": "other",
+        "name": "Other",
+        "spdx_id": "NOASSERTION",
+        "url": null,
+        "node_id": "MDc6TGljZW5zZTA="
+      },
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Reforged-Labs/mg-vau",
+      "html_url": "https://github.com/Reforged-Labs/mg-vau",
+      "archived": false,
+      "pushed_at": "2026-04-06T04:06:26Z",
+      "updated_at": "2026-06-05T07:43:54Z",
+      "license": {
+        "key": "other",
+        "name": "Other",
+        "spdx_id": "NOASSERTION",
+        "url": null,
+        "node_id": "MDc6TGljZW5zZTA="
+      },
+      "default_branch": "main"
+    },
+    {
+      "full_name": "Breakthrough/PySceneDetect",
+      "html_url": "https://github.com/Breakthrough/PySceneDetect",
+      "archived": false,
+      "pushed_at": "2026-10-25T01:20:06Z",
+      "updated_at": "2026-10-25T08:42:28Z",
+      "license": {
+        "key": "bsd-3-clause",
+        "name": "BSD 3-Clause \"New\" or \"Revised\" License",
+        "spdx_id": "BSD-3-Clause",
+        "url": "https://api.github.com/licenses/bsd-3-clause",
+        "node_id": "MDc6TGljZW5zZTU="
+      },
+      "default_branch": "main"
+    },
+    {
+      "full_name": "QwenLM/Qwen3-VL",
+      "html_url": "https://github.com/QwenLM/Qwen3-VL",
+      "archived": false,
+      "pushed_at": "2026-01-30T04:47:30Z",
+      "updated_at": "2026-10-25T11:50:42Z",
+      "license": {
+        "key": "apache-2.0",
+        "name": "Apache License 2.0",
+        "spdx_id": "Apache-2.0",
+        "url": "https://api.github.com/licenses/apache-2.0",
+        "node_id": "MDc6TGljZW5zZTI="
+      },
+      "default_branch": "main"
+    },
+    {
+      "full_name": "midas-research/video-persuasion",
+      "html_url": "https://github.com/midas-research/video-persuasion",
+      "archived": false,
+      "pushed_at": "2023-10-23T11:10:11Z",
+      "updated_at": "2026-02-22T05:44:51Z",
+      "license": null,
+      "default_branch": "main"
+    },
+    {
+      "full_name": "m-bain/whisperX",
+      "html_url": "https://github.com/m-bain/whisperX",
+      "archived": false,
+      "pushed_at": "2026-10-22T14:53:44Z",
+      "updated_at": "2026-10-25T13:38:32Z",
+      "license": {
+        "key": "bsd-2-clause",
+        "name": "BSD 2-Clause \"Simplified\" License",
+        "spdx_id": "BSD-2-Clause",
+        "url": "https://api.github.com/licenses/bsd-2-clause",
+        "node_id": "MDc6TGljZW5zZTQ="
+      },
+      "default_branch": "main"
+    }
+  ]
+}
