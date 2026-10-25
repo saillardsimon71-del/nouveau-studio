@@ -1,0 +1,97 @@
+name: Studio | Stage & Deploy MiniMax H3 on Modal
+
+# No MiniMax API charges. Model downloaded once to dedicated Modal volume.
+# Ordinary pushes run only static tests. Exactly one opt-in push triggers staging.
+on:
+  push:
+    branches: [feat/modal-h3-engine-20261025]
+    paths:
+      - ".github/workflows/modal-h3-local.yml"
+      - "deploy/modal_h3_worker.py"
+      - "backend/app/engines/registry.py"
+      - "backend/app/engines/modal_remote.py"
+  workflow_dispatch:
+    inputs:
+      stage:
+        type: choice
+        options: [preflight, doctor, prepare, deploy]
+        default: preflight
+      confirm_spend:
+        type: choice
+        options: ["non", "oui"]
+        default: "non"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pvs-minimax-h3-model-staging
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Python static syntax, no calls to MiniMax/Modal
+        run: |
+          python -m py_compile deploy/modal_h3_worker.py backend/app/engines/registry.py backend/app/engines/modal_remote.py
+          python - <<'PY'
+          from pathlib import Path
+          source = Path("deploy/modal_h3_worker.py").read_text()
+          assert "MiniMaxH3ImageToVideo" in source
+          assert "pvs-minimax-h3-models" in source
+          assert "MiniMaxAI/" not in source, "No full checkpoint snapshot or unused originals"
+          assert "MINIMAX_API_KEY" not in source
+          print("H3 native ComfyUI integration: syntax & configuration OK")
+          PY
+  provision:
+    needs: preflight
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.stage != 'preflight') || (github.event_name == 'push' && github.event.head_commit.message == 'H3_STAGE_MODELS_ON_MODAL_20261025') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      PVS_STAGE: ${{ github.event_name == 'push' && 'prepare' || inputs.stage }}
+      PVS_CONFIRMED: ${{ github.event_name == 'push' && 'oui' || inputs.confirm_spend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Modal SDK (no GPU)
+        run: python -m pip install "modal>=1.0,<2"
+      - name: Check credentials without leaking values
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${MODAL_TOKEN_ID:-}" =~ ^ak-[A-Za-z0-9_-]+$ ]] || { echo "::error::MODAL_TOKEN_ID absent/invalide"; exit 1; }
+          [[ "${MODAL_TOKEN_SECRET:-}" =~ ^as-[A-Za-z0-9_-]+$ ]] || { echo "::error::MODAL_TOKEN_SECRET absent/invalide"; exit 1; }
+          modal token info >/dev/null 2>&1 || { echo "::error::Modal authentication failed"; exit 1; }
+          modal volume list | grep -q "studio-ltx25-models" || { echo "::error::Wrong Modal workspace"; exit 1; }
+          echo "Authenticated to workspace containing existing LTX volume."
+      - name: Doctor (CPU only)
+        if: ${{ env.PVS_STAGE == 'doctor' }}
+        run: modal run -m deploy.modal_h3_worker --mode doctor --output artifacts/h3_doctor.json
+      - name: Download H3 compact checkpoints to dedicated Modal Volume (CPU only)
+        if: ${{ env.PVS_STAGE == 'prepare' && env.PVS_CONFIRMED == 'oui' }}
+        run: |
+          set -eu
+          modal run -m deploy.modal_h3_worker --mode prepare --output artifacts/h3_prepare.json
+          test -s artifacts/h3_prepare.json
+      - name: Deploy native Modal GPU worker (build only, no render)
+        if: ${{ env.PVS_STAGE == 'deploy' && env.PVS_CONFIRMED == 'oui' }}
+        run: modal deploy deploy/modal_h3_worker.py
+      - name: Upload check and staging manifest
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: h3-modal-report-${{ github.run_number }}
+          path: artifacts/
+          if-no-files-found: ignore
+          retention-days: 30
