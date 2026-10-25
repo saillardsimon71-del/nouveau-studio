@@ -13,6 +13,7 @@ permissions:
 
 concurrency:
   group: eclat-01-real-french-ad-once
+  # Preflight phase first: no GPU invoice
   cancel-in-progress: false
 
 jobs:
