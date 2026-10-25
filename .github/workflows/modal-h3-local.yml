@@ -10,6 +10,7 @@ on:
       - "deploy/modal_h3_worker.py"
       - "backend/app/engines/registry.py"
       - "backend/app/engines/modal_remote.py"
+      - "tests/test_modal_h3_local.py"
   workflow_dispatch:
     inputs:
       stage:
@@ -37,6 +38,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: H3 graph + duration + photo contract tests (no cloud calls)
+        run: python -m unittest discover -s tests -p "test_modal_h3_local.py" -v
       - name: Python static syntax, no calls to MiniMax/Modal
         run: |
           python -m py_compile deploy/modal_h3_worker.py backend/app/engines/registry.py backend/app/engines/modal_remote.py
