@@ -136,7 +136,7 @@ jobs:
           test -s artifacts/exports/MOVE-01-Spot-14s-LTX.mp4
           echo '### Delivered: 14s / 1080x1920 / 48fps interpolated' >> "$GITHUB_STEP_SUMMARY"
           echo 'Visual approval is still required before publication. Source LTX is native 24fps.' >> "$GITHUB_STEP_SUMMARY"
-          echo "Music: 'Ascension' by Scott Buckley, CC BY 4.0 — attribution required." >> "$GITHUB_STEP_SUMMARY"
+          echo "Music: 'Race The Sun' by Scott Buckley, CC BY 4.0 — attribution required." >> "$GITHUB_STEP_SUMMARY"
       - name: Download MP4, cover and attribution
         if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MOVE_01_ONCE_20261025')
         uses: actions/upload-artifact@v4
