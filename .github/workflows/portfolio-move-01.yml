@@ -1,0 +1,147 @@
+name: Portfolio | MOVE 01 14s (Pexels + LTX)
+# Push only runs 0-GPU preflight, except a SINGLE exact opt-in commit message for this requested production.
+on:
+  push:
+    branches: [production/portfolio-move-01-20261025]
+    paths: ['.github/workflows/portfolio-move-01.yml', 'scripts/production/portfolio_move_01.py']
+  workflow_dispatch:
+    inputs:
+      stage:
+        type: choice
+        description: 'Check assets for free or render the LTX film'
+        options: [preflight, render]
+        default: preflight
+      confirm_spend:
+        type: choice
+        description: 'Explicitly authorize Modal GPU spend'
+        options: ['non', 'oui']
+        default: 'non'
+permissions:
+  contents: read
+concurrency:
+  # Separate a one-time approved render from an old stuck no-GPU preflight queue.
+  group: portfolio-move-01-20261025
+  cancel-in-progress: false
+jobs:
+  showreel:
+    # All ordinary pushes remain no-GPU; only the exact approved, one-use commit triggers production.
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MOVE_01_ONCE_20261025')
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      PYTHONUNBUFFERED: '1'
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      MODAL_WORKSPACE_EXPECTED: kulejean567
+      PVS_MODAL_APP: pvs-ltx
+      PVS_MODAL_LTX_VOLUME: studio-ltx25-models
+      PVS_MODAL_GPU: L40S
+      PVS_MODAL_RENDER_TIMEOUT: '480'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install preflight and editing tools
+        run: |
+          set -eu
+          python -m pip install --disable-pip-version-check --timeout 40 --retries 1 'Pillow>=11,<13'
+          # GitHub's standard Ubuntu image normally already has ffmpeg and DejaVu.
+          # Avoid an unconditional apt-get update, which stalled the earlier preflight.
+          if ! command -v ffmpeg >/dev/null || ! command -v ffprobe >/dev/null || ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf; then
+            timeout 180s sudo apt-get update -qq
+            timeout 180s sudo apt-get install -y ffmpeg fonts-dejavu-core
+          fi
+          ffmpeg -version | head -n 1
+          test -f /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
+      - name: Verify real Pexels photos and licensed music before any GPU
+        run: |
+          set -eu
+          python scripts/production/portfolio_move_01.py prepare --out artifacts
+          test -s artifacts/source-provenance.json
+          for name in preparation vitesse horizon; do test -s "artifacts/references/$name-reference.png"; done
+          echo '### Pexels sources verified — zero GPU' >> "$GITHUB_STEP_SUMMARY"
+      - name: Download photos and provenance for visual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOVE-01-Pexels-references
+          path: |
+            artifacts/references/
+            artifacts/source-provenance.json
+          retention-days: 14
+      - name: Require explicit spend consent and Modal credentials
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MOVE_01_ONCE_20261025')
+        env:
+          # This exact push commit is authorized by the user in chat; any other push is skipped.
+          SPEND_APPROVAL: ${{ github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MOVE_01_ONCE_20261025' && 'oui' || inputs.confirm_spend }}
+        run: |
+          set -eu
+          test "$SPEND_APPROVAL" = 'oui' || { echo "::error::No GPU authorization"; exit 1; }
+          test -n "$MODAL_TOKEN_ID" && test -n "$MODAL_TOKEN_SECRET" || { echo "::error::No Modal secrets"; exit 1; }
+      - name: Install Modal only for paid manual render
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MOVE_01_ONCE_20261025')
+        run: python -m pip install 'modal>=1.0,<2'
+      - name: LTX shot 1 - preparation
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MOVE_01_ONCE_20261025')
+        env:
+          PROMPT: >-
+            Premium modern sportswear spec-ad, photorealistic continuous cinematic close-up. The person in the real reference gently finishes adjusting the shoelaces of the EXACT SAME neutral grey and black running shoe on a reflective floor. Preserve shoe silhouette, stitching, hands, human anatomy, fabric, floor and original natural photographic textures. Camera performs a deliberate controlled 5 centimeter dolly-in, shallow depth of field, crisp commercial lighting. No additional fingers, no changes in shoe design, no logos, no lettering, no transformations, no cut.
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/clips
+          modal run deploy/modal_ltx_worker.py --mode render \
+            --prompt "$PROMPT" --duration 5 --aspect '9:16' --seed 916011 \
+            --image-png artifacts/references/preparation-reference.png \
+            --image-strength 0.85 --audio-mode silent --out artifacts/clips/preparation-ltx.mp4
+
+      - name: LTX shot 2 - vitesse
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MOVE_01_ONCE_20261025')
+        env:
+          PROMPT: >-
+            High-energy editorial sport campaign in stunning authentic BLACK-AND-WHITE. Preserve the exact motion-blurred runner silhouette and monochrome Montreal street of the reference photo, face indistinct, no endorsements. A subtle cinematic lateral tracking camera follows the same person naturally moving forward while dynamic background motion blur breathes realistically. Keep anatomy and clothing stable, no duplicate limbs, no face reveal, no changes in wardrobe or perspective, no text, no logo, single continuous shot.
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/clips
+          modal run deploy/modal_ltx_worker.py --mode render \
+            --prompt "$PROMPT" --duration 5 --aspect '9:16' --seed 916012 \
+            --image-png artifacts/references/vitesse-reference.png \
+            --image-strength 0.85 --audio-mode silent --out artifacts/clips/vitesse-ltx.mp4
+
+      - name: LTX shot 3 - horizon
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MOVE_01_ONCE_20261025')
+        env:
+          PROMPT: >-
+            Premium outdoors running lifestyle commercial based only on the real Pexels source photograph: preserve the same single jogger SEEN FROM BEHIND on a sunlit tree-lined park path, outfit, shoes, landscape, natural afternoon light. Smooth forward tracking camera gently follows the same runner, slight motion of legs and arms with real running mechanics, trees and landscape stay stable. Invigorating warm sunlight and cinematic subtle lens glint, authentic photographic texture, no new persons, no duplicate legs, no deformations, no invented logos or text.
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/clips
+          modal run deploy/modal_ltx_worker.py --mode render \
+            --prompt "$PROMPT" --duration 5 --aspect '9:16' --seed 916013 \
+            --image-png artifacts/references/horizon-reference.png \
+            --image-strength 0.85 --audio-mode silent --out artifacts/clips/horizon-ltx.mp4
+
+      - name: Preserve all real clips even if assembly fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOVE-01-LTX-source-shots
+          path: artifacts/clips/
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Assemble hard cuts, licensed music and 48fps delivery
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MOVE_01_ONCE_20261025')
+        run: |
+          set -euo pipefail
+          python scripts/production/portfolio_move_01.py assemble --out artifacts
+          test -s artifacts/exports/MOVE-01-Spot-14s-LTX.mp4
+          echo '### Delivered: 14s / 1080x1920 / 48fps interpolated' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Visual approval is still required before publication. Source LTX is native 24fps.' >> "$GITHUB_STEP_SUMMARY"
+          echo "Music: 'Ascension' by Scott Buckley, CC BY 4.0 — attribution required." >> "$GITHUB_STEP_SUMMARY"
+      - name: Download MP4, cover and attribution
+        if: (github.event_name == 'workflow_dispatch' && inputs.stage == 'render' && inputs.confirm_spend == 'oui') || (github.event_name == 'push' && github.event.head_commit.message == 'RUN_PORTFOLIO_MOVE_01_ONCE_20261025')
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOVE-01-14s-LTX
+          path: artifacts/exports/
+          if-no-files-found: error
+          retention-days: 30
