@@ -1,0 +1,84 @@
+name: H3 | Native French voice + lips test (real Pexels portrait)
+
+# One-time triggers only. Check-only cannot contact GPU.
+on:
+  push:
+    branches: [test/h3-french-native-voice-20261025]
+    paths:
+      - ".github/workflows/h3-french-native-voice.yml"
+      - "scripts/production/h3_french_native_voice_test.py"
+permissions:
+  contents: read
+concurrency:
+  group: h3-fr-voice-one-shot-20261025
+  cancel-in-progress: false
+jobs:
+  french_voice:
+    if: ${{ github.event.head_commit.message == 'CHECK_H3_FR_VOICE_20261025' || github.event.head_commit.message == 'RUN_H3_FR_VOICE_20261025' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      PYTHONUNBUFFERED: "1"
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install media validation tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check "Pillow>=11,<13" "modal>=1.0,<2"
+          ffprobe -version | head -1
+      - name: Python syntax + short French script audit (no GPU)
+        run: |
+          python -m py_compile scripts/production/h3_french_native_voice_test.py
+          python - <<'PY'
+          from pathlib import Path
+          s=Path("scripts/production/h3_french_native_voice_test.py").read_text()
+          assert "MiniMax" not in s or "H3" in s
+          assert "non_diegetic_music: N/A" in s
+          assert "<d>[French]" in s
+          assert "steps\": 20" in s
+          assert "pexels.com/photos/4382484" in s
+          print("Native French speaker prompting and GPU spend boundary validated")
+          PY
+      - name: Verify source real Pexels portrait and preserve provenance (no GPU)
+        run: python scripts/production/h3_french_native_voice_test.py preflight
+      - name: Verify Modal app and token before any GPU
+        if: ${{ github.event.head_commit.message == 'RUN_H3_FR_VOICE_20261025' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${MODAL_TOKEN_ID:-}" =~ ^ak-[A-Za-z0-9_-]+$ ]] || exit 1
+          [[ "${MODAL_TOKEN_SECRET:-}" =~ ^as-[A-Za-z0-9_-]+$ ]] || exit 1
+          modal token info >/dev/null 2>&1
+          python - <<'PY'
+          import modal
+          modal.Function.from_name("pvs-minimax-h3", "render_clip", environment_name="main").hydrate()
+          print("Existing H3 Modal app is reachable.")
+          PY
+      - name: Generate ONE 5-second native-French audiovisual H3 shot on Modal L40S
+        if: ${{ github.event.head_commit.message == 'RUN_H3_FR_VOICE_20261025' }}
+        run: python scripts/production/h3_french_native_voice_test.py render
+      - name: Validate real MP4, native speech audio, and grab 5 frames
+        if: ${{ github.event.head_commit.message == 'RUN_H3_FR_VOICE_20261025' }}
+        run: python scripts/production/h3_french_native_voice_test.py inspect
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: H3-FRENCH-NATIVE-VOICE-TEST-20261025
+          path: artifacts/h3-french-voice/
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 0
+      - name: Report intended and observed status
+        if: always()
+        run: |
+          echo "## French-native speaking H3 test" >> "$GITHUB_STEP_SUMMARY"
+          echo "One real Pexels portrait; speech generated jointly by self-hosted H3." >> "$GITHUB_STEP_SUMMARY"
+          echo "Review French pronunciation, exact words and lip-sync manually; existence of an audio stream alone does not prove correctness." >> "$GITHUB_STEP_SUMMARY"
