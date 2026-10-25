@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """ÉCLAT / 01: fully edited French beauty concept commercial from real Pexels photos.
 
-One existing real H3 French speaking portrait is reused from run 40192700348.
 Two new H3 clips use the already deployed Modal render_batch function (20 steps).
 All STILL images are real stock photographs; no AI-generated first frames.
 """
@@ -22,7 +21,6 @@ REFS = ROOT / "references"
 CLIPS = ROOT / "clips"
 OUT = ROOT / "exports"
 SIZE = (768, 1344)
-HERO_TRIM = 4.40
 NEW_TRIM = 4.65
 CARD_SECONDS = 2.30
 MASTER = "ECLAT-01-SITEQUIVEND-FRENCH-AD-H3.mp4"
@@ -102,7 +100,6 @@ def preflight():
         "description":"Noncommissioned fictional skincare concept; not an actual brand endorsement",
         "real_first_frame_photography":{**SOURCE,"original_dimensions":list(img.size),"sha256":hashlib.sha256(data).hexdigest()},
         "frames":refs,
-        "first_plan_reused":"GitHub Actions run 40192700348, H3 native French voice test (already generated)",
         "soundtrack":{"name":"Ascension","artist":"Scott Buckley","license":"CC BY 4.0","page":SCORE_PAGE},
         "important":"No extra AI still imagery; no new logos or unsupported product claims"
     }
@@ -154,12 +151,10 @@ def prepare_one(src:Path,dst:Path,seconds:float):
          "-movflags","+faststart",str(dst)])
 
 def assemble():
-    hero=ROOT/"hero"/"H3-AVATAR-VOIX-FR-TEST.mp4"
-    if not hero.is_file(): raise FileNotFoundError("Approved prior French H3 clip not recovered")
     prepared=ROOT/"prepared"
     prepared.mkdir(parents=True,exist_ok=True)
     OUT.mkdir(parents=True,exist_ok=True)
-    segments=[("hero",hero,HERO_TRIM)]+[(s["name"],CLIPS/(s["name"]+".mp4"),NEW_TRIM) for s in SHOTS]
+    segments=[(s["name"],CLIPS/(s["name"]+".mp4"),NEW_TRIM) for s in SHOTS]
     ready=[]
     for name,src,trim in segments:
         dst=prepared/(name+".mp4")
@@ -190,7 +185,7 @@ def assemble():
     score=ROOT/"score.mp3"
     if not score.is_file(): raise FileNotFoundError("Music not downloaded")
     final=OUT/MASTER
-    length=HERO_TRIM+2*NEW_TRIM+CARD_SECONDS
+    length=2*NEW_TRIM+CARD_SECONDS
     # Low-volume licensed score under the native French dialogue.
     cmd(["ffmpeg","-hide_banner","-loglevel","error","-y","-i",str(base),"-ss","42","-i",str(score),
          "-filter_complex",
@@ -221,7 +216,6 @@ def assemble():
     (OUT/"CREDITS.txt").write_text(
         "ÉCLAT / 01 — fictional, uncommissioned commercial concept; not a real skincare brand.\n"
         "The filmed people and photographed cosmetics do not endorse this concept.\n"
-        "Photo: Anastasiya Gepp — https://www.pexels.com/photo/beautiful-woman-in-gray-top-looking-at-camera-4382484/\n"
         f"Photo: {SOURCE['photographer']} — {SOURCE['page']}\n"
         "Stock photograph license: https://www.pexels.com/license/\n"
         "Music: 'Ascension' by Scott Buckley, CC BY 4.0, www.scottbuckley.com.au\n",
