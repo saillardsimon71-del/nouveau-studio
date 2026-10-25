@@ -90,6 +90,7 @@ jobs:
       - name: Deploy native Modal GPU worker (build only, no render)
         if: ${{ env.PVS_STAGE == 'deploy' && env.PVS_CONFIRMED == 'oui' }}
         run: modal deploy deploy/modal_h3_worker.py
+        # Triggered after verified H3 weights were staged to a dedicated volume.
       - name: Upload check and staging manifest
         uses: actions/upload-artifact@v4
         if: always()
