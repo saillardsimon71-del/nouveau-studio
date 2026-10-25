@@ -1,0 +1,58 @@
+name: Studio | Auto-deploy H3 once after approved model staging
+
+# Only reacts to the EXACT staging run started by this user's request.
+# No recurring GPU, no render call, no external MiniMax API.
+on:
+  workflow_run:
+    workflows: ["Studio | Stage & Deploy MiniMax H3 on Modal"]
+    types: [completed]
+permissions:
+  contents: read
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.id == 40185329565 && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'feat/modal-h3-engine-20261025' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Modal SDK
+        run: python -m pip install "modal>=1.0,<2"
+      - name: Verify Modal workspace (without leaking tokens)
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${MODAL_TOKEN_ID:-}" =~ ^ak-[A-Za-z0-9_-]+$ ]] || exit 1
+          [[ "${MODAL_TOKEN_SECRET:-}" =~ ^as-[A-Za-z0-9_-]+$ ]] || exit 1
+          modal token info >/dev/null 2>&1
+          modal volume list | grep -q "studio-ltx25-models"
+      - name: Verify the actual four H3 checkpoints (CPU, no GPU)
+        run: |
+          set -euo pipefail
+          modal run -m deploy.modal_h3_worker --mode doctor --output artifacts/h3_doctor_before_deploy.json
+          python - <<'PY'
+          import json
+          r=json.load(open("artifacts/h3_doctor_before_deploy.json"))
+          assert r.get("ready") is True, f"H3 weights incomplete: {r.get('files')}"
+          print("H3 checkpoint manifest: ready")
+          PY
+      - name: Build and deploy H3 Modal app (zero GPU inference)
+        run: modal deploy deploy/modal_h3_worker.py
+      - name: Record deployment
+        if: always()
+        run: |
+          echo "## H3 dedicated app" >> "$GITHUB_STEP_SUMMARY"
+          echo "App: pvs-minimax-h3; volume: pvs-minimax-h3-models" >> "$GITHUB_STEP_SUMMARY"
+          echo "The GPU has NOT rendered a test video; visual QC remains required." >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: h3-deployment-manifest
+          path: artifacts/
+          if-no-files-found: ignore
+          retention-days: 30
