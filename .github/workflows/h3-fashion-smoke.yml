@@ -33,7 +33,11 @@ jobs:
           [[ "${MODAL_TOKEN_ID:-}" =~ ^ak-[A-Za-z0-9_-]+$ ]] || exit 1
           [[ "${MODAL_TOKEN_SECRET:-}" =~ ^as-[A-Za-z0-9_-]+$ ]] || exit 1
           modal token info >/dev/null 2>&1
-          modal app list | grep -q 'pvs-minimax-h3'
+          python - <<'PY'
+          import modal
+          func = modal.Function.from_name("pvs-minimax-h3", "render_clip", environment_name="main").hydrate()
+          print("Deployed Modal H3 render_clip function is reachable.")
+          PY
       - name: ONE GPU H3 render - authentic Pexels fashion photo
         run: python scripts/production/h3_fashion_smoke.py
       - name: Check real MP4 video and audio stream with ffprobe
