@@ -1,0 +1,326 @@
+{
+  "demo_id": "two_character_story",
+  "brief": "Publicité narrative avec deux personnages adultes, un cadeau, 20 secondes",
+  "source": "heuristic",
+  "notes": "Template local enrichi; origine documentaire ou mesurée précisée dans la provenance.",
+  "reference_context": {
+    "category": "storytelling",
+    "references": [
+      {
+        "reference_id": "ad_012",
+        "brand": "Dove",
+        "title": "Real Beauty Sketches",
+        "url": "https://www.ogilvy.com/work/real-beauty-sketches",
+        "access": "metadata_only",
+        "insights": [
+          {
+            "id": "ad_012_concept",
+            "value": "La confrontation de deux points de vue conduit à une révélation émotionnelle.",
+            "basis": "source_description",
+            "confidence": 0.7,
+            "evidence": {
+              "locator": "Campaign description / Overview / Information on linked page",
+              "start_s": null,
+              "end_s": null,
+              "media_sha256": null
+            }
+          }
+        ]
+      },
+      {
+        "reference_id": "ad_013",
+        "brand": "H&M",
+        "title": "Come Together - Wes Anderson",
+        "url": "https://hmgroup.com/news/wes-anderson-directs-hms-2016-holiday-film-come-together/",
+        "access": "metadata_only",
+        "insights": [
+          {
+            "id": "ad_013_concept",
+            "value": "Un obstacle de voyage place les personnages dans une situation commune.",
+            "basis": "source_description",
+            "confidence": 0.7,
+            "evidence": {
+              "locator": "Campaign description / Overview / Information on linked page",
+              "start_s": null,
+              "end_s": null,
+              "media_sha256": null
+            }
+          }
+        ]
+      }
+    ],
+    "recipes": [
+      {
+        "recipe_id": "story_documentary_v1",
+        "title": "Situation, contraste, réaction",
+        "basis": "source_description",
+        "reference_ids": [
+          "ad_013",
+          "ad_012"
+        ],
+        "rules": [
+          {
+            "instruction": "Establish one shared obstacle or situation before the resolution.",
+            "reference_id": "ad_013",
+            "observation_id": "ad_013_concept"
+          },
+          {
+            "instruction": "Use a difference in viewpoints to motivate an emotional reaction.",
+            "reference_id": "ad_012",
+            "observation_id": "ad_012_concept"
+          },
+          {
+            "instruction": "Let the product or garment belong to the characters situation rather than adding unsupported claims.",
+            "reference_id": "ad_013",
+            "observation_id": "ad_013_concept"
+          }
+        ]
+      }
+    ],
+    "measured_pace_wpm": null,
+    "measured_pace_reference_id": null,
+    "limitations": [
+      "Documentary patterns are provisional; measured patterns require editorial adaptation. No conversion claim."
+    ]
+  },
+  "storyboard": {
+    "concept": "Publicité narrative avec deux personnages adultes, un cadeau, 20 secondes",
+    "script": "Tu as pensé à moi ? Oui. Regarde, c'est pour toi. Tu me connais bien.",
+    "style_guide": "Reference-informed local template; claims and casting require client review.",
+    "shots": [
+      {
+        "kind": "b_roll",
+        "title": "Situation",
+        "duration_s": 5.0,
+        "dialogue": "Tu as pensé à moi ?",
+        "prompt": "Photorealistic commercial. Two distinct adults A and B; A faces B, asks a warm question; B listens without speaking. Client brief: Publicité narrative avec deux personnages adultes, un cadeau, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. Casting: A is adult A; B is a distinct adult with a separate voice. Speaker A speaks in French with a contemporary metropolitan French accent, warm conversational timbre, approximately 150 words per minute: \"Tu as pensé à moi ?\". Vary pitch across phrases; lift the question ending when applicable, then settle on the response. Use a short natural pause at punctuation, emphasize one meaningful word, allow a small audible breath. Synchronize mouth movement with speech; a slight eyebrow response, one motivated hand gesture, small smile after the phrase. Other visible characters listen without speaking. Keep the same voice across shots for this speaker; preserve the reference identity. No background narration and no competing voices. Creative adaptation: Establish one shared obstacle or situation before the resolution. Use a difference in viewpoints to motivate an emotional reaction. Let the product or garment belong to the characters situation rather than adding unsupported claims.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: story_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "A",
+          "speaker_role": "A",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "curious question then reassurance",
+          "timing": {
+            "word_count": 5,
+            "target_wpm": 150,
+            "pause_budget_s": 0.4,
+            "required_seconds": 2.4,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Establish one shared obstacle or situation before the resolution.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_013",
+            "observation_id": "ad_013_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Use a difference in viewpoints to motivate an emotional reaction.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_012",
+            "observation_id": "ad_012_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Let the product or garment belong to the characters situation rather than adding unsupported claims.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_013",
+            "observation_id": "ad_013_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      },
+      {
+        "kind": "b_roll",
+        "title": "Réponse",
+        "duration_s": 5.0,
+        "dialogue": "Oui. Regarde, c'est pour toi.",
+        "prompt": "Photorealistic commercial. Reverse medium close-up; B answers A and gently presents the client's product; A listens. Client brief: Publicité narrative avec deux personnages adultes, un cadeau, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. Casting: A is adult A; B is a distinct adult with a separate voice. Speaker B speaks in French with a contemporary metropolitan French accent, warm conversational timbre, approximately 150 words per minute: \"Oui. Regarde, c'est pour toi.\". Vary pitch across phrases; lift the question ending when applicable, then settle on the response. Use a short natural pause at punctuation, emphasize one meaningful word, allow a small audible breath. Synchronize mouth movement with speech; a slight eyebrow response, one motivated hand gesture, small smile after the phrase. Other visible characters listen without speaking. Keep the same voice across shots for this speaker; preserve the reference identity. No background narration and no competing voices. Creative adaptation: Establish one shared obstacle or situation before the resolution. Use a difference in viewpoints to motivate an emotional reaction. Let the product or garment belong to the characters situation rather than adding unsupported claims.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: story_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "B",
+          "speaker_role": "B",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "warm, engaged invitation",
+          "timing": {
+            "word_count": 5,
+            "target_wpm": 150,
+            "pause_budget_s": 0.4,
+            "required_seconds": 2.4,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Establish one shared obstacle or situation before the resolution.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_013",
+            "observation_id": "ad_013_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Use a difference in viewpoints to motivate an emotional reaction.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_012",
+            "observation_id": "ad_012_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Let the product or garment belong to the characters situation rather than adding unsupported claims.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_013",
+            "observation_id": "ad_013_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      },
+      {
+        "kind": "b_roll",
+        "title": "Réaction",
+        "duration_s": 5.0,
+        "dialogue": "Tu me connais bien.",
+        "prompt": "Photorealistic commercial. Reaction close-up of A, recognizes the gesture, small genuine smile after answering; B silent. Client brief: Publicité narrative avec deux personnages adultes, un cadeau, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. Casting: A is adult A; B is a distinct adult with a separate voice. Speaker A speaks in French with a contemporary metropolitan French accent, warm conversational timbre, approximately 150 words per minute: \"Tu me connais bien.\". Vary pitch across phrases; lift the question ending when applicable, then settle on the response. Use a short natural pause at punctuation, emphasize one meaningful word, allow a small audible breath. Synchronize mouth movement with speech; a slight eyebrow response, one motivated hand gesture, small smile after the phrase. Other visible characters listen without speaking. Keep the same voice across shots for this speaker; preserve the reference identity. No background narration and no competing voices. Creative adaptation: Establish one shared obstacle or situation before the resolution. Use a difference in viewpoints to motivate an emotional reaction. Let the product or garment belong to the characters situation rather than adding unsupported claims.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: story_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "A",
+          "speaker_role": "A",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "warm, engaged invitation",
+          "timing": {
+            "word_count": 4,
+            "target_wpm": 150,
+            "pause_budget_s": 0.4,
+            "required_seconds": 2.0,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Establish one shared obstacle or situation before the resolution.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_013",
+            "observation_id": "ad_013_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Use a difference in viewpoints to motivate an emotional reaction.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_012",
+            "observation_id": "ad_012_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Let the product or garment belong to the characters situation rather than adding unsupported claims.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_013",
+            "observation_id": "ad_013_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      },
+      {
+        "kind": "product",
+        "title": "Résolution",
+        "duration_s": 5.0,
+        "dialogue": "",
+        "prompt": "Photorealistic commercial. Two-shot of the same adults sharing a quiet moment, product visible between them. Client brief: Publicité narrative avec deux personnages adultes, un cadeau, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. No speech. Motivated, restrained expression and physically plausible gestures. Creative adaptation: Establish one shared obstacle or situation before the resolution. Use a difference in viewpoints to motivate an emotional reaction. Let the product or garment belong to the characters situation rather than adding unsupported claims.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: story_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "A",
+          "speaker_role": "A",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "warm, engaged invitation",
+          "timing": {
+            "word_count": 0,
+            "target_wpm": 150,
+            "pause_budget_s": 0,
+            "required_seconds": 0.0,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Establish one shared obstacle or situation before the resolution.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_013",
+            "observation_id": "ad_013_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Use a difference in viewpoints to motivate an emotional reaction.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_012",
+            "observation_id": "ad_012_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Let the product or garment belong to the characters situation rather than adding unsupported claims.",
+            "recipe_id": "story_documentary_v1",
+            "reference_id": "ad_013",
+            "observation_id": "ad_013_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      }
+    ]
+  },
+  "video_generated": false
+}

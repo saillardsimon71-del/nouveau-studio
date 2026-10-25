@@ -166,18 +166,24 @@ def delete_project(project_id: str) -> dict[str, bool]:
 @router.post("/director/propose")
 def director_propose(body: StoryboardRequest) -> dict[str, Any]:
     character = db.get("characters", body.character_id) if body.character_id else None
-    result = propose(
-        brief=body.brief,
-        target_duration_s=body.target_duration_s,
-        character=character,
-        extra=body.extra_instructions,
-        use_llm=body.use_llm,
-    )
+    try:
+        result = propose(
+            brief=body.brief,
+            target_duration_s=body.target_duration_s,
+            character=character,
+            extra=body.extra_instructions,
+            use_llm=body.use_llm,
+            use_references=body.use_references,
+            ad_category=body.ad_category,
+        )
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
     return {
         "source": result.source,
         "model": result.model,
         "notes": result.notes,
         "storyboard": result.storyboard.model_dump(),
+        "reference_context": result.reference_context,
     }
 
 
@@ -204,10 +210,11 @@ def apply_storyboard(project_id: str, body: Storyboard, replace: bool = Query(de
                 "dialogue": spec.dialogue,
                 "prompt": spec.prompt,
                 "camera": spec.camera,
-                "character_id": default_character if spec.kind == "avatar" else None,
+                "character_id": spec.character_id or (default_character if spec.kind == "avatar" else None),
                 "transition": spec.transition,
                 "status": "draft",
-                "params": {"engine_hint": spec.engine_hint, "notes": spec.notes},
+                "params": {"engine_hint": spec.engine_hint, "notes": spec.notes,
+                           "performance": spec.performance, "creative_provenance": spec.creative_provenance},
                 "created_at": now,
                 "updated_at": now,
             },

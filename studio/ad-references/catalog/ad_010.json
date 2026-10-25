@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "ad_010",
+  "category": "premium_fashion",
+  "brand": "Lacoste",
+  "title": "Timeless (2017)",
+  "source": {
+    "url": "https://www.strategies.fr/creations/campagnes/1065634/betc-pour-lacoste-mai-2017.html",
+    "origin_url": null,
+    "license": "No reproduction or commercial dataset license established",
+    "rights_note": "Link and original metadata only. Brand/agency/platform rights remain reserved. Obtain file authorization before ingestion.",
+    "analysis_access": "metadata_only",
+    "media_authorized": false,
+    "authorization_evidence": "",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": "2017-05",
+  "publication_date_basis": "source publication/campaign date, not independently verified upload date",
+  "duration_seconds": null,
+  "duration_basis": "unknown; variants not resolved",
+  "platform": "TV / digital",
+  "format": null,
+  "ad_type": "cinematic_fashion_story",
+  "concept": "Une poursuite romantique traverse des wagons et plusieurs décennies.",
+  "hook": {
+    "type": "poursuite romantique",
+    "basis": "source_description",
+    "opening_seconds": null
+  },
+  "narrative": {
+    "summary": "Un vêtement stable relie les changements d'époque de la narration.",
+    "basis": "source_description",
+    "timed_structure": null
+  },
+  "commercial_message": "Le polo reste constant à travers les époques.",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {},
+  "observations": [
+    {
+      "id": "ad_010_concept",
+      "domain": "marketing",
+      "value": "Un vêtement stable relie les changements d'époque de la narration.",
+      "basis": "source_description",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "https://www.strategies.fr/creations/campagnes/1065634/betc-pour-lacoste-mai-2017.html",
+        "locator": "Campaign description / Overview / Information on linked page",
+        "start_s": null,
+        "end_s": null,
+        "media_sha256": null
+      },
+      "uncertainty": "Documentary interpretation; complete film, editing, acting and voice not inspected."
+    }
+  ],
+  "limitations": [
+    "No media downloaded or full-video analysis. Duration/format/dialogue are unknown unless sourced.",
+    "No sales, conversion or creative performance data validated.",
+    "Category is editorial; UGC/presenter group includes professionally scripted presenters, not verified customer UGC."
+  ]
+}

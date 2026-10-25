@@ -1,0 +1,348 @@
+{
+  "demo_id": "ugc_cosmetic_fr",
+  "brief": "UGC cosmétique pour un sérum, une présentatrice française, 20 secondes",
+  "source": "heuristic",
+  "notes": "Template local enrichi; origine documentaire ou mesurée précisée dans la provenance.",
+  "reference_context": {
+    "category": "ugc_presenter",
+    "references": [
+      {
+        "reference_id": "ad_001",
+        "brand": "Dollar Shave Club",
+        "title": "Our Blades Are F***ing Great",
+        "url": "https://www.youtube.com/watch?v=ZUG9qYTJMsI",
+        "access": "metadata_only",
+        "insights": [
+          {
+            "id": "ad_001_concept",
+            "value": "Le fondateur présente une offre simple dans un film de marque.",
+            "basis": "source_description",
+            "confidence": 0.7,
+            "evidence": {
+              "locator": "Campaign description / Overview / Information on linked page",
+              "start_s": null,
+              "end_s": null,
+              "media_sha256": null
+            }
+          }
+        ]
+      },
+      {
+        "reference_id": "ad_004",
+        "brand": "Purple",
+        "title": "How to Use a Raw Egg to Determine if Your Mattress is Awful",
+        "url": "https://www.furnituretoday.com/mattress-bedding-news/purples-clever-egg-test-racks-online-views-wins-fans/",
+        "access": "metadata_only",
+        "insights": [
+          {
+            "id": "ad_004_concept",
+            "value": "Un personnage présente une comparaison dont le résultat est visible.",
+            "basis": "source_description",
+            "confidence": 0.7,
+            "evidence": {
+              "locator": "Campaign description / Overview / Information on linked page",
+              "start_s": null,
+              "end_s": null,
+              "media_sha256": null
+            }
+          }
+        ]
+      },
+      {
+        "reference_id": "ad_005",
+        "brand": "IL MAKIAGE",
+        "title": "Looks Like Skin",
+        "url": "https://www.ispot.tv/ad/qY8z/il-makiage-looks-like-skin",
+        "access": "metadata_only",
+        "insights": [
+          {
+            "id": "ad_005_concept",
+            "value": "La description associe bénéfice de produit et réduction du risque avant achat.",
+            "basis": "source_description",
+            "confidence": 0.7,
+            "evidence": {
+              "locator": "Campaign description / Overview / Information on linked page",
+              "start_s": null,
+              "end_s": null,
+              "media_sha256": null
+            }
+          }
+        ]
+      }
+    ],
+    "recipes": [
+      {
+        "recipe_id": "presenter_documentary_v1",
+        "title": "Présentation conversationnelle et démonstration",
+        "basis": "source_description",
+        "reference_ids": [
+          "ad_001",
+          "ad_004",
+          "ad_005"
+        ],
+        "rules": [
+          {
+            "instruction": "Explain one simple offer before introducing secondary detail.",
+            "reference_id": "ad_001",
+            "observation_id": "ad_001_concept"
+          },
+          {
+            "instruction": "Tie a product benefit to one clearly visible demonstration.",
+            "reference_id": "ad_004",
+            "observation_id": "ad_004_concept"
+          },
+          {
+            "instruction": "End with a clear, low-friction next step; make no unsupported product claim.",
+            "reference_id": "ad_005",
+            "observation_id": "ad_005_concept"
+          }
+        ]
+      }
+    ],
+    "measured_pace_wpm": null,
+    "measured_pace_reference_id": null,
+    "limitations": [
+      "Documentary patterns are provisional; measured patterns require editorial adaptation. No conversion claim."
+    ]
+  },
+  "storyboard": {
+    "concept": "UGC cosmétique pour un sérum, une présentatrice française, 20 secondes",
+    "script": "Votre routine mérite plus de simplicité, non ? Regardez comment je l'utilise, tout simplement. Un geste facile à intégrer au quotidien. Découvrez les détails et choisissez votre routine.",
+    "style_guide": "Reference-informed local template; claims and casting require client review.",
+    "shots": [
+      {
+        "kind": "b_roll",
+        "title": "Hook",
+        "duration_s": 5.0,
+        "dialogue": "Votre routine mérite plus de simplicité, non ?",
+        "prompt": "Photorealistic commercial. an adult French female presenter, medium close-up, eye contact with the lens, curious eyebrow lift. Client brief: UGC cosmétique pour un sérum, une présentatrice française, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. Speaker A speaks in French with a contemporary metropolitan French accent, warm conversational timbre, approximately 165 words per minute: \"Votre routine mérite plus de simplicité, non ?\". Vary pitch across phrases; lift the question ending when applicable, then settle on the response. Use a short natural pause at punctuation, emphasize one meaningful word, allow a small audible breath. Synchronize mouth movement with speech; a slight eyebrow response, one motivated hand gesture, small smile after the phrase. Other visible characters listen without speaking. Keep the same voice across shots for this speaker; preserve the reference identity. No background narration and no competing voices. Creative adaptation: Explain one simple offer before introducing secondary detail. Tie a product benefit to one clearly visible demonstration. End with a clear, low-friction next step; make no unsupported product claim.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: presenter_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "A",
+          "speaker_role": "A",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "curious question then reassurance",
+          "timing": {
+            "word_count": 7,
+            "target_wpm": 165,
+            "pause_budget_s": 0.4,
+            "required_seconds": 2.945,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Explain one simple offer before introducing secondary detail.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_001",
+            "observation_id": "ad_001_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Tie a product benefit to one clearly visible demonstration.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_004",
+            "observation_id": "ad_004_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "End with a clear, low-friction next step; make no unsupported product claim.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_005",
+            "observation_id": "ad_005_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      },
+      {
+        "kind": "product",
+        "title": "Démonstration",
+        "duration_s": 5.0,
+        "dialogue": "Regardez comment je l'utilise, tout simplement.",
+        "prompt": "Photorealistic commercial. Same presenter demonstrates the client's product with one clear, plausible hand movement. Client brief: UGC cosmétique pour un sérum, une présentatrice française, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. Speaker A speaks in French with a contemporary metropolitan French accent, warm conversational timbre, approximately 165 words per minute: \"Regardez comment je l'utilise, tout simplement.\". Vary pitch across phrases; lift the question ending when applicable, then settle on the response. Use a short natural pause at punctuation, emphasize one meaningful word, allow a small audible breath. Synchronize mouth movement with speech; a slight eyebrow response, one motivated hand gesture, small smile after the phrase. Other visible characters listen without speaking. Keep the same voice across shots for this speaker; preserve the reference identity. No background narration and no competing voices. Creative adaptation: Explain one simple offer before introducing secondary detail. Tie a product benefit to one clearly visible demonstration. End with a clear, low-friction next step; make no unsupported product claim.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: presenter_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "A",
+          "speaker_role": "A",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "warm, engaged invitation",
+          "timing": {
+            "word_count": 6,
+            "target_wpm": 165,
+            "pause_budget_s": 0.4,
+            "required_seconds": 2.582,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Explain one simple offer before introducing secondary detail.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_001",
+            "observation_id": "ad_001_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Tie a product benefit to one clearly visible demonstration.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_004",
+            "observation_id": "ad_004_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "End with a clear, low-friction next step; make no unsupported product claim.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_005",
+            "observation_id": "ad_005_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      },
+      {
+        "kind": "b_roll",
+        "title": "Bénéfice à valider",
+        "duration_s": 5.0,
+        "dialogue": "Un geste facile à intégrer au quotidien.",
+        "prompt": "Photorealistic commercial. Same presenter, relaxed shoulders, conversational delivery, small smile after the key phrase. Client brief: UGC cosmétique pour un sérum, une présentatrice française, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. Speaker A speaks in French with a contemporary metropolitan French accent, warm conversational timbre, approximately 165 words per minute: \"Un geste facile à intégrer au quotidien.\". Vary pitch across phrases; lift the question ending when applicable, then settle on the response. Use a short natural pause at punctuation, emphasize one meaningful word, allow a small audible breath. Synchronize mouth movement with speech; a slight eyebrow response, one motivated hand gesture, small smile after the phrase. Other visible characters listen without speaking. Keep the same voice across shots for this speaker; preserve the reference identity. No background narration and no competing voices. Creative adaptation: Explain one simple offer before introducing secondary detail. Tie a product benefit to one clearly visible demonstration. End with a clear, low-friction next step; make no unsupported product claim.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: presenter_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "A",
+          "speaker_role": "A",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "warm, engaged invitation",
+          "timing": {
+            "word_count": 7,
+            "target_wpm": 165,
+            "pause_budget_s": 0.4,
+            "required_seconds": 2.945,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Explain one simple offer before introducing secondary detail.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_001",
+            "observation_id": "ad_001_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Tie a product benefit to one clearly visible demonstration.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_004",
+            "observation_id": "ad_004_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "End with a clear, low-friction next step; make no unsupported product claim.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_005",
+            "observation_id": "ad_005_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      },
+      {
+        "kind": "product",
+        "title": "CTA",
+        "duration_s": 5.0,
+        "dialogue": "Découvrez les détails et choisissez votre routine.",
+        "prompt": "Photorealistic commercial. Same presenter presents the product steadily, direct gaze, warm invitation, holds final frame. Client brief: UGC cosmétique pour un sérum, une présentatrice française, 20 secondes. Preserve identities and product from the supplied real reference photo. No generated text or logos. Speaker A speaks in French with a contemporary metropolitan French accent, warm conversational timbre, approximately 165 words per minute: \"Découvrez les détails et choisissez votre routine.\". Vary pitch across phrases; lift the question ending when applicable, then settle on the response. Use a short natural pause at punctuation, emphasize one meaningful word, allow a small audible breath. Synchronize mouth movement with speech; a slight eyebrow response, one motivated hand gesture, small smile after the phrase. Other visible characters listen without speaking. Keep the same voice across shots for this speaker; preserve the reference identity. No background narration and no competing voices. Creative adaptation: Explain one simple offer before introducing secondary detail. Tie a product benefit to one clearly visible demonstration. End with a clear, low-friction next step; make no unsupported product claim.",
+        "camera": "eye level, restrained camera movement",
+        "transition": "cut",
+        "engine_hint": "modal_h3",
+        "notes": "Recipe: presenter_documentary_v1 (source_description). Voice target basis: editorial_rule_not_reference_measurement.",
+        "performance": {
+          "speaker": "A",
+          "speaker_role": "A",
+          "language": "fr",
+          "accent": "contemporary metropolitan French",
+          "timbre": "warm conversational adult voice, no imitation of reference actor",
+          "intent": "warm, engaged invitation",
+          "timing": {
+            "word_count": 7,
+            "target_wpm": 165,
+            "pause_budget_s": 0.4,
+            "required_seconds": 2.945,
+            "available_seconds": 5.0,
+            "fits": true,
+            "basis": "editorial_rule_not_reference_measurement",
+            "recommendation": "fits"
+          }
+        },
+        "creative_provenance": [
+          {
+            "decision": "Explain one simple offer before introducing secondary detail.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_001",
+            "observation_id": "ad_001_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "Tie a product benefit to one clearly visible demonstration.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_004",
+            "observation_id": "ad_004_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "End with a clear, low-friction next step; make no unsupported product claim.",
+            "recipe_id": "presenter_documentary_v1",
+            "reference_id": "ad_005",
+            "observation_id": "ad_005_concept",
+            "basis": "source_description"
+          },
+          {
+            "decision": "speech timing and restrained acting directions",
+            "basis": "editorial_rule",
+            "rule_id": "natural_delivery_v1"
+          }
+        ],
+        "character_id": null
+      }
+    ]
+  },
+  "video_generated": false
+}

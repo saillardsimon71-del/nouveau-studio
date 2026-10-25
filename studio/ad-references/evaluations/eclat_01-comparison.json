@@ -1,0 +1,24 @@
+{
+  "scene_id": "eclat_01",
+  "status": "awaiting_authorized_media",
+  "baseline": {
+    "title": "ECLAT / 01",
+    "media_path": null,
+    "expected_dialogue": null,
+    "evaluation_path": null
+  },
+  "candidate": {
+    "title": "ECLAT / 01 - future version",
+    "media_path": null,
+    "expected_dialogue": null,
+    "evaluation_path": null
+  },
+  "protocol": {
+    "same_scene_id": true,
+    "same_asr_model_and_analysis_config": true,
+    "compare_original_files_without_regeneration": true,
+    "human_review_required": ["lip_sync", "acting_naturalness", "visual_continuity", "product_presence", "facial_expression", "obvious_defects"]
+  },
+  "results": null,
+  "limitations": ["Neither ECLAT source video nor expected dialogue was found in this repository.", "No GPU generation was run and no comparative quality result is asserted."]
+}

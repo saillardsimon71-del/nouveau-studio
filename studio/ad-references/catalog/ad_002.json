@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "ad_002",
+  "category": "ugc_presenter",
+  "brand": "Old Spice",
+  "title": "The Man Your Man Could Smell Like",
+  "source": {
+    "url": "https://www.wk.com/work/old-spice-smell-like-a-man-man/",
+    "origin_url": "https://www.youtube.com/watch?v=owGykVbfgUE",
+    "license": "No reproduction or commercial dataset license established",
+    "rights_note": "Link and original metadata only. Brand/agency/platform rights remain reserved. Obtain file authorization before ingestion.",
+    "analysis_access": "metadata_only",
+    "media_authorized": false,
+    "authorization_evidence": "",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": "2010-02",
+  "publication_date_basis": "source publication/campaign date, not independently verified upload date",
+  "duration_seconds": null,
+  "duration_basis": "unknown; variants not resolved",
+  "platform": "TV / YouTube",
+  "format": null,
+  "ad_type": "scripted_camera_presenter",
+  "concept": "Une adresse aux couples autour du gel douche, prolongée par des réponses aux internautes.",
+  "hook": {
+    "type": "interpellation du public",
+    "basis": "source_description",
+    "opening_seconds": null
+  },
+  "narrative": {
+    "summary": "La campagne provoque une conversation entre partenaires plutôt que de détailler des ingrédients.",
+    "basis": "source_description",
+    "timed_structure": null
+  },
+  "commercial_message": "Associer le gel douche à une masculinité désirable.",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {},
+  "observations": [
+    {
+      "id": "ad_002_concept",
+      "domain": "marketing",
+      "value": "La campagne provoque une conversation entre partenaires plutôt que de détailler des ingrédients.",
+      "basis": "source_description",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "https://www.wk.com/work/old-spice-smell-like-a-man-man/",
+        "locator": "Campaign description / Overview / Information on linked page",
+        "start_s": null,
+        "end_s": null,
+        "media_sha256": null
+      },
+      "uncertainty": "Documentary interpretation; complete film, editing, acting and voice not inspected."
+    }
+  ],
+  "limitations": [
+    "No media downloaded or full-video analysis. Duration/format/dialogue are unknown unless sourced.",
+    "No sales, conversion or creative performance data validated.",
+    "Category is editorial; UGC/presenter group includes professionally scripted presenters, not verified customer UGC."
+  ]
+}

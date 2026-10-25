@@ -1,0 +1,36 @@
+{
+  "recipe_id": "presenter_documentary_v1",
+  "category": "ugc_presenter",
+  "title": "Présentation conversationnelle et démonstration",
+  "basis": "source_description",
+  "reference_ids": [
+    "ad_001",
+    "ad_004",
+    "ad_005"
+  ],
+  "rules": [
+    {
+      "instruction": "Explain one simple offer before introducing secondary detail.",
+      "reference_id": "ad_001",
+      "observation_id": "ad_001_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    },
+    {
+      "instruction": "Tie a product benefit to one clearly visible demonstration.",
+      "reference_id": "ad_004",
+      "observation_id": "ad_004_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    },
+    {
+      "instruction": "End with a clear, low-friction next step; make no unsupported product claim.",
+      "reference_id": "ad_005",
+      "observation_id": "ad_005_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    }
+  ],
+  "limitations": [
+    "Provisional documentary synthesis; no full-video measurements.",
+    "Voice pace, pauses and acting guidance come from separate editorial rules, not these references.",
+    "No automatic conversion improvement claimed."
+  ]
+}

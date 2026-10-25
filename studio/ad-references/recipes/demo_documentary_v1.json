@@ -1,0 +1,35 @@
+{
+  "recipe_id": "demo_documentary_v1",
+  "category": "product_demo",
+  "title": "Question et résultat observable",
+  "basis": "source_description",
+  "reference_ids": [
+    "ad_015",
+    "ad_014"
+  ],
+  "rules": [
+    {
+      "instruction": "Frame a product question that a visible test can answer.",
+      "reference_id": "ad_015",
+      "observation_id": "ad_015_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    },
+    {
+      "instruction": "Explain the mechanism with a clear demonstration; verify any health-related claims separately.",
+      "reference_id": "ad_014",
+      "observation_id": "ad_014_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    },
+    {
+      "instruction": "Show the test result without extrapolating unverified performance claims.",
+      "reference_id": "ad_015",
+      "observation_id": "ad_015_concept",
+      "adaptation": "Editorial adaptation of the linked description, not a measured effect."
+    }
+  ],
+  "limitations": [
+    "Provisional documentary synthesis; no full-video measurements.",
+    "Voice pace, pauses and acting guidance come from separate editorial rules, not these references.",
+    "No automatic conversion improvement claimed."
+  ]
+}

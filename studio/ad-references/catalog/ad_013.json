@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "ad_013",
+  "category": "storytelling",
+  "brand": "H&M",
+  "title": "Come Together - Wes Anderson",
+  "source": {
+    "url": "https://hmgroup.com/news/wes-anderson-directs-hms-2016-holiday-film-come-together/",
+    "origin_url": "https://hmgroup.com/news/wes-anderson-directs-hms-2016-holiday-film-come-together/",
+    "license": "No reproduction or commercial dataset license established",
+    "rights_note": "Link and original metadata only. Brand/agency/platform rights remain reserved. Obtain file authorization before ingestion.",
+    "analysis_access": "metadata_only",
+    "media_authorized": false,
+    "authorization_evidence": "",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": "2016-11-28",
+  "publication_date_basis": "source publication/campaign date, not independently verified upload date",
+  "duration_seconds": null,
+  "duration_basis": "unknown; variants not resolved",
+  "platform": "YouTube / web",
+  "format": null,
+  "ad_type": "narrative_fashion_dialogue",
+  "concept": "Un conducteur de train et ses passagers affrontent un retard de Noël.",
+  "hook": {
+    "type": "contretemps collectif",
+    "basis": "source_description",
+    "opening_seconds": null
+  },
+  "narrative": {
+    "summary": "Un obstacle de voyage place les personnages dans une situation commune.",
+    "basis": "source_description",
+    "timed_structure": null
+  },
+  "commercial_message": "La collection de fêtes accompagne une occasion de rassemblement.",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {},
+  "observations": [
+    {
+      "id": "ad_013_concept",
+      "domain": "marketing",
+      "value": "Un obstacle de voyage place les personnages dans une situation commune.",
+      "basis": "source_description",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "https://hmgroup.com/news/wes-anderson-directs-hms-2016-holiday-film-come-together/",
+        "locator": "Campaign description / Overview / Information on linked page",
+        "start_s": null,
+        "end_s": null,
+        "media_sha256": null
+      },
+      "uncertainty": "Documentary interpretation; complete film, editing, acting and voice not inspected."
+    }
+  ],
+  "limitations": [
+    "No media downloaded or full-video analysis. Duration/format/dialogue are unknown unless sourced.",
+    "No sales, conversion or creative performance data validated.",
+    "Category is editorial; UGC/presenter group includes professionally scripted presenters, not verified customer UGC."
+  ]
+}

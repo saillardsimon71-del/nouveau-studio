@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "ad_001",
+  "category": "ugc_presenter",
+  "brand": "Dollar Shave Club",
+  "title": "Our Blades Are F***ing Great",
+  "source": {
+    "url": "https://www.youtube.com/watch?v=ZUG9qYTJMsI",
+    "origin_url": "https://www.youtube.com/watch?v=ZUG9qYTJMsI",
+    "license": "No reproduction or commercial dataset license established",
+    "rights_note": "Link and original metadata only. Brand/agency/platform rights remain reserved. Obtain file authorization before ingestion.",
+    "analysis_access": "metadata_only",
+    "media_authorized": false,
+    "authorization_evidence": "",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": "2012-03-06",
+  "publication_date_basis": "source publication/campaign date, not independently verified upload date",
+  "duration_seconds": null,
+  "duration_basis": "unknown; variants not resolved",
+  "platform": "YouTube",
+  "format": null,
+  "ad_type": "scripted_founder_presenter",
+  "concept": "Présentation du service de rasoirs livré à domicile.",
+  "hook": {
+    "type": "offre directe",
+    "basis": "source_description",
+    "opening_seconds": null
+  },
+  "narrative": {
+    "summary": "Le fondateur présente une offre simple dans un film de marque.",
+    "basis": "source_description",
+    "timed_structure": null
+  },
+  "commercial_message": "Rasoirs et produits de soin livrés pour quelques dollars.",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {},
+  "observations": [
+    {
+      "id": "ad_001_concept",
+      "domain": "marketing",
+      "value": "Le fondateur présente une offre simple dans un film de marque.",
+      "basis": "source_description",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "https://www.youtube.com/watch?v=ZUG9qYTJMsI",
+        "locator": "Campaign description / Overview / Information on linked page",
+        "start_s": null,
+        "end_s": null,
+        "media_sha256": null
+      },
+      "uncertainty": "Documentary interpretation; complete film, editing, acting and voice not inspected."
+    }
+  ],
+  "limitations": [
+    "No media downloaded or full-video analysis. Duration/format/dialogue are unknown unless sourced.",
+    "No sales, conversion or creative performance data validated.",
+    "Category is editorial; UGC/presenter group includes professionally scripted presenters, not verified customer UGC."
+  ]
+}

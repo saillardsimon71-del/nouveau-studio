@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "reference_id": "ad_006",
+  "category": "premium_beauty",
+  "brand": "Dior",
+  "title": "J'adore - Rihanna, Steven Klein",
+  "source": {
+    "url": "https://www.dior.com/en_us/beauty/fragrance/discover-jadore-lor.html",
+    "origin_url": "https://www.dior.com/en_us/beauty/fragrance/discover-jadore-lor.html",
+    "license": "No reproduction or commercial dataset license established",
+    "rights_note": "Link and original metadata only. Brand/agency/platform rights remain reserved. Obtain file authorization before ingestion.",
+    "analysis_access": "metadata_only",
+    "media_authorized": false,
+    "authorization_evidence": "",
+    "verification_date": "2026-10-25",
+    "downloaded": false,
+    "local_path": null
+  },
+  "publication_date": null,
+  "publication_date_basis": "unknown",
+  "duration_seconds": null,
+  "duration_basis": "unknown; variants not resolved",
+  "platform": "web / campagne film",
+  "format": null,
+  "ad_type": "luxury_fragrance",
+  "concept": "Rihanna incarne une métamorphose royale dans les ors de Versailles.",
+  "hook": {
+    "type": "univers visuel et égérie",
+    "basis": "source_description",
+    "opening_seconds": null
+  },
+  "narrative": {
+    "summary": "Une palette dorée et une égérie portent une identité de parfum.",
+    "basis": "source_description",
+    "timed_structure": null
+  },
+  "commercial_message": "Associer J'adore à un rêve de féminité assumée.",
+  "editing_style": null,
+  "dialogue_present": null,
+  "voice": {},
+  "observations": [
+    {
+      "id": "ad_006_concept",
+      "domain": "marketing",
+      "value": "Une palette dorée et une égérie portent une identité de parfum.",
+      "basis": "source_description",
+      "confidence": 0.7,
+      "evidence": {
+        "url": "https://www.dior.com/en_us/beauty/fragrance/discover-jadore-lor.html",
+        "locator": "Campaign description / Overview / Information on linked page",
+        "start_s": null,
+        "end_s": null,
+        "media_sha256": null
+      },
+      "uncertainty": "Documentary interpretation; complete film, editing, acting and voice not inspected."
+    }
+  ],
+  "limitations": [
+    "No media downloaded or full-video analysis. Duration/format/dialogue are unknown unless sourced.",
+    "No sales, conversion or creative performance data validated.",
+    "Category is editorial; UGC/presenter group includes professionally scripted presenters, not verified customer UGC."
+  ]
+}
