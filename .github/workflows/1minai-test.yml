@@ -1,0 +1,54 @@
+name: "1min.ai - Test API"
+
+# Test manuel et isole : pas de GPU, aucun changement du code ou du pipeline video.
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: "Modele 1min.ai a tester"
+        type: choice
+        required: true
+        default: "1min/gpt-4o-mini"
+        options:
+          - "1min/gpt-4o-mini"
+          - "1min/qwen3-coder-flash"
+          - "1min/claude-4-6-sonnet"
+          - "1min/gpt-5.1-codex-mini"
+      prompt:
+        description: "Prompt de diagnostic (ne pas coller de secrets)"
+        type: string
+        required: true
+        default: "Reponds seulement : CONNEXION_OK"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installer LLM et le plugin 1min.ai
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install llm
+          llm install llm-1minai
+
+      - name: Tester la connexion et la generation
+        env:
+          ONEMIN_API_KEY: ${{ secrets.ONEMIN_API_KEY }}
+          TEST_MODEL: ${{ inputs.model }}
+          TEST_PROMPT: ${{ inputs.prompt }}
+        shell: bash
+        run: |
+          if [[ -z "$ONEMIN_API_KEY" ]]; then
+            echo "::error::Le secret ONEMIN_API_KEY est absent ou vide."
+            exit 1
+          fi
+          echo "Appel de 1min.ai avec $TEST_MODEL"
+          llm -m "$TEST_MODEL" --no-stream "$TEST_PROMPT"
