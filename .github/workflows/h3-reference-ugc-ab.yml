@@ -12,6 +12,7 @@ permissions:
 
 concurrency:
   group: h3-ugc-reference-AB-once
+  # No-GPU preflight before deliberate paired H3 production
   cancel-in-progress: false
 
 jobs:
