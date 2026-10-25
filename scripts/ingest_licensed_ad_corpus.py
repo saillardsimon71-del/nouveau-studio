@@ -133,7 +133,7 @@ def ingest(item: dict, checkpoint: Path | None) -> dict:
     except Exception:
         media.unlink(missing_ok=True)
         raise
-    recorded = import_analysis(result, item["id"], item["category"],
+    # Never let a music hallucination or tiny token sample become a Director pace rule.\n    voice = result["voice"]\n    if (voice.get("transcription_source") == "whisper_local_cpu" and\n        (int(voice.get("word_count") or 0) < 8 or\n         float(voice.get("speech_span_s") or 0) < 2.0)):\n        voice["words_per_minute_speech_span"] = None\n        voice["speech_present"] = None\n        voice["transcription_source"] = "whisper_local_cpu_insufficient_evidence"\n        voice.setdefault("limitations", []).append("Too few speech words for a defensible delivery-rate estimate.")\n        (DATA / "analysis" / item["id"] / "analysis.json").write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")\n    recorded = import_analysis(result, item["id"], item["category"],
                                item["brand"], item["title"], LIBRARY)
     path = LIBRARY / "catalog" / (item["id"] + ".json")
     data = recorded.model_dump()
