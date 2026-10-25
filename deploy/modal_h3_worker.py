@@ -268,6 +268,71 @@ def render_clip(payload: dict) -> dict:
     return {"video_base64": base64.b64encode(data).decode("ascii"), "metadata": metadata}
 
 
+
+@app.function(image=gpu_image, gpu="L40S", cpu=8, memory=65536, timeout=5400,
+              scaledown_window=2, max_containers=1, volumes={str(MOUNT): VOLUME})
+def render_batch(payloads: list[dict]) -> dict:
+    """Render 1–3 editorial shots in ONE warm ComfyUI process.
+
+    The baseline 20-step H3 graph is retained (no unverified quality sacrifice).
+    Reuses the mounted models and ComfyUI cache across shots. No MiniMax API.
+    Calls must NOT be retried automatically if a GPU job fails.
+    """
+    if not isinstance(payloads, list) or not 1 <= len(payloads) <= 3:
+        raise ValueError("H3 batch must contain 1–3 shots")
+    requests = [validate(p) for p in payloads]
+    for req in requests:
+        if not req["image_png_base64"]:
+            raise ValueError("MAISON production requires authentic first-frame photography")
+        if not 12 <= req["steps"] <= 25:
+            raise ValueError("H3 production steps must be 12..25")
+    started = time.monotonic()
+    process = start_comfy()
+    completed = []
+    for index, request in enumerate(requests, 1):
+        begun = time.monotonic()
+        reference = upload_png(base64.b64decode(request["image_png_base64"], validate=True))
+        prefix = f"pvs-maison-h3-{index}-" + uuid.uuid4().hex[:10]
+        submitted = http_json("/prompt", {
+            "prompt": build_graph(request, reference, prefix), "client_id": "pvs-h3-batch"
+        })
+        if "prompt_id" not in submitted:
+            raise RuntimeError("ComfyUI rejected MAISON H3 shot " + str(index)
+                               + ": " + repr(submitted)[:1200])
+        video = wait_video(str(submitted["prompt_id"]), prefix, process)
+        raw = video.read_bytes()
+        if not 20_000 < len(raw) < 25 * 1024 * 1024:
+            raise RuntimeError(f"Shot {index}: invalid or excessively large video")
+        result = subprocess.run([
+            "ffprobe", "-v", "error", "-show_entries",
+            "format=duration:stream=codec_type,width,height",
+            "-of", "json", str(video),
+        ], check=True, capture_output=True, text=True)
+        probe = json.loads(result.stdout)
+        streams = probe.get("streams", [])
+        if not any(s.get("codec_type") == "video" and s.get("width") == request["width"]
+                   and s.get("height") == request["height"] for s in streams):
+            raise RuntimeError(f"Shot {index}: missing expected H3 video stream")
+        if not any(s.get("codec_type") == "audio" for s in streams):
+            raise RuntimeError(f"Shot {index}: H3 native audio missing")
+        metadata = {
+            "engine": "minimax_h3", "gpu": "L40S", "batch_position": index,
+            "duration_sec": float(probe.get("format", {}).get("duration") or 0),
+            "width": request["width"], "height": request["height"],
+            "steps": request["steps"], "frames": request["frames"],
+            "generation_seconds": round(time.monotonic() - begun, 2),
+            "comfy_sha": COMFY_SHA,
+        }
+        completed.append({
+            "index": index,
+            "video_base64": base64.b64encode(raw).decode("ascii"),
+            "metadata": metadata,
+        })
+        print(f"H3 batch shot {index}/{len(requests)} done "
+              f"({metadata['generation_seconds']}s)", flush=True)
+    return {"shots": completed, "batch_wall_seconds": round(time.monotonic() - started, 2)}
+
+
 @app.local_entrypoint()
 def main(mode: str = "doctor", output: str = ""):
     fn = {"doctor": doctor, "prepare": prepare}.get(mode)
