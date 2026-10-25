@@ -113,6 +113,57 @@ class ModalEngine(Engine):
                 call.cancel(terminate_containers=True)
 
 
+class ModalH3Engine(ModalEngine):
+    """MiniMax H3 on our own Modal GPU, same request/artifact contract as LTX.
+
+    An unavailable deployment remains explicitly unavailable, so the existing
+    video resolver can fall back to LTX without pretending to have run H3.
+    """
+
+    def __init__(self):
+        super().__init__("video")
+        self.app_name = "pvs-minimax-h3"
+        self.function_name = "render_clip"
+        self.info = EngineInfo(
+            name="modal_h3", kind="video",
+            label="MiniMax H3 — Modal (poids locaux, sans API)",
+            capabilities=["text_to_video", "image_to_video", "audio_video_joint"],
+            requires_gpu=True, provider="modal", gpu="L40S",
+            verified=False,
+            notes="H3 FL2VA sur ComfyUI; 4 à 15 s, 24fps; contrôles visuels requis",
+        )
+
+    def payload(self, request):
+        if not 4 <= request.duration_s <= 15:
+            raise ValueError("MiniMax H3 accepte des plans de 4 à 15 secondes")
+        payload = super().payload(request)[0]
+        payload["steps"] = int(request.params.get("steps", 20))
+        if not 1 <= payload["steps"] <= 35:
+            raise ValueError("MiniMax H3 steps hors intervalle 1..35")
+        return (payload,)
+
+    def save_result(self, request, result):
+        # Do not claim an LTX render in filenames, usage, or engine metadata.
+        path = request.out("modal_h3.mp4")
+        path.write_bytes(base64.b64decode(result["video_base64"], validate=True))
+        info = media.probe(path)
+        if not info.width or info.duration_s <= 0:
+            raise ValueError("Modal H3 n'a pas retourné un MP4 lisible")
+        metadata = result.get("metadata", {})
+        request.out("modal_h3_metadata.json").write_text(
+            json.dumps(metadata, indent=2), encoding="utf-8")
+        seconds = float(metadata.get("generation_seconds", 0))
+        rate_per_second = 0.000542 + 8 * 0.0000131 + 64 * 0.00000222
+        output = EngineOutput(
+            usage=Usage(provider="modal", gpu="L40S", gpu_seconds=seconds,
+                        rate_usd_hr=rate_per_second * 3600,
+                        notes="H3 L40S + 8 CPU + 64GiB, hors modèles/stockage"),
+            diagnostics=metadata,
+        )
+        output.add(path, "video", "video/mp4", engine="modal_h3", simulated=False)
+        return output
+
+
 class FrenchEdgeVoice(Engine):
     info = EngineInfo(name="edge_tts_fr", kind="tts", label="Voix française Henri", provider="edge-tts", gpu="CPU", verified=True)
 
