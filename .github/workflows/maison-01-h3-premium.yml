@@ -1,6 +1,6 @@
 name: MAISON 01 | Premium Fashion Film (Pexels + own Modal H3)
 
-# Two isolated phases: preflight (no GPU), then exactly one intentional production launch.
+# Two isolated phases: preflight passed on run 40188243130; one intentional production launch.
 on:
   push:
     branches: [production/maison-01-h3-premium-20261025]
