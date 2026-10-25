@@ -48,3 +48,4 @@ jobs:
           path: artifacts/h3-fashion-smoke/
           if-no-files-found: warn
           retention-days: 30
+          compression-level: 0
