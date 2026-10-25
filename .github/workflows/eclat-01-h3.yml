@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: eclat-01-real-french-ad-once
-  # Preflight phase: real Pexels still checked; no GPU until explicit RUN commit
+  # Preflight run 40195355642 succeeded; launch one approved two-shot H3 production
   cancel-in-progress: false
 
 jobs:
