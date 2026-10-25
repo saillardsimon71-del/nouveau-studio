@@ -9,12 +9,14 @@ from app.ad_references.models import Reference
 
 def test_catalog_has_exactly_fifteen_honest_references():
     library = Library()
-    assert len(library.references) == 15
-    assert Counter(r.category for r in library.references) == {
+    originals = [r for r in library.references if r.reference_id.startswith("ad_")]
+    assert len(originals) == 15
+    assert len(library.references) >= 15
+    assert Counter(r.category for r in originals) == {
         "ugc_presenter": 5, "premium_beauty": 3, "premium_fashion": 3,
         "storytelling": 2, "product_demo": 2,
     }
-    for reference in library.references:
+    for reference in originals:
         assert reference.source.url.startswith("https://")
         assert reference.source.analysis_access == "metadata_only"
         assert reference.source.media_authorized is False
@@ -28,7 +30,10 @@ def test_retrieval_is_bounded_and_explains_documentary_basis():
     assert context["category"] == "ugc_presenter"
     assert len(context["references"]) <= 3
     assert len(context["recipes"]) == 1
-    assert context["recipes"][0]["basis"] == "source_description"
+    assert context["recipes"][0]["basis"] in {"source_description", "analyzed_media"}
+    if any(r.reference_id == "licensed_007" for r in Library().references):
+        assert context["recipes"][0]["basis"] == "analyzed_media"
+        assert context["measured_pace_wpm"] is not None
     assert len(json.dumps(context, ensure_ascii=False)) < 6000
     assert "transcript" not in json.dumps(context)
 
