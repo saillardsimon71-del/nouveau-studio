@@ -51,13 +51,13 @@ jobs:
           PY
   provision:
     needs: preflight
-    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.stage != 'preflight') || (github.event_name == 'push' && github.event.head_commit.message == 'H3_STAGE_MODELS_ON_MODAL_20261025') }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.stage != 'preflight') || (github.event_name == 'push' && (github.event.head_commit.message == 'H3_STAGE_MODELS_ON_MODAL_20261025' || github.event.head_commit.message == 'H3_DEPLOY_WORKER_ON_MODAL_20261025')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 110
     env:
       MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
       MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
-      PVS_STAGE: ${{ github.event_name == 'push' && 'prepare' || inputs.stage }}
+      PVS_STAGE: ${{ github.event_name == 'push' && (github.event.head_commit.message == 'H3_DEPLOY_WORKER_ON_MODAL_20261025' && 'deploy' || 'prepare') || inputs.stage }}
       PVS_CONFIRMED: ${{ github.event_name == 'push' && 'oui' || inputs.confirm_spend }}
     steps:
       - uses: actions/checkout@v4
