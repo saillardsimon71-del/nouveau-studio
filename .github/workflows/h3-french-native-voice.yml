@@ -1,6 +1,6 @@
 name: H3 | Native French voice + lips test (real Pexels portrait)
 
-# One-time triggers only. First perform stock portrait and prompt dry-run, no GPU.
+# One-time triggers only. Stock photo/preflight verified on run 40192632106; this commit launches ONE authorized render.
 on:
   push:
     branches: [test/h3-french-native-voice-20261025]
