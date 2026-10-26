@@ -21,6 +21,7 @@ export default function Studio({
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [musicGain, setMusicGain] = useState(-20);
+  const [musicDucking, setMusicDucking] = useState(false);
   const [subtitles, setSubtitles] = useState(true);
   const [transitionsOn, setTransitionsOn] = useState(true);
   const [retake, setRetake] = useState<{ shotId: string; start: number; end: number } | null>(null);
