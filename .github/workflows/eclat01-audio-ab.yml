@@ -30,9 +30,14 @@ jobs:
       - name: Install CPU audio/video tools (no inference models)
         run: |
           set -euo pipefail
-          command -v ffmpeg
-          command -v ffprobe
           python -m pip install --disable-pip-version-check -r backend/requirements.txt
+          python - <<'PY'
+          import imageio_ffmpeg
+          from pathlib import Path
+          ffmpeg=Path(imageio_ffmpeg.get_ffmpeg_exe())
+          assert ffmpeg.exists(), "Bundled CPU ffmpeg not installed"
+          print(f"Bundled ffmpeg: {ffmpeg}")
+          PY
       - name: Retrieve existing real French spoken ÉCLAT 01 scene (no GPU)
         uses: actions/download-artifact@v4
         with:
@@ -76,7 +81,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ECLAT01-AUDIO-AB-CPU-20261026-V3
+          name: ECLAT01-AUDIO-AB-CPU-20261026-V4
           path: |
             artifacts/audio-ab/ECLAT01-*.mp4
             artifacts/audio-ab/ECLAT01-*.m4a
