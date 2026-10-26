@@ -183,9 +183,10 @@ def sound_design(key, path):
     rng = random.Random(261026)
     events = ([(.18, "glass", .10), (1.1, "glass", .055), (4.5, "air", .055),
                (9.0, "glass", .065), (13.5, "air", .07)] if key == "eclat-02" else
-              [(0, "impact", .30), (1.5, "impact", .12), (3.8, "air", .16),
-               (4.0, "impact", .34), (6.0, "impact", .19), (7.8, "air", .14),
-               (8.0, "impact", .29), (11.8, "air", .18), (12.0, "impact", .32)])
+              [(0, "impact", .30), (1.5, "impact", .12), (2.8, "air", .16),
+               (3.0, "impact", .34), (5.0, "impact", .19), (6.8, "air", .10),
+               (7.0, "impact", .15), (7.8, "air", .14), (8.0, "impact", .29),
+               (11.8, "air", .18), (12.0, "impact", .32)])
     for start, kind, gain in events:
         duration = .48 if kind == "air" else .30
         low = 0.0
@@ -214,6 +215,45 @@ def sound_design(key, path):
         wav.writeframes(pcm.tobytes())
 
 
+def remove_glove_marks(src, dst):
+    import cv2
+    import numpy as np
+
+    cap = cv2.VideoCapture(str(src))
+    ok, frame = cap.read()
+    assert ok and frame.shape[:2] == (1344, 768)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    patches = [
+        {"x": 450, "y": 230, "w": 30, "h": 42, "offset": (15, 19), "axes": (6, 9)},
+        {"x": 330, "y": 580, "w": 52, "h": 44, "offset": (20, 18), "axes": (17, 9)},
+    ]
+    for p in patches:
+        p["template"] = gray[p["y"]:p["y"] + p["h"], p["x"]:p["x"] + p["w"]].copy()
+    encoder = subprocess.Popen([
+        "ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "rawvideo",
+        "-pix_fmt", "bgr24", "-s", "768x1344", "-r", "24", "-i", "pipe:0",
+        "-an", "-c:v", "libx264", "-preset", "medium", "-crf", "17", "-pix_fmt", "yuv420p", str(dst),
+    ], stdin=subprocess.PIPE)
+    while ok:
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        mask = np.zeros(gray.shape, dtype=np.uint8)
+        for p in patches:
+            x0, y0 = max(0, p["x"] - 12), max(0, p["y"] - 12)
+            x1, y1 = min(768, p["x"] + p["w"] + 12), min(1344, p["y"] + p["h"] + 12)
+            match = cv2.matchTemplate(gray[y0:y1, x0:x1], p["template"], cv2.TM_CCOEFF_NORMED)
+            _, score, _, loc = cv2.minMaxLoc(match)
+            assert score > .8, "Glove repair tracking lost; inspect before exporting"
+            p["x"], p["y"] = x0 + loc[0], y0 + loc[1]
+            p["template"] = gray[p["y"]:p["y"] + p["h"], p["x"]:p["x"] + p["w"]].copy()
+            center = (p["x"] + p["offset"][0], p["y"] + p["offset"][1])
+            cv2.ellipse(mask, center, p["axes"], 30, 0, 360, 255, -1)
+        encoder.stdin.write(cv2.inpaint(frame, mask, 3, cv2.INPAINT_TELEA).tobytes())
+        ok, frame = cap.read()
+    cap.release()
+    encoder.stdin.close()
+    assert encoder.wait() == 0
+
+
 def assemble(key):
     film = FILMS[key]
     folder = ROOT / key
@@ -225,19 +265,31 @@ def assemble(key):
         src = folder / "clips" / (shot["name"] + "-h3.mp4")
         info = probe(src)
         assert float(info["format"]["duration"]) >= film["trim"]
+        if key == "pulse-01" and shot["name"] == "resolve":
+            cleaned = prepared / "resolve-without-marks.mp4"
+            remove_glove_marks(src, cleaned)
+            src = cleaned
         grade = "eq=contrast=1.025:saturation=0.93:brightness=0.006,colorbalance=rs=0.012:bs=-0.012" if key == "eclat-02" else "eq=contrast=1.07:saturation=0.76,colorbalance=bs=0.025:rs=-0.012"
-        command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(src), "-t", str(film["trim"]),
-                 "-vf", "fps=24,scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1," + grade + ",format=yuv420p",
+        framing = "crop=480:854:288:40," if key == "eclat-02" and shot["name"] == "caresse" else ""
+        trim = 3.0 if key == "pulse-01" and shot["name"] == "focus" else film["trim"]
+        command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(src), "-t", str(trim),
+                 "-vf", framing + "fps=24,scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1," + grade + ",format=yuv420p",
                  "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "17", str(prepared / (shot["name"] + ".mp4"))])
     card = prepared / "endcard.png"
     endcard(key, card)
     command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-loop", "1", "-i", str(card), "-t", str(film["card"]),
              "-r", "24", "-vf", "format=yuv420p,setsar=1", "-an", "-c:v", "libx264", "-crf", "17", str(prepared / "endcard.mp4")])
     paths = [prepared / (s["name"] + ".mp4") for s in film["shots"]]
+    if key == "pulse-01":
+        detail = prepared / "fabric.mp4"
+        command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", "3", "-i", str(folder / "clips" / "focus-h3.mp4"), "-t", "1",
+                 "-vf", "crop=480:854:144:450,fps=24,scale=1080:1920:flags=lanczos,setsar=1," + grade + ",format=yuv420p",
+                 "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "17", str(detail)])
+        paths.insert(2, detail)
     if key == "eclat-02":
         command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(paths[0]), "-i", str(paths[1]), "-i", str(paths[2]),
-                 "-filter_complex", "[0:v][1:v]xfade=transition=fade:duration=0.25:offset=4.5[x];[x][2:v]xfade=transition=fade:duration=0.25:offset=9[v]",
-                 "-map", "[v]", "-an", "-c:v", "libx264", "-preset", "slow", "-crf", "17", str(prepared / "shots.mp4")])
+                 "-filter_complex", "[0:v][1:v]xfade=transition=fade:duration=0.25:offset=4.5[x];[x][2:v]xfade=transition=fade:duration=0.25:offset=9,format=yuv420p[v]",
+                 "-map", "[v]", "-an", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "slow", "-crf", "17", str(prepared / "shots.mp4")])
         paths = [prepared / "shots.mp4"]
     paths.append(prepared / "endcard.mp4")
     listing = prepared / "concat.txt"
@@ -253,13 +305,17 @@ def assemble(key):
              "-filter_complex", f"[1:a]atrim=0:{seconds},asetpts=PTS-STARTPTS,afade=t=in:d=0.12,afade=t=out:st={seconds-0.65}:d=0.65,volume=0.82[m];[m][2:a]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=9[a]",
              "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-b:a", "256k", "-ar", "48000", "-t", str(seconds), "-movflags", "+faststart", str(final)])
     web = exports / (key.upper() + "-WEB-720x1280.mp4")
-    command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(final), "-vf", "scale=720:1280:flags=lanczos", "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", str(web)])
+    command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(final), "-vf", "scale=720:1280:flags=lanczos", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "slow", "-crf", "24", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", str(web)])
     for p in [final, web]:
         info = probe(p)
         assert abs(float(info["format"]["duration"]) - seconds) < .15
         assert {s["codec_type"] for s in info["streams"]} >= {"audio", "video"}
+        video = next(s for s in info["streams"] if s["codec_type"] == "video")
+        assert video["pix_fmt"] == "yuv420p"
+        assert int(video["nb_frames"]) == round(seconds * FPS)
+        assert abs(float(video["duration"]) - seconds) < 1 / FPS
         command(["ffmpeg", "-v", "error", "-i", str(p), "-f", "null", "-"])
-    command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", "1", "-i", str(final), "-frames:v", "1", str(exports / (key.upper() + "-COVER.jpg"))])
+    command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-ss", "11" if key == "eclat-02" else "1", "-i", str(final), "-frames:v", "1", str(exports / (key.upper() + "-COVER.jpg"))])
     command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(final), "-vf", "fps=2,scale=180:320,tile=8x4", "-frames:v", "1", str(exports / (key.upper() + "-CONTACT.jpg"))])
     (exports / "CREDITS.txt").write_text("Independent fictional concept film. AI-animated real photographs.\n" +
         "\n".join(s["author"] + " - " + s["page"] for s in film["shots"]) +

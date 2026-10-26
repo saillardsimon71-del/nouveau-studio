@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: portfolio-eclat-pulse-production
@@ -32,7 +33,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg fonts-dejavu-core
-          python -m pip install --disable-pip-version-check "modal>=1.0,<2" "Pillow>=11,<13"
+          python -m pip install --disable-pip-version-check "modal>=1.0,<2" "Pillow>=11,<13" "opencv-python-headless==4.13.0.92"
       - name: CPU contract tests and real photographic source preflight
         run: |
           python -m unittest discover -s tests -p test_modal_h3_local.py -v
@@ -78,6 +79,49 @@ jobs:
           name: PULSE-01-H3-production
           path: |
             artifacts/portfolio-20261026/pulse-01/
+            artifacts/portfolio-20261026/sources.json
+            artifacts/portfolio-20261026/storyboard-real-sources.jpg
+          retention-days: 30
+          compression-level: 0
+
+  finalize:
+    if: ${{ github.event.head_commit.message == 'FINALIZE_PORTFOLIO_ECLAT_PULSE_20261026' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: CPU finishing tools only - no Modal credentials or GPU calls
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check "Pillow>=11,<13" "opencv-python-headless==4.13.0.92"
+      - uses: actions/download-artifact@v4
+        with:
+          name: ECLAT-02-H3-production
+          run-id: 40292105062
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: artifacts/portfolio-20261026
+      - uses: actions/download-artifact@v4
+        with:
+          name: PULSE-01-H3-production
+          run-id: 40292105062
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: artifacts/portfolio-20261026
+      - name: Finish both real films from the six paid clips without regeneration
+        run: |
+          python scripts/production/portfolio_eclat_pulse.py assemble --film eclat-02
+          python scripts/production/portfolio_eclat_pulse.py assemble --film pulse-01
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PORTFOLIO-ECLAT-02-PULSE-01-FINAL
+          path: |
+            artifacts/portfolio-20261026/eclat-02/exports/
+            artifacts/portfolio-20261026/pulse-01/exports/
+            artifacts/portfolio-20261026/eclat-02/render-report.json
+            artifacts/portfolio-20261026/pulse-01/render-report.json
             artifacts/portfolio-20261026/sources.json
             artifacts/portfolio-20261026/storyboard-real-sources.jpg
           retention-days: 30

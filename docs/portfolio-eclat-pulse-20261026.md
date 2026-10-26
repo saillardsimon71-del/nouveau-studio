@@ -14,8 +14,9 @@ Un seul visage, un seul packshot, aucune marque ajoutée dans les images.
 Musique : Reverie, Scott Buckley, piano et nappes.
 
 PULSE 01, 13,25 s : concentration en tenue technique, poussée sur haltères,
-retour au calme déterminé, signature sur fond charbon et accent citron.
-Trois plans animés du même shooting cottonbro, même athlète et salle.
+insert matière de 1 s, retour au calme déterminé, signature sur fond charbon
+et accent citron. Trois générations donnent quatre plans montés du même
+shooting cottonbro, avec la même athlète et la même salle.
 Coupes franches, lumière de fenêtre contrastée, ombres froides.
 Musique : Catalyst, Scott Buckley, pulsation synthétique et orchestre.
 
@@ -33,7 +34,8 @@ de l'utilisateur le 26 octobre 2026 ; elle n'est pas déclarée acquise.
 3. Deux lots de trois plans, sans redéploiement, sans relance automatique.
 4. Montage 1080x1920 et web 720x1280, H.264/AAC faststart.
 5. Inspection visuelle des MP4, contrôle des mains, peau, objets, mouvements,
-   raccords, durée et audio. Sound design final après inspection des sons natifs.
+   raccords, durée et audio. Musique instrumentale et bruitages originaux ;
+   la piste sonore H3 est écartée pour ne pas intégrer de voix imprévue.
 6. Livraison des fichiers et du rapport factuel dans une PR non fusionnée.
 
 Les vidéos de prospection ne sont pas utilisées. Aucun nouveau moteur,
