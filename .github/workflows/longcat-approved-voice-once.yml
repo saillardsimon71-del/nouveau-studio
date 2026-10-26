@@ -1,0 +1,130 @@
+name: "LongCat | one 3.68s approved-voice test (isolated Modal GPU)"
+
+on:
+  push:
+    branches: [test/longcat-approved-voice-20261026]
+    paths:
+      - ".github/workflows/longcat-approved-voice-once.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: approved-longcat-human-performance-20261026
+  cancel-in-progress: false
+
+jobs:
+  one_validated_voice_test:
+    if: ${{ github.event.head_commit.message == 'RUN_ONCE_LONGCAT_APPROVED_WAV_20261026' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      PVS_MODAL_AVATAR_APP: "pvs-longcat-voicefirst-test-20261026"
+      PYTHONUNBUFFERED: "1"
+      PVS_LLM_API_KEY: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install CPU-only preparatory dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install "modal>=1,<2" "Pillow>=11,<13"
+          python -m py_compile deploy/modal_avatar_worker.py backend/app/avatar.py scripts/production/recover_approved_voice_modal.py
+      - name: Authenticate existing Modal workspace and retrieve EXACT approved WAV by SHA-256 (NO GPU)
+        shell: bash
+        run: |
+          set -euo pipefail
+          modal token info >/dev/null 2>&1
+          modal run -m scripts.production.recover_approved_voice_modal --out artifacts/approved_voice_3s68.wav
+      - name: Build voice report from documented APPROVED SHA and real Pexels photo (NO GPU)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+          from PIL import Image, ImageOps
+          from io import BytesIO
+          import hashlib, json, wave
+          d=Path("artifacts"); d.mkdir(exist_ok=True)
+          wav=d/"approved_voice_3s68.wav"
+          actual=hashlib.sha256(wav.read_bytes()).hexdigest()
+          expected="7f0b0a1aa0d3184833eb7b93cad36330eeb2c4503bd57f8b942a79c18b236ec6"
+          if actual != expected: raise RuntimeError("Voice does not match Work-approved SHA")
+          with wave.open(str(wav), "rb") as w:
+              duration=w.getnframes()/w.getframerate()
+          text="Vous aussi, vous perdez du temps ? Bon. On va faire plus simple."
+          report={"source_sha256":actual,"expected_text":text,"transcript":text,
+                  "duration_s":duration,"accepted":True,"human_approved":True,
+                  "provenance":"prior Work user-approval, exact documented SHA-256; not a new listening assertion"}
+          (d/"approved_voice_report.json").write_text(json.dumps(report,indent=2),encoding="utf-8")
+          url="https://images.pexels.com/photos/7490973/pexels-photo-7490973.jpeg"
+          with urlopen(Request(url,headers={"User-Agent":"Mozilla/5.0"}),timeout=60) as r:
+              raw=r.read(25_000_001)
+          if not 50000<len(raw)<25000000: raise RuntimeError("Real reference photo missing")
+          im=ImageOps.exif_transpose(Image.open(BytesIO(raw))).convert("RGB")
+          if min(im.size)<700: raise RuntimeError("Photo insufficient resolution")
+          ImageOps.fit(im,(768,1344),method=Image.Resampling.LANCZOS,centering=(.5,.45)).save(d/"portrait_real.png")
+          print(f"PRE-GPU APPROVED 3.68s voice SHA={actual} and Pexels first-frame; no model substitution")
+          PY
+      - name: Verify existing LongCat weights and fixed backend packaging (REMOTE CPU ONLY)
+        shell: bash
+        run: |
+          set -euo pipefail
+          modal run -m deploy.modal_avatar_models --mode doctor --json-out artifacts/longcat_models.json
+          modal run -m deploy.modal_avatar_worker --mode doctor
+      - name: Exactly ONE LongCat Modal render with approved voice
+        shell: bash
+        run: |
+          set -euo pipefail
+          modal run -m deploy.modal_avatar_worker --mode render \
+            --image-png artifacts/portrait_real.png \
+            --audio-wav artifacts/approved_voice_3s68.wav \
+            --voice-report artifacts/approved_voice_report.json \
+            --receipt artifacts/longcat_test_attempt_20261026.json \
+            --num-segments 1 \
+            --out artifacts/longcat_approved_voice_3s68.mp4 \
+            --prompt "Photorealistic adult French female presenter using the supplied real portrait. One uninterrupted medium shot, face and mouth in sharp focus, subtle gaze and eyebrows, one natural reassuring reaction. Preserve exact face identity, adult proportions, natural eye contact. Audio is already provided and must not be invented. No second voice, no music, no on-screen text."
+      - name: Verify actual MP4, sound, duration and frame count
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s artifacts/longcat_approved_voice_3s68.mp4
+          ffprobe -v error -show_entries format=duration -show_entries stream=codec_type,width,height -of json artifacts/longcat_approved_voice_3s68.mp4 > artifacts/longcat_probe.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("artifacts/longcat_probe.json").read_text())
+          tracks=p["streams"]; d=float(p["format"]["duration"])
+          assert any(x.get("codec_type")=="audio" for x in tracks)
+          assert any(x.get("codec_type")=="video" and x.get("width")==720 and x.get("height")==1280 for x in tracks)
+          assert 3.55<d<3.85
+          print("REAL_LONGCAT_MP4_VERIFIED",d)
+          PY
+      - name: Upload MP4, metadata and receipt; source WAV kept private, not published
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LongCat-Human-Performance-One-Test-20261026
+          path: |
+            artifacts/longcat_approved_voice_3s68.mp4
+            artifacts/longcat_approved_voice_3s68.json
+            artifacts/longcat_models.json
+            artifacts/longcat_probe.json
+            artifacts/longcat_test_attempt_20261026.json
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Report honest outcome
+        if: always()
+        shell: bash
+        run: |
+          if test -s artifacts/longcat_approved_voice_3s68.mp4; then
+            echo "Actual LongCat MP4 generated, not yet quality-reviewed." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No MP4. If approved WAV was not recoverable, GPU was deliberately NOT called. No substitute voice used." >> "$GITHUB_STEP_SUMMARY"
+          fi
