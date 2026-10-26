@@ -127,6 +127,7 @@ class GenerateRequest(BaseModel):
 class ExportRequest(BaseModel):
     music_path: str | None = None
     music_gain_db: float = -20.0
+    music_ducking: bool = False  # opt-in; requires a music bed and voiced clip audio
     subtitles: bool = True
     transitions: bool = True
     loudness_target: float = -14.0

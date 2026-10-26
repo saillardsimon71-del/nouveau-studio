@@ -97,3 +97,45 @@ def test_splice_region_rebuilds_full_clip(tmp_path: Path):
     info = media.probe(out)
     assert abs(info.duration_s - 3.0) < 0.35
     assert info.has_audio
+
+
+def test_assembly_optional_ducking_keeps_audio_and_export(tmp_path: Path, clips: list[dict]):
+    """A voiced export may reduce music under dialogue without touching source clips."""
+    music = tmp_path / "music.wav"
+    media.run_ffmpeg([
+        "-f", "lavfi", "-i", "sine=frequency=550:sample_rate=48000:duration=3",
+        "-c:a", "pcm_s16le", str(music),
+    ])
+    request = EngineRequest(
+        kind="assembly",
+        output_dir=tmp_path / "ducked",
+        project={"name": "Pub", "format": "9:16"},
+        params={
+            "format": "9:16", "fps": 30, "subtitles": False,
+            "transitions": False, "music_path": str(music),
+            "music_gain_db": -12, "music_ducking": True,
+        },
+        inputs={"clips": clips},
+    )
+    output = AssemblyEngine().run(request, Ctx())
+    assert output.diagnostics["music_ducking"] is True
+    export = next(a for a in output.artifacts if a["kind"] == "export")
+    assert media.probe(export["path"]).has_audio
+    graph = (request.output_dir / "filtergraph.txt").read_text(encoding="utf-8")
+    assert "sidechaincompress=" in graph
+    assert "asplit=2[dialogue_bus][duck_key]" in graph
+
+
+def test_assembly_ducking_requested_without_music_keeps_existing_mix(tmp_path: Path, clips: list[dict]):
+    """No music means no compression, even when the option is enabled."""
+    request = EngineRequest(
+        kind="assembly", output_dir=tmp_path / "no_music",
+        project={"name": "Pub", "format": "9:16"},
+        params={"format": "9:16", "fps": 30, "subtitles": False,
+                "transitions": False, "music_ducking": True},
+        inputs={"clips": clips},
+    )
+    output = AssemblyEngine().run(request, Ctx())
+    assert output.diagnostics["music_ducking"] is False
+    graph = (request.output_dir / "filtergraph.txt").read_text(encoding="utf-8")
+    assert "sidechaincompress=" not in graph

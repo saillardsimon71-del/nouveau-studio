@@ -50,6 +50,7 @@ class AssemblyEngine(Engine):
         loudness_target = float(request.params.get("loudness_target") or -14.0)
         music_path = request.params.get("music_path") or request.project.get("music_path")
         music_gain = float(request.params.get("music_gain_db", -20.0))
+        music_ducking = bool(request.params.get("music_ducking", False))
         fade_s = float(request.params.get("transition_s") or 0.35)
         title_card = bool(request.params.get("title_card", False))
 
@@ -181,6 +182,7 @@ class AssemblyEngine(Engine):
         a_next = a_last
         music_input_index = len(segments)
         has_music = bool(music_path) and Path(str(music_path)).exists()
+        ducking_applied = False
         if has_music:
             inputs += ["-stream_loop", "-1", "-i", str(music_path)]
             filters.append(
@@ -188,9 +190,24 @@ class AssemblyEngine(Engine):
                 f"atrim=duration={total},volume={music_gain}dB,"
                 f"afade=t=in:st=0:d=1.2,afade=t=out:st={max(0.0, total - 1.5)}:d=1.5[music]"
             )
-            filters.append(
-                f"[{a_last}][music]amix=inputs=2:duration=first:dropout_transition=2:normalize=0[amixed]"
-            )
+            # Optional and conservative: use existing clip audio as a sidechain
+            # only when there is a real spoken-dialogue track. Original audio
+            # remains in the mix at full gain; only the music is compressed.
+            if music_ducking and any(s["has_audio"] and str(s["dialogue"]).strip() for s in segments):
+                filters.append(f"[{a_last}]asplit=2[dialogue_bus][duck_key]")
+                filters.append(
+                    "[music][duck_key]sidechaincompress="
+                    "threshold=0.035:ratio=4:attack=12:release=280:makeup=1[ducked_music]"
+                )
+                filters.append(
+                    "[dialogue_bus][ducked_music]"
+                    "amix=inputs=2:duration=first:dropout_transition=2:normalize=0[amixed]"
+                )
+                ducking_applied = True
+            else:
+                filters.append(
+                    f"[{a_last}][music]amix=inputs=2:duration=first:dropout_transition=2:normalize=0[amixed]"
+                )
             a_next = "amixed"
         filters.append(
             f"[{a_next}]loudnorm=I={loudness_target}:TP=-1.5:LRA=11,"
@@ -237,7 +254,8 @@ class AssemblyEngine(Engine):
         out = EngineOutput(
             usage=Usage(provider="local", gpu="CPU", gpu_seconds=0.0, notes="montage CPU"),
             notes=f"{len(segments)} plans, {total}s, {width}x{height}@{fps}",
-            diagnostics={"duration_s": total, "segments": len(segments), "music": bool(has_music)},
+            diagnostics={"duration_s": total, "segments": len(segments), "music": bool(has_music),
+                         "music_ducking": ducking_applied},
         )
         out.add(out_path, "export", "video/mp4", duration_s=total, size=f"{width}x{height}")
         if poster:

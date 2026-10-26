@@ -21,6 +21,7 @@ export default function Studio({
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [musicGain, setMusicGain] = useState(-20);
+  const [musicDucking, setMusicDucking] = useState(false);
   const [subtitles, setSubtitles] = useState(true);
   const [transitionsOn, setTransitionsOn] = useState(true);
   const [retake, setRetake] = useState<{ shotId: string; start: number; end: number } | null>(null);
@@ -120,6 +121,7 @@ export default function Studio({
         subtitles,
         transitions: transitionsOn,
         music_gain_db: musicGain,
+        music_ducking: musicDucking,
         format: project.format,
         fps: 30,
       });
@@ -368,6 +370,10 @@ export default function Studio({
               value={musicGain}
               onChange={(event) => setMusicGain(Number(event.target.value))}
             />
+          </label>
+          <label className="check">
+            <input type="checkbox" checked={musicDucking} onChange={(event) => setMusicDucking(event.target.checked)} />
+            Atténuer automatiquement la musique pendant les dialogues (si une musique est configurée)
           </label>
           <label className="check">
             <input type="checkbox" checked={subtitles} onChange={(event) => setSubtitles(event.target.checked)} />
