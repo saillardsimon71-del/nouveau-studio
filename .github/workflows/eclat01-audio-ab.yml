@@ -1,4 +1,4 @@
-name: ECLAT 01 audio A/B — CPU only (no GPU)
+name: ECLAT 01 audio A/B — original soundtrack cue at 42s (CPU)
 
 on:
   push:
@@ -76,12 +76,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ECLAT01-AUDIO-AB-CPU-20261026
+          name: ECLAT01-AUDIO-AB-CPU-20261026-V2
           path: |
             artifacts/audio-ab/ECLAT01-*.mp4
             artifacts/audio-ab/ECLAT01-*.m4a
             artifacts/audio-ab/comparison.json
             artifacts/audio-ab/README.txt
+            artifacts/audio-ab/score-excerpt-42s.wav
           retention-days: 30
           if-no-files-found: warn
           compression-level: 0
