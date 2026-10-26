@@ -1,0 +1,84 @@
+name: Portfolio | ECLAT 02 + PULSE 01 on existing Modal H3
+
+on:
+  push:
+    branches: [production/portfolio-eclat02-pulse01-20261026]
+    paths:
+      - .github/workflows/portfolio-eclat-pulse.yml
+      - scripts/production/portfolio_eclat_pulse.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portfolio-eclat-pulse-production
+  cancel-in-progress: false
+
+jobs:
+  production:
+    if: ${{ github.event.head_commit.message == 'CHECK_PORTFOLIO_ECLAT_PULSE_20261026' || github.event.head_commit.message == 'RUN_PORTFOLIO_ECLAT_PULSE_20261026' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      PYTHONUNBUFFERED: "1"
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install existing production dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check "modal>=1.0,<2" "Pillow>=11,<13"
+      - name: CPU contract tests and real photographic source preflight
+        run: |
+          python -m unittest discover -s tests -p test_modal_h3_local.py -v
+          python -m py_compile scripts/production/portfolio_eclat_pulse.py
+          python scripts/production/portfolio_eclat_pulse.py prepare
+      - name: Verify existing deployed function and all four weights (CPU)
+        run: |
+          python - <<'PY'
+          import modal, json
+          f = modal.Function.from_name("pvs-minimax-h3", "render_batch", environment_name="main").hydrate()
+          r = modal.Function.from_name("pvs-minimax-h3", "doctor", environment_name="main").remote()
+          print(json.dumps(r, indent=2))
+          assert r["ready"]
+          print("Existing render_batch ready:", f.object_id)
+          PY
+      - name: Generate ECLAT 02 - three real H3 shots, no retry
+        if: ${{ github.event.head_commit.message == 'RUN_PORTFOLIO_ECLAT_PULSE_20261026' }}
+        run: python scripts/production/portfolio_eclat_pulse.py render --film eclat-02
+      - name: Assemble ECLAT 02 master and web MP4
+        if: ${{ github.event.head_commit.message == 'RUN_PORTFOLIO_ECLAT_PULSE_20261026' }}
+        run: python scripts/production/portfolio_eclat_pulse.py assemble --film eclat-02
+      - name: Preserve ECLAT 02 before the next GPU batch
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECLAT-02-H3-production
+          path: |
+            artifacts/portfolio-20261026/eclat-02/
+            artifacts/portfolio-20261026/sources.json
+            artifacts/portfolio-20261026/storyboard-real-sources.jpg
+          retention-days: 30
+          compression-level: 0
+      - name: Generate PULSE 01 - three real H3 shots, no retry
+        if: ${{ github.event.head_commit.message == 'RUN_PORTFOLIO_ECLAT_PULSE_20261026' }}
+        run: python scripts/production/portfolio_eclat_pulse.py render --film pulse-01
+      - name: Assemble PULSE 01 master and web MP4
+        if: ${{ github.event.head_commit.message == 'RUN_PORTFOLIO_ECLAT_PULSE_20261026' }}
+        run: python scripts/production/portfolio_eclat_pulse.py assemble --film pulse-01
+      - name: Preserve PULSE 01 and source provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: PULSE-01-H3-production
+          path: |
+            artifacts/portfolio-20261026/pulse-01/
+            artifacts/portfolio-20261026/sources.json
+            artifacts/portfolio-20261026/storyboard-real-sources.jpg
+          retention-days: 30
+          compression-level: 0
