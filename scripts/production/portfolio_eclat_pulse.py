@@ -4,10 +4,14 @@ import base64
 import hashlib
 import io
 import json
+import math
 from pathlib import Path
+import random
 import subprocess
 import time
 import urllib.request
+import wave
+from array import array
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
@@ -173,6 +177,43 @@ def endcard(key, path):
     im.save(path)
 
 
+def sound_design(key, path):
+    rate = 48000
+    samples = [0.0] * round(FILMS[key]["duration"] * rate)
+    rng = random.Random(261026)
+    events = ([(.18, "glass", .10), (1.1, "glass", .055), (4.5, "air", .055),
+               (9.0, "glass", .065), (13.5, "air", .07)] if key == "eclat-02" else
+              [(0, "impact", .30), (1.5, "impact", .12), (3.8, "air", .16),
+               (4.0, "impact", .34), (6.0, "impact", .19), (7.8, "air", .14),
+               (8.0, "impact", .29), (11.8, "air", .18), (12.0, "impact", .32)])
+    for start, kind, gain in events:
+        duration = .48 if kind == "air" else .30
+        low = 0.0
+        for i in range(round(duration * rate)):
+            t = i / rate
+            j = round(start * rate) + i
+            if j >= len(samples):
+                break
+            noise = rng.uniform(-1, 1)
+            low = .82 * low + .18 * noise
+            if kind == "glass":
+                value = (math.sin(2 * math.pi * (1450 * t - 900 * t * t)) + .3 * math.sin(2 * math.pi * 2850 * t)) * math.exp(-t * 29) * min(t * 1000, 1)
+            elif kind == "impact":
+                value = (.8 * math.sin(2 * math.pi * (92 * t - 65 * t * t)) + .5 * low) * math.exp(-t * 19) * min(t * 1800, 1)
+            else:
+                value = (noise - low) * math.sin(math.pi * t / duration) ** 3 * .55
+            samples[j] += gain * value
+    pcm = array("h")
+    for value in samples:
+        level = round(max(-.99, min(.99, value)) * 32767)
+        pcm.extend([level, level])
+    with wave.open(str(path), "wb") as wav:
+        wav.setnchannels(2)
+        wav.setsampwidth(2)
+        wav.setframerate(rate)
+        wav.writeframes(pcm.tobytes())
+
+
 def assemble(key):
     film = FILMS[key]
     folder = ROOT / key
@@ -203,10 +244,13 @@ def assemble(key):
     listing.write_text("".join("file '" + p.resolve().as_posix() + "'\n" for p in paths), encoding="utf-8")
     command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0", "-i", str(listing), "-c", "copy", str(prepared / "picture.mp4")])
     seconds = film["duration"]
+    effects = prepared / "original-sound-design.wav"
+    sound_design(key, effects)
     final = exports / (key.upper() + "-MASTER-1080x1920.mp4")
     command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(prepared / "picture.mp4"),
              "-ss", str(film["music_start"]), "-i", str(folder / "music" / (film["music"] + ".mp3")),
-             "-filter_complex", f"[1:a]atrim=0:{seconds},asetpts=PTS-STARTPTS,afade=t=in:d=0.12,afade=t=out:st={seconds-0.65}:d=0.65,loudnorm=I=-16:TP=-1.5:LRA=9[a]",
+             "-i", str(effects),
+             "-filter_complex", f"[1:a]atrim=0:{seconds},asetpts=PTS-STARTPTS,afade=t=in:d=0.12,afade=t=out:st={seconds-0.65}:d=0.65,volume=0.82[m];[m][2:a]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=9[a]",
              "-map", "0:v", "-map", "[a]", "-c:v", "copy", "-c:a", "aac", "-b:a", "256k", "-ar", "48000", "-t", str(seconds), "-movflags", "+faststart", str(final)])
     web = exports / (key.upper() + "-WEB-720x1280.mp4")
     command(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(final), "-vf", "scale=720:1280:flags=lanczos", "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", str(web)])
@@ -221,12 +265,12 @@ def assemble(key):
         "\n".join(s["author"] + " - " + s["page"] for s in film["shots"]) +
         "\nPexels: https://www.pexels.com/license/\nMusic: '" + film["music"].title() +
         "' by Scott Buckley - CC BY 4.0 - www.scottbuckley.com.au\n" +
-        "https://www.scottbuckley.com.au/library/" + film["music"] + "/\nMusic edited, trimmed and normalized. Include this music credit wherever published.\n", encoding="utf-8")
+        "https://www.scottbuckley.com.au/library/" + film["music"] + "/\nMusic edited, trimmed and normalized. Include this music credit wherever published.\nOriginal synthetic sound design: SiteQuiVend, 2026. No voice recordings used.\n", encoding="utf-8")
     (exports / "delivery.json").write_text(json.dumps({"film": key, "duration": seconds,
         "source": "768x1344 H3, cropped and upscaled to 1080x1920", "fps": 24,
         "files": [{"name": p.name, "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()} for p in [final, web]],
         "qc": "Technical decode passed; visual and listening inspection still required.",
-        "audio": "Music only at this stage; native H3 audio intentionally excluded until speech inspection."}, indent=2))
+        "audio": "Instrumental score and original glass, air and impact sound design. Native H3 audio excluded; no voice recording used."}, indent=2))
     print("EXPORTED " + str(final), flush=True)
 
 
