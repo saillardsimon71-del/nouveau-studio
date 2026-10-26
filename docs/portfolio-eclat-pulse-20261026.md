@@ -40,3 +40,26 @@ de l'utilisateur le 26 octobre 2026 ; elle n'est pas déclarée acquise.
 
 Les vidéos de prospection ne sont pas utilisées. Aucun nouveau moteur,
 aucun agent, aucune voix, aucun merge ou changement de production.
+
+## Livraison du 26 octobre 2026
+
+Les quatre MP4 définitifs, leurs couvertures et crédits sont dans `data/exports/` :
+
+| Film | Master | Web | Durée |
+|---|---|---|---|
+| ÉCLAT 02 | `ECLAT-02-MASTER-1080x1920.mp4` | `ECLAT-02-WEB-720x1280.mp4` | 15,50 s |
+| PULSE 01 | `PULSE-01-MASTER-1080x1920.mp4` | `PULSE-01-WEB-720x1280.mp4` | 13,25 s |
+
+Décodage intégral des quatre fichiers sans erreur, 24 i/s, yuv420p, H.264/AAC
+stéréo et démarrage rapide contrôlés. Inspection visuelle par planches à 4 i/s
+des six plans puis à 2 i/s des montages, avec vérification détaillée des zones
+retouchées. Six générations, zéro régénération GPU. Environ 72 min de fonctions
+Modal en deux lots. Les corrections finales sont effectuées sur CPU.
+
+Le rapport `PORTFOLIO-20261026-QUALITE.md` décrit la méthode et ses limites.
+`PORTFOLIO-20261026-VERIFICATION.json` contient les mesures et SHA-256 ;
+`PORTFOLIO-20261026-SOURCES.json` contient les sources et paramètres.
+
+- Précontrôle : https://github.com/saillardsimon71-del/nouveau-studio/actions/runs/40291747686
+- Six plans H3 : https://github.com/saillardsimon71-del/nouveau-studio/actions/runs/40292105062
+- Finition définitive : https://github.com/saillardsimon71-del/nouveau-studio/actions/runs/40302562256

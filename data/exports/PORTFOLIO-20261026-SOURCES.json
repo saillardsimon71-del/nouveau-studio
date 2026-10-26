@@ -1,0 +1,194 @@
+{
+  "reference": "MAISON 01 - Actions 40188342628; 20 steps; res_multistep/simple; L40S; native 768x1344/24fps",
+  "photos": [
+    {
+      "film": "eclat-02",
+      "name": "essence",
+      "id": 6693978,
+      "author": "Tara Winstead",
+      "page": "https://www.pexels.com/photo/bottle-with-dropper-6693978/",
+      "crop": [
+        0.28,
+        0.28,
+        0.75,
+        0.85
+      ],
+      "seed": 26102601,
+      "prompt": "Prestige skincare commercial. Extreme macro of the authentic glass pipette and amber glass from this real photograph. The crop deliberately excludes the cap. A tiny glistening meniscus of clear serum moves slowly inside the transparent pipette; one small droplet catches a soft warm reflection. Controlled 2 cm lateral macro camera slide, exquisite specular highlights, shallow optical depth of field, warm ivory background, natural transparent liquid physics. Keep the exact glass geometry and original composition. One uninterrupted cinematic take, restrained and sensual. No new hands, no new bottle, no text, no labels, no logos. Silent human subjects; audio contains only a tiny liquid tick and soft room tone. No speech, no whisper, no vocals, no music.",
+      "download": "https://images.pexels.com/photos/6693978/pexels-photo-6693978.jpeg",
+      "original_dimensions": [
+        3959,
+        5938
+      ],
+      "crop_pixels": [
+        1109,
+        1663,
+        2969,
+        5047
+      ],
+      "source_sha256": "acab99aca9eafbef00d70a761541b4865084f2dcfbb68700115957c2b99a8ddb",
+      "firstframe_sha256": "01aabc7e5543e723da38f50c1d8bfa3c5aebd0aae8d51399d5f4e986c03d2457"
+    },
+    {
+      "film": "eclat-02",
+      "name": "caresse",
+      "id": 6417954,
+      "author": "Pavel Danilyuk",
+      "page": "https://www.pexels.com/photo/person-woman-hand-face-6417954/",
+      "crop": [
+        0,
+        0.03,
+        1,
+        1
+      ],
+      "seed": 26102602,
+      "prompt": "Luxury skincare beauty film from the authentic photograph. Preserve the exact adult woman's face, skin texture, fingers, transparent pipette and white clothing. A single tiny drop of serum touches her cheek beneath the eye, then her hand withdraws only two centimeters; her expression stays calm and relaxed, lips closed. An exceptionally slow cinematic camera push of a few centimeters. Soft diffused ivory window light, luminous natural skin, warm neutral color, shallow depth of field, elegant restrained beauty photography. No speaking or moving lips. No additional fingers, no warped pipette, no new product packaging, no text, no letters, no logo, no cut. Audio: extremely soft liquid touch and cloth rustle only, no voice, no whisper, no song or music.",
+      "download": "https://images.pexels.com/photos/6417954/pexels-photo-6417954.jpeg",
+      "original_dimensions": [
+        4351,
+        6526
+      ],
+      "crop_pixels": [
+        0,
+        196,
+        4351,
+        6526
+      ],
+      "source_sha256": "cc6bc350ff80eb5f5e1d949a140a003d4a78c0cd1a9768aedbf713a85d9fe656",
+      "firstframe_sha256": "05e238c8256e3d65d168ef5039de4d12c393aa6465674e08bde81332ce958949"
+    },
+    {
+      "film": "eclat-02",
+      "name": "packshot",
+      "id": 8101511,
+      "author": "Polina",
+      "page": "https://www.pexels.com/photo/close-up-photo-of-serum-bottles-8101511/",
+      "crop": [
+        0.59,
+        0.3,
+        1,
+        1
+      ],
+      "seed": 26102603,
+      "prompt": "Impeccable luxury skincare product packshot, the exact single amber glass serum bottle with white dropper cap and COMPLETELY BLANK white paper label from this authentic photograph. Bottle stays upright, sealed, rigid and absolutely stationary on the same ivory textured linen. A slow, very short lateral dolly produces delicate parallax and a soft golden highlight travels along the curved amber shoulder. Keep precisely the same blank label, white cap, bottle silhouette, cloth and light direction. Warm cream and champagne palette, refined optical detail, soft window light and long elegant shadows. Only this one bottle, no additions, no opening cap, no hands, no new props. No letters or generated text anywhere. Audio: near-silent airy room tone, no voice, no whisper, no music.",
+      "download": "https://images.pexels.com/photos/8101511/pexels-photo-8101511.jpeg",
+      "original_dimensions": [
+        3409,
+        4540
+      ],
+      "crop_pixels": [
+        2011,
+        1362,
+        3409,
+        4540
+      ],
+      "source_sha256": "e96e467f687caf8aeea5bde24b439f3cb7a7e1784788e3d485fa7b6eec107a49",
+      "firstframe_sha256": "430aa3e5b83168163ebbf2091769079e94c3db74812a63dc36c305bcc5d08188"
+    },
+    {
+      "film": "pulse-01",
+      "name": "focus",
+      "id": 4754140,
+      "author": "cottonbro studio",
+      "page": "https://www.pexels.com/photo/woman-in-black-sports-bra-and-black-shorts-4754140/",
+      "crop": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "seed": 26102611,
+      "prompt": "Premium activewear campaign. Keep the exact athletic adult female boxer, braided hair, graphite sports bra, black gloves and industrial boxing gym from this real photograph. She lifts her gaze with fierce focus and raises her gloved hands just slightly into a compact guard; a controlled athletic breath moves the ribbed performance fabric. Cinematic short lateral tracking camera, steel blue shadows, bright white rim light through the windows, dramatic contrast, fine realistic sweat and tactile technical fabric. Preserve identity, body anatomy and original garment seams. Short purposeful movement, no punch, no new people or equipment, no extra fingers or arms, no logos or text. Sound: close fabric rustle and glove leather creak, no vocal breath, no words, no dialogue, no singing and no music.",
+      "download": "https://images.pexels.com/photos/4754140/pexels-photo-4754140.jpeg",
+      "original_dimensions": [
+        4039,
+        2698
+      ],
+      "crop_pixels": [
+        0,
+        0,
+        4039,
+        2698
+      ],
+      "source_sha256": "93d0bbd2d4815f1bed4b9731145a66d56867e6ac78bff4a04c9b36fbce63f1e8",
+      "firstframe_sha256": "424dbc35622b60d2ca101367a77f81540b8cca4f8f26f3f8c3a0da5da3bbbb92"
+    },
+    {
+      "film": "pulse-01",
+      "name": "drive",
+      "id": 4753990,
+      "author": "cottonbro studio",
+      "page": "https://www.pexels.com/photo/woman-in-white-tank-top-and-black-shorts-sitting-on-brown-wooden-floor-4753990/",
+      "crop": [
+        0,
+        0.05,
+        1,
+        1
+      ],
+      "seed": 26102612,
+      "prompt": "A cinematic premium activewear campaign, same exact adult female athlete with two braids and graphite ribbed sports bra in this authentic industrial boxing gym photograph. Starting in the photographed low push-up position gripping the two stationary hexagonal dumbbells, she presses smoothly upward ONCE by a short distance with plausible shoulder and elbow mechanics, then holds. Her hands remain planted on the exact dumbbell handles, weights never slide. Camera is low and makes a small energetic forward tracking move, strong cool window rim light, rich dark shadows, crisp fabric texture and natural sweat. Preserve her face, outfit, braids, gym and body proportions. No extra limbs, no fast repetitions, no camera spin, no added objects, no brand or lettering. Audio: weight contact, subtle floor impact, fabric stretch only; no human voice, no words, no grunts, no singing, no music.",
+      "download": "https://images.pexels.com/photos/4753990/pexels-photo-4753990.jpeg",
+      "original_dimensions": [
+        2573,
+        3852
+      ],
+      "crop_pixels": [
+        0,
+        193,
+        2573,
+        3852
+      ],
+      "source_sha256": "e7ab702d38f2f6bcd175440ab71983af901290e24e1f37b9dc425c43ccfa4a25",
+      "firstframe_sha256": "64d0bb620b660884beeeb929fa200f3b4241aeb657a665c56cdba280b8433926"
+    },
+    {
+      "film": "pulse-01",
+      "name": "resolve",
+      "id": 4753988,
+      "author": "cottonbro studio",
+      "page": "https://www.pexels.com/photo/woman-in-black-sports-bra-and-black-shorts-doing-exercise-4753988/",
+      "crop": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "seed": 26102613,
+      "prompt": "Cinematic sportswear campaign finale from the authentic photo. Preserve this exact adult female athlete, two tight braids, graphite sports bra and shorts, black boxing gloves and same industrial gym. Seated at the edge of the ring, she slowly lifts her head and locks a determined forward gaze, gently lowering the glove from her forehead toward her chin in one small controlled movement. Subtle real fabric movement and sweat highlights, powerful composed silhouette. A short low lateral dolly reveals window light, cool charcoal shadows, tactile ribbed activewear, silver-blue rim, premium cinematic contrast. Keep exact body, face, hands, gloves and original gym. No new limbs or people, no smile, no text, no visible brand, no speech. Audio: glove leather, restrained sports fabric and room tone; no voice, no singing, no words and no music.",
+      "download": "https://images.pexels.com/photos/4753988/pexels-photo-4753988.jpeg",
+      "original_dimensions": [
+        2832,
+        4240
+      ],
+      "crop_pixels": [
+        0,
+        0,
+        2832,
+        4240
+      ],
+      "source_sha256": "b56b5f62bda128d4263237aabfa4a2e3f09970bd08e1c8da58c0838d5c8f0963",
+      "firstframe_sha256": "99659bafb6375d48cc2de54e9c6d7361996fc3a6724291cc80740cf34040cfe1"
+    }
+  ],
+  "photo_license": "https://www.pexels.com/license/",
+  "music": [
+    {
+      "film": "eclat-02",
+      "title": "Reverie",
+      "author": "Scott Buckley",
+      "page": "https://www.scottbuckley.com.au/library/reverie/",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "film": "pulse-01",
+      "title": "Catalyst",
+      "author": "Scott Buckley",
+      "page": "https://www.scottbuckley.com.au/library/catalyst/",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  ],
+  "rights_review": "Not certified; user explicitly excluded licensing review on 2026-10-26.",
+  "sources": "Authentic photographs only; crop and resize, no AI still generation."
+}

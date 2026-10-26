@@ -1,0 +1,74 @@
+[
+  {
+    "file": "ECLAT-02-MASTER-1080x1920.mp4",
+    "bytes": 9551280,
+    "sha256": "1b1d56d49112074967838cd088e49e4d001e4961732089f320382a9dabfe251a",
+    "duration": 15.5,
+    "dimensions": [
+      1080,
+      1920
+    ],
+    "frames": 372,
+    "fps": 24,
+    "video": "H.264 yuv420p",
+    "audio": "AAC stereo 48kHz",
+    "integrated_lufs": -15.9,
+    "true_peak_dbfs": -3.4,
+    "full_decode": "pass",
+    "faststart": true
+  },
+  {
+    "file": "ECLAT-02-WEB-720x1280.mp4",
+    "bytes": 1736147,
+    "sha256": "a769c0594f20cba224f62cac1a25657595c9889064f5be5af285d1f5b4e01c26",
+    "duration": 15.5,
+    "dimensions": [
+      720,
+      1280
+    ],
+    "frames": 372,
+    "fps": 24,
+    "video": "H.264 yuv420p",
+    "audio": "AAC stereo 48kHz",
+    "integrated_lufs": -15.9,
+    "true_peak_dbfs": -3.4,
+    "full_decode": "pass",
+    "faststart": true
+  },
+  {
+    "file": "PULSE-01-MASTER-1080x1920.mp4",
+    "bytes": 8250747,
+    "sha256": "dbf5cf0eb9ac5a917f383c3bce2643a632bfac162fd05b9464e48b7b086354a9",
+    "duration": 13.25,
+    "dimensions": [
+      1080,
+      1920
+    ],
+    "frames": 318,
+    "fps": 24,
+    "video": "H.264 yuv420p",
+    "audio": "AAC stereo 48kHz",
+    "integrated_lufs": -16.5,
+    "true_peak_dbfs": -2.6,
+    "full_decode": "pass",
+    "faststart": true
+  },
+  {
+    "file": "PULSE-01-WEB-720x1280.mp4",
+    "bytes": 1497561,
+    "sha256": "ce94c0acf68dd2c330c8f6c3c5555e3458d5f77c37c2d41d2925e2a40735c52f",
+    "duration": 13.25,
+    "dimensions": [
+      720,
+      1280
+    ],
+    "frames": 318,
+    "fps": 24,
+    "video": "H.264 yuv420p",
+    "audio": "AAC stereo 48kHz",
+    "integrated_lufs": -16.6,
+    "true_peak_dbfs": -2.5,
+    "full_decode": "pass",
+    "faststart": true
+  }
+]
