@@ -27,7 +27,7 @@ MUSIC_PAGE = "https://www.scottbuckley.com.au/library/ascension/"
 DIALOGUE = "Et si le luxe commençait par prendre soin de soi ?"
 # New/old mixes use the same deliberately audible music level. This is an
 # A/B for comparative audition, not a proposed final mastering recommendation.
-MUSIC_GAIN_DB = -14.0
+MUSIC_GAIN_DB = -9.0
 
 
 class Context:
@@ -62,7 +62,7 @@ def find_speaking_clip() -> Path:
 
 def licensed_music() -> Path:
     OUT.mkdir(parents=True, exist_ok=True)
-    destination = OUT / "score.mp3"
+    destination = OUT / "score-full.mp3"
     req = urllib.request.Request(MUSIC_URL, headers={"User-Agent": "Mozilla/5.0 SiteQuiVend-AudioAB/1.0"})
     with urllib.request.urlopen(req, timeout=90) as response:
         blob = response.read(25_000_001)
@@ -71,7 +71,17 @@ def licensed_music() -> Path:
     destination.write_bytes(blob)
     if not media.probe(destination).has_audio:
         raise RuntimeError("The licensed score has no audio")
-    return destination
+    excerpt = OUT / "score-excerpt-42s.wav"
+    # Match the real ÉCLAT 01 ad, which starts this cue at 42 seconds.
+    # A/B score gain is deliberately more audible than the approved master,
+    # solely to stress-test whether ducking avoids masking the narration.
+    media.run_ffmpeg([
+        "-ss", "42", "-i", str(destination), "-t", "6.0",
+        "-vn", "-ar", "48000", "-ac", "2", "-c:a", "pcm_s16le", str(excerpt)
+    ])
+    if media.probe(excerpt).duration_s < 5:
+        raise RuntimeError("Expected 6-second scored excerpt not found")
+    return excerpt
 
 
 def render_variant(clip: Path, score: Path, label: str, ducking: bool, duration: float) -> dict:
@@ -141,12 +151,14 @@ def main() -> None:
             "original_script": "scripts/production/eclat_01_h3.py",
             "score": "'Ascension' by Scott Buckley, CC BY 4.0",
             "score_page": MUSIC_PAGE, "score_sha256": sha256(score),
+            "score_excerpt_start_s": 42.0,
         },
         "controls": {
             "unchanged_between_variants": ["source video", "source audio", "score", "score gain",
                                             "resolution", "fps", "duration", "LUFS target"],
             "difference": "music_ducking False / True",
             "score_gain_db": MUSIC_GAIN_DB,
+            "purpose": "Stress-test mix; NOT an approved target for customer mastering",
             "dialogue_text_expected_from_prompt": DIALOGUE,
             "limitation": "Speech quality and perceptual clarity require HUMAN listening; metrics cannot prove improvement.",
         },
@@ -161,7 +173,8 @@ def main() -> None:
     (OUT / "README.txt").write_text(
         "ÉCLAT / 01 — comparatif audio A/B, vraie scène vidéo avec voix native française.\n"
         "A = musique à niveau fixe ; B = musique atténuée par la voix (sidechain).\n"
-        "Même voix, même scène, même musique CC BY 4.0, même cible -14 LUFS.\n"
+        "Même voix, même scène, même musique (extrait à 42s), même cible -14 LUFS.\n"
+        "Test volontairement plus musical que le master final : ne pas publier tel quel.\n"
         "Comparer surtout l'intelligibilité de la phrase parlée, l'ambiance et les artefacts de pompage.\n"
         "ATTENTION: le passage QC signifie absence de défaut technique, pas meilleure qualité audible.\n"
         "L'audio natif H3 peut avoir des défauts de diction non résolus par le mixage.\n"
