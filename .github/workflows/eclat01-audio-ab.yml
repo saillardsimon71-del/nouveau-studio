@@ -1,0 +1,87 @@
+name: ECLAT 01 audio A/B — CPU only (no GPU)
+
+on:
+  push:
+    branches:
+      - feat/openmontage-audio-ducking-20261026
+    paths:
+      - .github/workflows/eclat01-audio-ab.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audio-ab:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'RUN_AUDIO_AB_ECLAT_20261026' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      PYTHONUNBUFFERED: "1"
+      PVS_MODAL_ENABLED: "0"
+      PVS_LLM_API_KEY: ""
+      CUDA_VISIBLE_DEVICES: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install CPU audio/video tools (no inference models)
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install --disable-pip-version-check -r backend/requirements.txt
+      - name: Retrieve existing real French spoken ÉCLAT 01 scene (no GPU)
+        uses: actions/download-artifact@v4
+        with:
+          name: ECLAT-01-FRENCH-COMMERCIAL-H3
+          run-id: 40195429662
+          github-token: ${{ github.token }}
+          path: inputs/eclat
+      - name: Verify archived audio/video without changing source
+        run: |
+          set -euo pipefail
+          find inputs/eclat -type f -printf '%p (%s bytes)\n' | head -50
+          test "$(find inputs/eclat -type f -name beauty-spokesperson.mp4 | wc -l)" -eq 1
+      - name: Render identical A and B sources through real assembly engine
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/production/eclat01_music_ducking_ab.py
+          python scripts/production/eclat01_music_ducking_ab.py
+      - name: Summarize QC and differences
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("artifacts/audio-ab/comparison.json").read_text())
+          summary=[
+            "# ÉCLAT 01 — real-speaking-clip audio A/B",
+            "",
+            "- GPU and paid calls: 0",
+            "- Source: archived H3 ÉCLAT 01 French speaking scene",
+            "- Only change: music ducking on/off",
+          ]
+          for name in ("A","B"):
+            p=report[name]
+            summary += [f"- {name}: {p['video']}, QC={p['qc']['verdict']}, "
+                        f"loudness={p['loudness'].get('integrated_lufs', 'n/a')} LUFS, "
+                        f"applied={p['ducking_applied']}"]
+          summary.append("- Human A/B listening still required before enabling by default.")
+          Path(__import__("os").environ["GITHUB_STEP_SUMMARY"]).write_text("\n".join(summary))
+          print("\n".join(summary))
+          PY
+      - name: Publish A/B videos, listenable audio and QC reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECLAT01-AUDIO-AB-CPU-20261026
+          path: |
+            artifacts/audio-ab/ECLAT01-*.mp4
+            artifacts/audio-ab/ECLAT01-*.m4a
+            artifacts/audio-ab/comparison.json
+            artifacts/audio-ab/README.txt
+          retention-days: 30
+          if-no-files-found: warn
+          compression-level: 0
