@@ -347,6 +347,7 @@ def _run_assembly(job: dict[str, Any], params: dict[str, Any], project: dict[str
         "loudness_target": float(params.get("loudness_target") or -14.0),
         "music_path": params.get("music_path") or project.get("music_path"),
         "music_gain_db": float(params.get("music_gain_db", -20.0)),
+        "music_ducking": bool(params.get("music_ducking", False)),
         "title_card": bool(params.get("title_card", False)),
     }
     engine = AssemblyEngine()
