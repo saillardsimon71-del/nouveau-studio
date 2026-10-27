@@ -93,6 +93,9 @@ avec de l'IA. Un exemple est versionné :
 - [`docs/STATE.md`](docs/STATE.md) — ce qui marche, ce qui est testé, ce qui reste
   non vérifié, limites observées, coûts.
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — prochains gains, ordonnés par impact réel.
+- [`docs/PORTFOLIO_MORPH.md`](docs/PORTFOLIO_MORPH.md) — deux films portfolio
+  premium avec transitions morph (Food & Luxe 27,6 s, Automotive 26,7 s),
+  moteur CPU `scripts/portfolio/`, passage LTX-2.5 prêt sur Modal.
 
 ## Structure
 
