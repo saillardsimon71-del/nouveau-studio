@@ -1,7 +1,7 @@
 # Arena AI — Photorealistic English talking-head video (2026-10-27)
 
 ## Mission
-Produce one **real generated MP4**, depicting the person shown in the creator-provided reference portrait looking into camera and speaking **exactly the supplied English audio**. The person states that this is their own portrait; the creator supplied the voice sample. Target is a believable self-recorded talking-head video, with no obvious animation, identity drift, uncanny facial movement or mouth/voice mismatch.
+Produce one **real generated MP4**, depicting the person shown in the creator-provided reference portrait looking into camera and speaking a new 45–60 second English professional introduction. The creator states that this is their own portrait and supplied voice sample. `voice.mp3` is a **voice-reference sample only**, not dialogue and not the final soundtrack. First synthesize a 5–8 second sample of the new script using the reference voice, and require human listening/comparison before any video GPU render. Only proceed to the full narration and avatar after that approval. Target is a believable self-recorded talking-head video, with no obvious animation, identity drift, uncanny facial movement or mouth/voice mismatch.
 
 **Do not modify the production engine, deploy infrastructure, or unrelated code merely to improve this one asset.** Audit the current engine and use an already working, proven route. Do not claim successful rendering without a downloadable playable MP4 and a verified QC report.
 
@@ -11,10 +11,10 @@ Produce one **real generated MP4**, depicting the person shown in the creator-pr
 - Both media files are **already available** in this branch under `content/productions/english-talking-head-20261027/assets/`. Their Git blob hashes have been checked against the original uploaded files. **Use them directly; do not substitute reference media.**
 - **Privacy notice:** this repository is public. The creator explicitly asked for these two media files to be placed here after being informed of public visibility. Do not expose additional personal assets or generated results without permission.
 
-## Exact spoken copy
-> Not louder. Not faster. Just better. Crafted for the ones who notice the difference between good and unforgettable. This is for you.
+## New spoken copy and voice
+Write a new, natural first-person English professional introduction of 45–60 seconds (roughly 95–125 words). Do not claim personal credentials, clients, results, or biographical facts that the creator has not supplied. The workflow's current draft script is in `.github/workflows/modal-avatar.yml`; revise it only to improve natural spoken delivery or fit the measured duration.
 
-Use the exact supplied voice track as the final audio. **No TTS, re-recording, cloning or voice replacement.** Non-destructive technical resampling is allowed for model ingestion, then remux original audio for delivery if sync is retained.
+Use the original MP3 **only as a voice-cloning reference**. Reuse the repository's Chatterbox Multilingual V3 voice engine in English, and produce an initial 5–8 second sample of the new dialogue. A person must listen to the generated sample and compare it directly with the original reference before approving any avatar-video GPU run. Do not claim voice fidelity from model choice, logs, or automated measurements. After approval, generate the full 45–60 second speech with the same model/reference; use that generated WAV as LongCat conditioning and remux that exact synthesized track into the final video. No TTS-provider substitution or unapproved voice claims.
 
 ## Performance & image direction
 - Front-facing natural camera presentation, direct eye contact, calm confident manner, restrained friendly expression, **minimal natural head movement**, blinks, subtle breathing.
@@ -24,15 +24,15 @@ Use the exact supplied voice track as the final audio. **No TTS, re-recording, c
 - Deliver 1:1 master matching the square source when that best preserves quality. A 9:16 crop is optional only if anatomy and composition remain natural; no stretching. Prefer natural talking-head realism over aesthetic overproduction.
 
 ## Execution procedure for Arena AI
-1. Inspect the latest repository branches and **actual tested** speaking-avatar solutions (LongCat + any newer approved-audio or image-to-video route). The published LongCat pilot is only proven for **3.72 s segments**; a 11.729 s result is **not** yet proven.
-2. Ensure reference media have been received privately and check hashes, dimensions, exact duration. If they are unexpectedly absent, mark `BLOCKED_MISSING_MEDIA` and stop; do not render a stand-in.
-3. Check whether one continuous 11.729 s voice-driven generation is **really** supported. If not, split at real phonetic pauses, retain the original full audio timeline, render overlapping short segments and join without visual jumps or audio discontinuities. Avoid new infrastructure unless strictly necessary.
-4. Render one **cheap 2-3 s lip-sync pilot** on a representative, lip-intensive phrase, listen and inspect face/mouth at normal speed. If unsuitable, stop GPU spending and report defect; avoid endless model tweaking.
-5. Upon pilot acceptance, render the complete 11.729 s clip, preserving identity/pose/voice, and produce a single standard H.264/AAC MP4.
-6. Deliver playable MP4 in an accessible **private** artifact location; provide source ref + exact generation run id + measured cost + automated QC (duration, fps, codec, sound, black/frozen frames) and explicit human QC for identity, lip-sync, temporal artifacts.
-7. If quality is below realistic self-shot footage, report precisely what failed. Do not claim indistinguishable realism from automated tests alone.
+1. Use the existing GitHub Actions → Modal path and audit its tested LongCat route. The 3.72 s pilot is the only documented avatar duration; longer segmented output remains experimental and requires review.
+2. Verify original asset hashes before use. Use `voice.mp3` as the reference sample only; create the new spoken script in English.
+3. Run the `voice_sample` workflow stage to synthesize a representative 5–8 second excerpt via Chatterbox Multilingual V3 in English. Upload the sample artifact and stop.
+4. A human must listen to that sample alongside the supplied voice reference and make an explicit approval decision. If similarity/naturalness is unsuitable, do not run video GPU. Do not infer voice fidelity from automated tests.
+5. Only after approval and explicit GPU-spend authorization, synthesize the complete script from the same voice reference, verify it is 45–60 seconds, then call LongCat with the original portrait and generated WAV. For long audio use the documented segment continuation flags; inspect for continuity defects.
+6. Remux the exact synthesized WAV used for conditioning, then produce one H.264/AAC MP4. Deliver it with synthesis/video run identifiers, measured cost, automated QC, and human review of voice likeness, identity, lip-sync, and temporal artifacts.
+7. If the result is not convincing, report precisely what failed. Do not claim realistic identity, lip-sync, or voice likeness from automated checks alone.
 
 ## Rules
 - Create only production-specific files and logs in this dedicated branch. Leave `main` and existing production workflows untouched.
 - No public publishing or outreach. No unnecessary API calls, GPU preparation, or irreversible actions.
-- Do not alter dialogue or replace the supplied reference with a synthetic lookalike.
+- The original MP3 is a voice sample, not dialogue. Do not use a synthetic lookalike portrait or expose generated media outside the private workflow artifacts.

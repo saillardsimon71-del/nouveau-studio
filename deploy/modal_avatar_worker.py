@@ -59,20 +59,29 @@ render_image = (
     },
 )
 def render_avatar(image_b64: str, audio_b64: str, prompt: str) -> dict:
-    """One real 93-frame (~3.72s) French talking avatar, then vertical MP4."""
+    """Generate a LongCat talking avatar; longer speech uses continuation segments."""
     if not inspection()["ready"]:
         raise RuntimeError("LongCat models absent/incomplete: run --mode prepare first")
     started = time.perf_counter()
     with tempfile.TemporaryDirectory(prefix="pvs-avatar-") as temp:
         folder = Path(temp)
         img_path = folder / "reference.png"
-        audio_path = folder / "french_voice.wav"
+        audio_path = folder / "synthesized_english_voice.wav"
         img_path.write_bytes(base64.b64decode(image_b64, validate=True))
         audio_path.write_bytes(base64.b64decode(audio_b64, validate=True))
         if not img_path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
             raise ValueError("Expected PNG reference")
         if not audio_path.read_bytes().startswith(b"RIFF"):
             raise ValueError("Expected PCM WAV speech")
+        # The upstream pilot is 93 frames (~3.72 s). Enable its documented
+        # continuation mode for longer speech rather than silently truncating it.
+        audio_duration = float(subprocess.check_output(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)], text=True
+        ).strip())
+        segments = max(1, int((audio_duration + 3.71) // 3.72))
+        if audio_duration < 4.0 or audio_duration > 65.0:
+            raise ValueError(f"Expected 4-65 seconds of final speech, got {audio_duration:.2f}s")
         payload = {
             "prompt": prompt,
             "cond_image": str(img_path),
@@ -94,7 +103,10 @@ def render_avatar(image_b64: str, audio_b64: str, prompt: str) -> dict:
             "--resolution=480p",
             "--use_distill", "--use_int8",
         ]
-        print("Running official LongCat Avatar v1.5, INT8, 480p, 1 segment ...", flush=True)
+        if segments > 1:
+            cmd += ["--num_segments", str(segments), "--ref_img_index", "10",
+                    "--mask_frame_range", "3"]
+        print(f"Running official LongCat Avatar v1.5, INT8, 480p, {segments} segment(s) ...", flush=True)
         samples_path = folder / "gpu.csv"
         with samples_path.open("w") as samples:
             monitor = subprocess.Popen(
@@ -116,16 +128,16 @@ def render_avatar(image_b64: str, audio_b64: str, prompt: str) -> dict:
         if not candidates:
             raise RuntimeError("LongCat finished but output MP4 missing")
         raw = candidates[-1]
-        final = folder / "avatar_vertical.mp4"
-        # Upstream uses aspect-ratio buckets; crop centrally to true 9:16
-        # without stretching faces. Preserve speech and verify video/audio streams.
+        final = folder / "english_talking_head.mp4"
+        # Keep the source's natural frame (usually square); do not force a
+        # vertical crop. Replace model audio with the exact synthesized WAV used
+        # as LongCat conditioning, so no generated/altered speech is delivered.
         subprocess.run(
-            ["ffmpeg", "-y", "-v", "error", "-i", str(raw),
-             "-map", "0:v:0", "-map", "0:a:0",
-             "-vf", "crop=ih*9/16:ih,scale=720:1280",
+            ["ffmpeg", "-y", "-v", "error", "-i", str(raw), "-i", str(audio_path),
+             "-map", "0:v:0", "-map", "1:a:0", "-vf", "scale=720:-2",
              "-c:v", "libx264", "-crf", "19", "-preset", "fast",
-             "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart",
-             str(final)], check=True, timeout=240,
+             "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart",
+             str(final)], check=True, timeout=300,
         )
         meta = subprocess.check_output(
             ["ffprobe", "-v", "error", "-show_entries",
@@ -136,7 +148,7 @@ def render_avatar(image_b64: str, audio_b64: str, prompt: str) -> dict:
         detail = json.loads(meta)
         tracks = {s["codec_type"] for s in detail.get("streams", [])}
         if not {"video", "audio"}.issubset(tracks):
-            raise RuntimeError("LongCat MP4 missing video or French audio track")
+            raise RuntimeError("LongCat MP4 missing video or synthesized audio track")
         wall = round(time.perf_counter() - started, 2)
         samples = [tuple(float(v.strip()) for v in line.split(",")) for line in samples_path.read_text().splitlines()]
         import resource
@@ -147,6 +159,9 @@ def render_avatar(image_b64: str, audio_b64: str, prompt: str) -> dict:
                 "engine": "longcat-video-avatar-1.5",
                 "gpu": GPU_NAME,
                 "gpu_wall_seconds": wall,
+                "audio_duration_seconds": round(audio_duration, 3),
+                "continuation_segments": segments,
+                "voice_track": "synthesized WAV supplied to LongCat, remuxed as AAC",
                 "gpu_peak_memory_mib": max((s[0] for s in samples), default=0),
                 "gpu_mean_utilization_percent": round(sum(s[1] for s in samples) / max(1, len(samples)), 2),
                 "child_peak_ram_kib": resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss,
