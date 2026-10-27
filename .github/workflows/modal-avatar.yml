@@ -1,4 +1,4 @@
-name: PVS French Talking Avatar (LongCat)
+name: PVS English Portrait Avatar Pilot (LongCat)
 # Separate Modal app & volume; never touches legacy Studio IA resources.
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: pvs-avatar-${{ github.ref }}
+  group: pvs-english-portrait-pilot-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   avatar:
@@ -56,24 +56,36 @@ jobs:
       - name: Install voice tools only when needed, without apt
         if: ${{ env.STAGE == 'voice' || env.STAGE == 'render' }}
         run: |
-          pip install edge-tts==7.3.1 imageio-ffmpeg==0.6.0
+          pip install imageio-ffmpeg==0.6.0
           mkdir -p "$RUNNER_TEMP/pvs-bin"
           ln -sf "$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')" "$RUNNER_TEMP/pvs-bin/ffmpeg"
           echo "$RUNNER_TEMP/pvs-bin" >> "$GITHUB_PATH"
-      - name: Generate a short French demo voice (no avatar GPU)
+      - name: Prepare EXACT creator photo and 3.4s source-voice pilot (CPU only)
         if: ${{ env.STAGE == 'voice' || env.STAGE == 'render' }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p artifacts
-          edge-tts --voice fr-FR-HenriNeural --text "L'IA peut automatiser vos tâches, dès aujourd'hui." --write-media artifacts/voice_fr.mp3
-          ffmpeg -hide_banner -loglevel error -y -i artifacts/voice_fr.mp3 -ac 1 -ar 16000 -c:a pcm_s16le artifacts/voice_fr.wav
+          ASSETS="content/productions/english-talking-head-20261027/assets"
+          test -s "$ASSETS/portrait.jpg" && test -s "$ASSETS/voice.mp3"
+          # Center the square photograph in a neutral vertical matte; NO face distortion.
+          ffmpeg -hide_banner -loglevel error -y -i "$ASSETS/portrait.jpg" \
+            -vf "scale=720:720:flags=lanczos,pad=720:1280:0:280:color=0xd8d8d8" \
+            -frames:v 1 artifacts/portrait_pilot.png
+          # Pilot only; preserve the exact natural timing of this audio portion.
+          ffmpeg -hide_banner -loglevel error -y -i "$ASSETS/voice.mp3" \
+            -t 3.4 -ac 1 -ar 16000 -c:a pcm_s16le artifacts/voice_pilot.wav
           python - <<'PY'
-          import wave
-          with wave.open("artifacts/voice_fr.wav","rb") as f:
-              duration=f.getnframes()/f.getframerate()
-              print(f"French TTS WAV: {duration:.2f}s, {f.getframerate()} Hz")
-              if not 1 < duration < 8: raise RuntimeError("unexpected speech duration")
+          from pathlib import Path
+          import wave, hashlib
+          p=Path("artifacts/voice_pilot.wav")
+          with wave.open(str(p), "rb") as w:
+              duration=w.getnframes()/w.getframerate()
+              assert w.getnchannels()==1 and w.getframerate()==16000 and w.getsampwidth()==2
+              assert 3.2 < duration < 3.6
+          assert Path("artifacts/portrait_pilot.png").read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+          print(f"Pilot duration: {duration:.3f}s; SOURCE PHOTO sha256: {hashlib.sha256(Path('content/productions/english-talking-head-20261027/assets/portrait.jpg').read_bytes()).hexdigest()}")
+          print(f"Source audio sha256: {hashlib.sha256(Path('content/productions/english-talking-head-20261027/assets/voice.mp3').read_bytes()).hexdigest()}")
           PY
       - name: Check account (no secret values in output)
         if: ${{ env.STAGE == 'prepare' || env.STAGE == 'doctor' || env.STAGE == 'render' }}
@@ -89,14 +101,30 @@ jobs:
       - name: Doctor LongCat weights (CPU only)
         if: ${{ env.STAGE == 'doctor' }}
         run: modal run -m deploy.modal_avatar_models --mode doctor
-      - name: Generate real speaking French avatar on NEW Modal app
+      - name: Generate ONE real creator talking-head pilot on existing Modal LongCat
         if: ${{ env.STAGE == 'render' }}
         run: |
           modal run -m deploy.modal_avatar_models --mode doctor
           modal run -m deploy.modal_avatar_worker --mode render \
-            --image-png benchmark_assets/character_reference.png \
-            --audio-wav artifacts/voice_fr.wav \
-            --out artifacts/longcat_avatar_fr.mp4
+            --image-png artifacts/portrait_pilot.png \
+            --audio-wav artifacts/voice_pilot.wav \
+            --out artifacts/english_pilot.mp4 \
+            --prompt "Photorealistic adult man from the supplied photo, same facial identity and blue shirt, looking into the lens while speaking English naturally. Natural lip-sync to the exact supplied audio, subtle head motions and blinks, neutral grey backdrop, ordinary self-recorded video realism. No aesthetic changes, no stylization."
+      - name: Validate REAL MP4 streams and pilot duration
+        if: ${{ env.STAGE == 'render' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s artifacts/english_pilot.mp4
+          ffprobe -v error -show_entries stream=codec_type,codec_name -show_entries format=duration -of json artifacts/english_pilot.mp4 > artifacts/english_pilot_ffprobe.json
+          python - <<'PY'
+          import json
+          d=json.load(open("artifacts/english_pilot_ffprobe.json"))
+          types={s["codec_type"] for s in d["streams"]}
+          duration=float(d["format"]["duration"])
+          assert "video" in types and "audio" in types and 2.9 <= duration <= 4.3,(types,duration)
+          print("REAL pilot MP4 validated:",types,duration)
+          PY
       - name: Retrieve the existing real MP4 without another GPU render
         if: ${{ env.STAGE == 'collect' }}
         run: |
@@ -105,19 +133,22 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: pvs-avatar-${{ github.run_number }}
-          path: artifacts/
+          name: pvs-english-pilot-${{ github.run_number }}
+          path: |
+            artifacts/english_pilot.mp4
+            artifacts/english_pilot.json
+            artifacts/english_pilot_ffprobe.json
           retention-days: 30
           if-no-files-found: ignore
       - name: Report actual result only
         if: always()
         shell: bash
         run: |
-          echo "### LongCat French Avatar" >> "$GITHUB_STEP_SUMMARY"
+          echo "### LongCat English Portrait 3.4s Pilot" >> "$GITHUB_STEP_SUMMARY"
           echo "- stage: $STAGE" >> "$GITHUB_STEP_SUMMARY"
           echo "- workspace expected: kulejean567" >> "$GITHUB_STEP_SUMMARY"
-          if test -s artifacts/longcat_avatar_fr.mp4; then
-            echo "- real MP4: generated (see Artifacts)" >> "$GITHUB_STEP_SUMMARY"
+          if test -s artifacts/english_pilot.mp4; then
+            echo "- REAL PILOT MP4: generated (see Artifacts). Human lip-sync/identity QC still required." >> "$GITHUB_STEP_SUMMARY"
           elif [[ "$STAGE" == "render" ]]; then
-            echo "- MP4: NOT generated; see job log" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Pilot MP4: NOT generated; see job log" >> "$GITHUB_STEP_SUMMARY"
           fi
