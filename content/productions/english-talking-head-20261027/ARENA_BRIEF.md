@@ -5,11 +5,11 @@ Produce one **real generated MP4**, depicting the person shown in the creator-pr
 
 **Do not modify the production engine, deploy infrastructure, or unrelated code merely to improve this one asset.** Audit the current engine and use an already working, proven route. Do not claim successful rendering without a downloadable playable MP4 and a verified QC report.
 
-## Source files (required, NOT COMMITTED)
-- `assets/portrait.jpg`: source provided by creator, 1600 x 1600 JPEG.
-- `assets/voice.mp3`: source provided by creator, mono MP3 44.1 kHz/128 kbps, **11.729 seconds**.
-- These two private media files exist in the originating ChatGPT conversation **but are not yet available in this Git branch**. They must be supplied via an appropriate private channel before rendering. **Do not silently substitute any other image or audio.**
-- Repository is currently **public**: do not commit portrait, voice, any derived face/voice media or generated output to this public repository without the creator expressly accepting public disclosure. Prefer a secure private asset store or a private repository, with expiring signed URLs and no credentials in logs.
+## Source files (verified and committed to this production branch)
+- `assets/portrait.jpg`: creator-provided original JPEG, **123777 bytes**; Git blob SHA `7a027e76012449546f3c8f41348512fb17af10aa`.
+- `assets/voice.mp3`: creator-provided original MP3, **204318 bytes**, **11.729 seconds**; Git blob SHA `2159c910f30db2afe8b640d83b08d7c39cacb823`.
+- Both media files are **already available** in this branch under `content/productions/english-talking-head-20261027/assets/`. Their Git blob hashes have been checked against the original uploaded files. **Use them directly; do not substitute reference media.**
+- **Privacy notice:** this repository is public. The creator explicitly asked for these two media files to be placed here after being informed of public visibility. Do not expose additional personal assets or generated results without permission.
 
 ## Exact spoken copy
 > Not louder. Not faster. Just better. Crafted for the ones who notice the difference between good and unforgettable. This is for you.
@@ -25,7 +25,7 @@ Use the exact supplied voice track as the final audio. **No TTS, re-recording, c
 
 ## Execution procedure for Arena AI
 1. Inspect the latest repository branches and **actual tested** speaking-avatar solutions (LongCat + any newer approved-audio or image-to-video route). The published LongCat pilot is only proven for **3.72 s segments**; a 11.729 s result is **not** yet proven.
-2. Ensure reference media have been received privately and check hashes, dimensions, exact duration. If not, mark `BLOCKED_MISSING_MEDIA` and stop; do not render a stand-in.
+2. Ensure reference media have been received privately and check hashes, dimensions, exact duration. If they are unexpectedly absent, mark `BLOCKED_MISSING_MEDIA` and stop; do not render a stand-in.
 3. Check whether one continuous 11.729 s voice-driven generation is **really** supported. If not, split at real phonetic pauses, retain the original full audio timeline, render overlapping short segments and join without visual jumps or audio discontinuities. Avoid new infrastructure unless strictly necessary.
 4. Render one **cheap 2-3 s lip-sync pilot** on a representative, lip-intensive phrase, listen and inspect face/mouth at normal speed. If unsuitable, stop GPU spending and report defect; avoid endless model tweaking.
 5. Upon pilot acceptance, render the complete 11.729 s clip, preserving identity/pose/voice, and produce a single standard H.264/AAC MP4.
