@@ -24,9 +24,10 @@ image = (
     modal.Image.from_registry(
         "nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04", add_python="3.11"
     )
-    .apt_install("ffmpeg", "libsndfile1", "libgomp1")
+    .apt_install("git", "ffmpeg", "libsndfile1", "libgomp1")
     .pip_install("torch==2.6.0", index_url="https://download.pytorch.org/whl/cu124")
-    .pip_install("chatterbox-tts", "torchaudio==2.6.0")
+    # Pin to the revision previously used and verified by this studio: supports t3_model="v3".
+    .pip_install("git+https://github.com/resemble-ai/chatterbox.git@5de7a54aa4e5e2baadb0182dde554908b48b85c2", "torchaudio==2.6.0")
 )
 
 
