@@ -172,10 +172,12 @@ jobs:
             echo "- Stage: $STAGE"
             echo "- Voice model: Chatterbox Multilingual V3, English, supplied MP3 used only as speaker reference"
             echo "- Voice similarity: NOT automatically verified; listen to voice_sample.wav and compare with the original reference"
-            if [[ "$STAGE" == voice_sample ]]; then
+            if [[ "$STAGE" == voice_sample && -s artifacts/voice_sample.wav ]]; then
               echo "- Private sample: Modal volume pvs-english-talking-head-private / english-talking-head-20261027/voice_sample.wav"
               echo "- Retrieve with: modal volume get pvs-english-talking-head-private english-talking-head-20261027/voice_sample.wav ./voice_sample.wav"
               echo "- Next step: listen to the sample and compare with the reference; dispatch render only if acceptable"
+            elif [[ "$STAGE" == voice_sample ]]; then
+              echo "- Voice sample: NOT GENERATED; inspect the failed step and do not approve avatar render"
             fi
             if [[ -s artifacts/english_talking_head.mp4 ]]; then
               echo "- MP4: generated; visual identity, lip-sync and temporal quality still require human review"
