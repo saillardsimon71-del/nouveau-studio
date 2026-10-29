@@ -1,5 +1,15 @@
 # Fruit City — Episode 04 : L'autre Durio
 
+## Premier lancement vérifié — 29 octobre 2026
+
+- Run GitHub Actions : https://github.com/saillardsimon71-del/nouveau-studio/actions/runs/40846790352
+- Résultat : storyboard 13 plans/65 s **validé** ; démarrage GPU **bloqué avant toute génération**.
+- Cause démontrée par les logs : le secret Modal présent dans **ce dépôt** authentifie encore le workspace `kulejean567`. La cible de production choisie est `lucj76861`.
+- Le changement des secrets effectué précédemment dans **UGCv2** ne les modifie pas dans `nouveau-studio` : chaque dépôt possède ses propres secrets.
+- Action requise : mettre à jour `MODAL_TOKEN_ID` et `MODAL_TOKEN_SECRET` sous `nouveau-studio → Settings → Secrets and variables → Actions` avec un token du workspace `lucj76861`, puis utiliser **Re-run all jobs** sur le run ci-dessus.
+- Le volume `studio-ltx25-models` et ses cinq fichiers ne seront contrôlés qu'après identification du bon compte. Aucun GPU n'a été lancé pendant ce premier run.
+
+
 **Format :** TikTok/Reels/Shorts 9:16 • **durée :** 65 s (13 × 5 s) • **langue :** français • **diffusion :** aucune publication automatique.
 
 ## Vérification de la création des images
