@@ -1,0 +1,115 @@
+name: Fruit City | Episode 04 - L'autre Durio - 65s LTX
+
+on:
+  push:
+    branches: ['production/fruit-city-episode-04-20261029']
+    paths:
+      - 'production/fruit-city-ep04/TRIGGER_RENDER.txt'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fruit-city-episode-04-20261029
+  cancel-in-progress: false
+
+jobs:
+  produce_episode:
+    if: ${{ github.event_name == 'push' && github.event.head_commit.message == 'RUN_FRUIT_CITY_EP04_ONCE_20261029' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PYTHONUNBUFFERED: '1'
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+      MODAL_WORKSPACE_EXPECTED: lucj76861
+      PVS_MODAL_APP: pvs-ltx
+      PVS_MODAL_LTX_VOLUME: studio-ltx25-models
+      PVS_MODAL_GPU: L40S
+      PVS_ALLOW_MOCK: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate 65-second original storyboard without GPU
+        run: |
+          python -m py_compile scripts/production/fruit_city_ep04.py
+          python scripts/production/fruit_city_ep04.py preflight --out artifacts
+          test -s artifacts/episode-04-storyboard.json
+      - name: Save storyboard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fruit-City-E04-Storyboard-65s
+          path: artifacts/episode-04-storyboard.json
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Verify intentional run marker and existing credentials (no GPU)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(cat production/fruit-city-ep04/TRIGGER_RENDER.txt)" = "APPROVED_GPU_RENDER_EP04_20261029"
+          test -n "${MODAL_TOKEN_ID:-}" && test -n "${MODAL_TOKEN_SECRET:-}" || { echo "::error::Missing Modal GitHub Actions secrets"; exit 1; }
+          [[ "$MODAL_TOKEN_ID" =~ ^ak-[A-Za-z0-9_-]+$ ]] || { echo "::error::Invalid Modal token id format"; exit 1; }
+          [[ "$MODAL_TOKEN_SECRET" =~ ^as-[A-Za-z0-9_-]+$ ]] || { echo "::error::Invalid Modal token secret format"; exit 1; }
+      - name: Install Modal CLI (CPU only)
+        run: python -m pip install --disable-pip-version-check "modal>=1.0,<2"
+      - name: Verify Modal account and LTX model volume before paid GPU
+        shell: bash
+        run: |
+          set -euo pipefail
+          modal token info > "$RUNNER_TEMP/modal-identity.txt" 2>&1 || { echo "::error::Modal authentication failed"; rm -f "$RUNNER_TEMP/modal-identity.txt"; exit 1; }
+          workspace=$(sed -E 's/\[[^]]*\]//g' "$RUNNER_TEMP/modal-identity.txt" | sed -n 's/^Workspace:[[:space:]]*\([^[:space:](]*\).*/\1/p' | head -n1)
+          rm -f "$RUNNER_TEMP/modal-identity.txt"
+          test "$workspace" = "$MODAL_WORKSPACE_EXPECTED" || { echo "::error::Wrong Modal workspace: expected $MODAL_WORKSPACE_EXPECTED, found ${workspace:-unknown}. No GPU started."; exit 1; }
+          modal volume list > "$RUNNER_TEMP/volumes.txt"
+          grep -q "$PVS_MODAL_LTX_VOLUME" "$RUNNER_TEMP/volumes.txt" || { echo "::error::Missing LTX volume, no GPU started."; exit 1; }
+          modal volume ls "$PVS_MODAL_LTX_VOLUME" diffusion_models > "$RUNNER_TEMP/unet.txt"
+          modal volume ls "$PVS_MODAL_LTX_VOLUME" text_encoders > "$RUNNER_TEMP/clip.txt"
+          modal volume ls "$PVS_MODAL_LTX_VOLUME" vae > "$RUNNER_TEMP/vae.txt"
+          modal volume ls "$PVS_MODAL_LTX_VOLUME" latent_upscale_models > "$RUNNER_TEMP/upscaler.txt"
+          grep -q 'ltx-2.5-22b-distilled-transformer-comfy-int8-convrot.safetensors' "$RUNNER_TEMP/unet.txt"
+          grep -q 'gemma4-12b-with-proj-ltx-2.5-comfy-int8-convrot.safetensors' "$RUNNER_TEMP/clip.txt"
+          grep -q 'ltx-2.5-video-vae-conv-bf16.safetensors' "$RUNNER_TEMP/vae.txt"
+          grep -q 'ltx-2.5-audio-vae-bf16.safetensors' "$RUNNER_TEMP/vae.txt"
+          grep -q 'ltx-2.5-latent-spatial-upscaler-x2-bf16-1.0.safetensors' "$RUNNER_TEMP/upscaler.txt"
+          echo "Modal workspace and five LTX weights validated before any GPU render"
+      - name: Install editing voice and subtitle tools (CPU only)
+        run: |
+          python -m pip install --disable-pip-version-check 'edge-tts>=7.0,<8.0' 'pydub>=0.25,<0.26'
+          if ! command -v ffmpeg >/dev/null || ! command -v espeak-ng >/dev/null || ! test -f /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf; then
+            timeout 180s sudo apt-get update -qq
+            timeout 180s sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
+          fi
+      - name: Render 13 real five-second LTX shots on Modal
+        run: python scripts/production/fruit_city_ep04.py render --out artifacts
+      - name: Preserve available raw MP4 clips and generation metadata even on errors
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fruit-City-E04-Raw-LTX-13-Shots
+          path: artifacts/clips/
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Assemble French dialogue ambient sound captions and final MP4
+        run: python scripts/production/fruit_city_ep04.py assemble --out artifacts
+      - name: Publish final MP4 and SRT poster quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fruit-City-E04-Final-65s
+          path: artifacts/exports/
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: Report verified delivery only
+        if: always()
+        run: |
+          echo "### Fruit City Episode 4 — L'autre Durio" >> "$GITHUB_STEP_SUMMARY"
+          echo "13 x 5 seconds / 65 seconds / 9:16 / LTX-2.5 / French voices / SRT / private review" >> "$GITHUB_STEP_SUMMARY"
+          echo "Expected Modal workspace: $MODAL_WORKSPACE_EXPECTED" >> "$GITHUB_STEP_SUMMARY"
+          if test -s artifacts/exports/Fruit-City-Durian-en-Prison-Episode-04.mp4; then
+            echo "✅ MP4 produced. Check continuity and audio before posting." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "⚠️ MP4 absent; inspect the failing step and raw artifacts." >> "$GITHUB_STEP_SUMMARY"
+          fi
