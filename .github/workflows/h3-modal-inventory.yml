@@ -1,0 +1,51 @@
+name: H3 Modal inventory (no render)
+on:
+  push:
+    branches:
+      - diagnostics/h3-modal-inventory-20261113
+permissions:
+  contents: read
+jobs:
+  h3-modal-readonly-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -q modal==1.6.2
+      - name: Verify old H3 deployment and volume metadata only
+        env:
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+        run: |
+          python - <<'PY'
+          import os
+          import modal
+
+          if not (os.environ.get("MODAL_TOKEN_ID") and os.environ.get("MODAL_TOKEN_SECRET")):
+              print("MODAL_TOKEN_MISSING")
+              raise SystemExit(1)
+          for name in ("render_clip", "render_batch"):
+              try:
+                  handle = modal.Function.from_name("pvs-minimax-h3", name, environment_name="main")
+                  handle.hydrate()
+              except Exception as exc:
+                  print("H3_FUNCTION", name, "UNAVAILABLE", type(exc).__name__)
+              else:
+                  print("H3_FUNCTION", name, "FOUND")
+          volume = modal.Volume.from_name("pvs-minimax-h3-models", environment_name="main")
+          for folder, filename in (
+              ("diffusion_models", "minimax_h3_fl2va_pruned_int8_convrot.safetensors"),
+              ("text_encoders", "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors"),
+              ("vae", "minimax_h3_video_vae_int8_convrot.safetensors"),
+              ("vae", "minimax_h3_audio_vae_fp32.safetensors"),
+          ):
+              try:
+                  entries = volume.listdir(folder)
+              except Exception as exc:
+                  print("H3_WEIGHT", filename, "UNVERIFIED", type(exc).__name__)
+              else:
+                  found = next((entry for entry in entries if entry.path.rsplit("/", 1)[-1] == filename), None)
+                  print("H3_WEIGHT", filename, "FOUND" if found else "ABSENT", getattr(found, "size", None))
+          PY
