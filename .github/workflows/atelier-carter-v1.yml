@@ -1,0 +1,50 @@
+name: TerrainIA Atelier Carter - one H3 pilot
+on:
+  push:
+    branches: [diagnostics/h3-modal-inventory-20261113]
+permissions:
+  contents: read
+jobs:
+  render-comparison:
+    if: github.event.head_commit.message == 'Run one H3 ASMR motorcycle engine cover pilot'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -q modal==1.6.2 cryptography Pillow imageio-ffmpeg==0.6.0
+      - name: Verify graph contract without GPU
+        run: |
+          python -m py_compile pilots/atelier-carter-v1/run.py pilots/atelier-carter-v1/worker.py
+          PYTHONPATH=pilots/atelier-carter-v1 python - <<'PY'
+          from worker import build_graph
+          g = build_graph(dict(width=576,height=1024,frames=124,steps=20,seed=128023,prompt="check"),"one.png","test")
+          assert g["104"]["inputs"]["first_frame"] == ["1",0]
+          assert "last_frame" not in g["104"]["inputs"]
+          assert g["91"]["inputs"]["audio"] == ["23",0]
+          assert g["9"]["inputs"]["steps"] == 20
+          PY
+      - name: Render one carter pilot with native H3 audio
+        env:
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+        run: python -u pilots/atelier-carter-v1/run.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: atelier-carter-encrypted-result
+          path: build/atelier-carter/result.encrypted
+          if-no-files-found: error
+          retention-days: 5
+      - name: Remove one-shot input decryption key
+        if: always()
+        env:
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+        run: |
+          python - <<'PY'
+          import modal
+          modal.Dict.objects.delete("terrainia-h3-pilot-20261113-transport", environment_name="main", allow_missing=True)
+          PY
