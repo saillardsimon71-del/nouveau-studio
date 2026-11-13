@@ -155,7 +155,7 @@ def wait_video(task_id: str, prefix: str, proc: subprocess.Popen) -> Path:
 
 
 @app.function(image=gpu_image, gpu="L40S", cpu=8, memory=65536, timeout=2300,
-              scaledown_window=2, max_containers=1, retries=0,
+              scaledown_window=2, max_containers=1,
               volumes={str(MOUNT): VOLUME})
 def render_pilot(first_png: bytes, prompt: str, seeds: list[int]):
     if len(seeds) != 3 or len(set(seeds)) != 3:
