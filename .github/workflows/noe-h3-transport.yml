@@ -1,0 +1,33 @@
+name: Noe H3 private transport setup
+on:
+  push:
+    branches: [pilot/noe-h3-locked-audio]
+permissions:
+  contents: read
+jobs:
+  transport-setup:
+    if: github.event.head_commit.message == 'Prepare private transport for one Noe H3 audio guide test'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -q modal==1.6.2 cryptography
+      - name: Prepare key in the existing private Modal workspace
+        env:
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+        run: |
+          python - <<'PY'
+          import base64
+          import modal
+          from cryptography.hazmat.primitives import serialization
+          from cryptography.hazmat.primitives.asymmetric import rsa
+          key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+          private = key.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption())
+          public = key.public_key().public_bytes(serialization.Encoding.PEM, serialization.PublicFormat.SubjectPublicKeyInfo)
+          d = modal.Dict.from_name("terrainia-noe-h3-guide-20261114", environment_name="main", create_if_missing=True)
+          d["private_key"] = private
+          print("H3_TRANSPORT_PUBLIC_KEY=" + base64.b64encode(public).decode())
+          PY
