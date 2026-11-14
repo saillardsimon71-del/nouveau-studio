@@ -1,5 +1,6 @@
 """One private H3 audio-guided comparison, returning silent video only."""
-import base64, hashlib, io, json, os
+import base64, hashlib, io, json, os, subprocess, tempfile
+import imageio_ffmpeg
 from pathlib import Path
 from zipfile import ZipFile
 import modal
@@ -23,7 +24,7 @@ def main():
     image=base64.b64decode(data["portrait"],validate=True)
     audio=base64.b64decode(data["guide"],validate=True)
     check(image,"c36c7c45191e0e7411f4be131325dc0d2aa97dba788410334995b1b8ee252743")
-    check(audio,"558a1e7e796ddc94dce5e09c8a7302f0ef59881e76fabf4049c231ce07b92d9b")
+    check(audio,"8542e2ff83235c0c324634f0ed64a79ef4aea85cea389a33537b6028651d95a0")
     png=io.BytesIO()
     with Image.open(io.BytesIO(image)) as im:
         im.convert("RGB").save(png,format="PNG")
@@ -41,6 +42,13 @@ def main():
             raise
     check(raw,receipt["raw_sha256"])
     check(audio,receipt["audio_guide_sha256"])
+    with tempfile.TemporaryDirectory() as td:
+        src,dest=Path(td)/"native.mp4",Path(td)/"picture.mp4"
+        src.write_bytes(raw)
+        subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(),"-v","error","-y","-i",str(src),
+                        "-map","0:v:0","-an","-c:v","copy",str(dest)],check=True,timeout=60)
+        raw=dest.read_bytes()
+    receipt["silent_sha256"]=hashlib.sha256(raw).hexdigest()
     archive=io.BytesIO()
     with ZipFile(archive,"w") as z:
         z.writestr("h3-presenter.mp4",raw)

@@ -161,15 +161,18 @@ def render_comparison(first_png: bytes, audio_wav: bytes, prompt: str) -> tuple[
     started = time.monotonic()
     proc = None
     audio_path = None
+    stage = "boot"
     try:
         proc = start_comfy()
+        stage = "portrait"
         first = upload_png(first_png)
-        if not audio_wav.startswith(b"RIFF") or len(audio_wav) > 450000:
+        if not audio_wav.startswith(b"RIFF") or len(audio_wav) > 750000:
             raise ValueError("Expected short original audio guide")
         audio_name = "noe-guide-" + uuid.uuid4().hex + ".wav"
         audio_path = COMFY / "input" / audio_name
         audio_path.parent.mkdir(exist_ok=True, parents=True)
         audio_path.write_bytes(audio_wav)
+        stage = "graph_validation"
         req = {"width": 1280, "height": 720, "frames": 141, "seed": 128022, "steps": 20, "prompt": prompt}
         prefix = "terrainia-h3-" + uuid.uuid4().hex[:12]
         graph = build_graph(req, first, prefix)
@@ -178,12 +181,19 @@ def render_comparison(first_png: bytes, audio_wav: bytes, prompt: str) -> tuple[
             "positive":["104",0],"latent":["104",1],"audio_vae":["24",0],
             "audio":["105",0],"frame_idx":0}}
         graph["16"]["inputs"]["conditioning"]=["106",0]
-        graph["91"]["inputs"].pop("audio")
-        del graph["23"]
+        # Keep the documented CreateVideo AV graph. The source guide is remuxed only during review.
         assert graph["104"]["inputs"]["first_frame"] == ["1", 0]
         assert graph["106"]["inputs"]["frame_idx"] == 0
-        reply = http_json("/prompt", {"prompt": graph, "client_id": "terrainia-h3-pilot"}, timeout=60)
+        try:
+            reply = http_json("/prompt", {"prompt": graph, "client_id": "terrainia-h3-pilot"}, timeout=60)
+        except urllib.error.HTTPError as err:
+            obj = json.loads(err.read())
+            failures = {k:[x.get("type","unknown") for x in v.get("errors",[])]
+                        for k,v in obj.get("node_errors",{}).items()}
+            raise RuntimeError(f"HTTP {err.code}, rejected nodes {failures}") from None
+        stage = "sampling"
         out = wait_video(str(reply["prompt_id"]), prefix, proc)
+        stage = "result"
         raw = out.read_bytes()
         if not 0 < len(raw) < 24 * 1024 * 1024:
             raise ValueError("Unexpected H3 video size")
@@ -203,7 +213,15 @@ def render_comparison(first_png: bytes, audio_wav: bytes, prompt: str) -> tuple[
         return raw, metadata
     except Exception as exc:
         # Only report exception type and stage. A model message can contain the private prompt.
-        raise RuntimeError(f"H3 worker failed: {type(exc).__name__}") from None
+        safe = str(exc)
+        if stage == "graph_validation" and safe.startswith("HTTP "):
+            detail = safe[:300]
+        elif stage == "sampling":
+            detail = next((word for word in ("CUDA out of memory","shape","dimension","channel","expected","device","not found")
+                           if word.lower() in safe.lower()),"no recognized hint")
+        else:
+            detail = "no private input logged"
+        raise RuntimeError(f"H3 {stage}: {type(exc).__name__} ({detail})") from None
     finally:
         if audio_path is not None:
             audio_path.unlink(missing_ok=True)
