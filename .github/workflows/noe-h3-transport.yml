@@ -1,4 +1,4 @@
-name: Noe H3 private transport setup
+name: H3 private comparison transport setup
 on:
   push:
     branches: [pilot/noe-h3-locked-audio]
@@ -6,7 +6,7 @@ permissions:
   contents: read
 jobs:
   transport-setup:
-    if: github.event.head_commit.message == 'Prepare a fresh ephemeral key for Noe H3 retry'
+    if: github.event.head_commit.message == 'Prepare transport for the aligned Noe H3 canvas'
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     steps:
