@@ -6,7 +6,7 @@ permissions:
   contents: read
 jobs:
   transport-setup:
-    if: github.event.head_commit.message == 'Prepare private transport for one Noe H3 audio guide test'
+    if: github.event.head_commit.message == 'Prepare a fresh ephemeral key for Noe H3 retry'
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     steps:
