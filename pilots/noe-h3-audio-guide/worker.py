@@ -173,7 +173,7 @@ def render_comparison(first_png: bytes, audio_wav: bytes, prompt: str) -> tuple[
         audio_path.parent.mkdir(exist_ok=True, parents=True)
         audio_path.write_bytes(audio_wav)
         stage = "graph_validation"
-        req = {"width": 1280, "height": 720, "frames": 141, "seed": 128022, "steps": 20, "prompt": prompt}
+        req = {"width": 1280, "height": 704, "frames": 141, "seed": 128022, "steps": 20, "prompt": prompt}
         prefix = "terrainia-h3-" + uuid.uuid4().hex[:12]
         graph = build_graph(req, first, prefix)
         graph["105"] = {"class_type":"LoadAudio","inputs":{"audio":audio_name}}
@@ -217,8 +217,11 @@ def render_comparison(first_png: bytes, audio_wav: bytes, prompt: str) -> tuple[
         if stage == "graph_validation" and safe.startswith("HTTP "):
             detail = safe[:300]
         elif stage == "sampling":
+            import re
+            signatures = re.findall(r"(?:\[(?:\d+[ ,]*)+\]|(?<![A-Za-z])\d{1,5}x\d{1,5})",safe)
             detail = next((word for word in ("CUDA out of memory","shape","dimension","channel","expected","device","not found")
                            if word.lower() in safe.lower()),"no recognized hint")
+            detail += "; tensor sizes " + ",".join(signatures[:8])
         else:
             detail = "no private input logged"
         raise RuntimeError(f"H3 {stage}: {type(exc).__name__} ({detail})") from None

@@ -7,7 +7,7 @@ permissions:
   contents: read
 jobs:
   render:
-    if: github.event.head_commit.message == 'Retry Noe H3 once with staged audio and safe diagnostics' && github.run_attempt == 1
+    if: github.event.head_commit.message == 'Render the aligned-canvas Noe H3 audio-guide sample' && github.run_attempt == 1
     runs-on: ubuntu-24.04
     timeout-minutes: 26
     steps:
