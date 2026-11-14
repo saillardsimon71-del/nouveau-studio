@@ -1,0 +1,37 @@
+name: Terrain IA private MiniMax H3 presenter audio guide
+on:
+  push:
+    branches: [pilot/noe-h3-locked-audio]
+    paths: [pilots/noe-h3-audio-guide/input.encrypted]
+permissions:
+  contents: read
+jobs:
+  render:
+    if: github.event.head_commit.message == 'Run one private MiniMax H3 Noe audio guide comparison' && github.run_attempt == 1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -q modal==1.6.2 cryptography Pillow
+      - name: Verify graph and launch one private H3 attempt
+        env:
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+        run: |
+          python -m py_compile pilots/noe-h3-audio-guide/worker.py pilots/noe-h3-audio-guide/run.py
+          python -u pilots/noe-h3-audio-guide/run.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: noe-h3-encrypted-review
+          path: build/noe-h3-result.encrypted
+          if-no-files-found: error
+          retention-days: 5
+      - name: Remove the ephemeral input key
+        if: always()
+        env:
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+        run: python -c 'import modal; modal.Dict.objects.delete("terrainia-noe-h3-guide-20261114", environment_name="main", allow_missing=True)'
